@@ -542,22 +542,53 @@ async function deleteFile(fileType) {
         clearRescoutTable();
       } else if (fileType === 'pitFile') {
         pitScoutingData = [];
+        
+        const currentTeam = document.getElementById('teamSearch').value.trim();
+        if (currentTeam) {
+          const teamData = filterTeamData(currentTeam);
+          if (teamData.length > 0) {
+            renderTeamStatistics(teamData, []); 
+          }
+        }
+
+        const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
+        const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
+
+        if (comparisonTeam1) {
+          const team1Data = filterTeamData(comparisonTeam1);
+          if (team1Data.length > 0) {
+            renderComparisonTeamStatistics(team1Data, [], 1);
+          }
+        }
+
+        if (comparisonTeam2) {
+          const team2Data = filterTeamData(comparisonTeam2);
+          if (team2Data.length > 0) {
+            renderComparisonTeamStatistics(team2Data, [], 2);
+          }
+        }
       }
     } else {
       document.getElementById(fileInputId).value = '';
       document.getElementById(statusId).textContent = 'File deleted successfully';
-      clearAllCharts();
-      clearRescoutTable();
-      pitScoutingData = [];
-
+      
+      if (fileType === 'dataFile') {
+        clearAllCharts();
+        clearRescoutTable();
+      } else if (fileType === 'pitFile') {
+        pitScoutingData = [];
+      }
     }
   } catch (error) {
     document.getElementById(fileInputId).value = '';
     document.getElementById(statusId).textContent = 'File deleted successfully';
-    clearAllCharts();
-    clearRescoutTable();
-    pitScoutingData = [];
-
+    
+    if (fileType === 'dataFile') {
+      clearAllCharts();
+      clearRescoutTable();
+    } else if (fileType === 'pitFile') {
+      pitScoutingData = [];
+    }
   }
 }
 
@@ -1704,6 +1735,10 @@ function filterAndRenderCharts(filterValue) {
     autoFilteredData = autoFilteredData.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
     autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   if (autoFilteredData.length === 0) {
@@ -1715,10 +1750,8 @@ function filterAndRenderCharts(filterValue) {
 
   renderTeleCharts(filteredData);
   renderEndGameChart(filteredData);
-
   renderTeleAlgaeChartFiltered(filteredData, algaeFilter);
 }
-
 function syncDropdowns(value) {
   document.querySelectorAll('#startingPositionFilter').forEach(dropdown => {
     dropdown.value = value;
@@ -1791,6 +1824,10 @@ function getMaxAutoCoral(team1Data, team2Data, filterValue = 'all') {
     filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
     filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   let max = 0;
@@ -1814,6 +1851,10 @@ function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
     filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
     filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   let max = 0;
@@ -2541,6 +2582,10 @@ function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxCoral = nu
     filteredData = filteredData.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
     filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   const dataToUse = filterValue === 'all' ? teamData : filteredData;
