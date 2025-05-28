@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shark Scout</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="images/app_logo.png" />
+</head>
+
+<body>
+  <!--SIDEBAR CONTENT-->
+  <div class="sidebar" style="position: relative;">
+    <h2>SharkScout</h2>
+    <div class="tab active" onclick="showTab(event, 'overview')">Overview</div>
+    <div class="tab" onclick="showTab(event, 'individual')">Individual View</div>
+    <div class="tab" onclick="showTab(event, 'comparison')">Comparison View</div>
+    <div class="tab" onclick="showTab(event, 'filterTeams')">Filter Teams</div>
+    <div class="tab" onclick="showTab(event, 'matchPredictor')">Match Predictor</div>
+    <div class="tab" onclick="showTab(event, 'csvUpload')">CSV Upload</div>
+
+
+    <div id="latestMatchInfoSidebar"
+      style="color: #ccc; font-size: 14px; padding: 15px; position: absolute; bottom: 0; width: 100%; text-align: center;">
+      Data up till Q—
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!--OVERVIEW CONTENT-->
+
+    <div id="overview" class="tab-content active">
+      <div class="overview-header">
+        <h1>Overview</h1>
+        <div class="overview-search-bar">
+          <input type="text" id="overviewSearch" placeholder="Team Number" autocomplete="off" />
+          <button id="comparisonSearch" onclick="handleOverviewSearch()">Search</button>
+          <button class="clear-btn" style="    background-color: #ff1e1e; padding: 10px"onclick="clearOverviewSearch()">Clear</button>
+        </div>
+      </div>
+
+      <div id="overviewStackedChartContainer">
+        <div id="overviewStackedChartTitle">
+          <h3 class="chart-title" style="margin: 0;">EPA</h3>
+
+          <select id="chartFilterDropdown" class="dropdown">
+            <option value="all">All</option>
+            <option value="auto">Auto</option>
+            <option value="teleop">TeleOp</option>
+          </select>
+
+        </div>
+        <canvas id="overviewStackedChart"></canvas>
+      </div>
+
+      <div id="coralCyclesChartContainer" style="margin-top: 20px;">
+        <div id="coralCyclesChartTitle">
+          <h3 class="chart-title" style="margin: 0;">Coral Cycles</h3>
+        </div>
+        <canvas id="coralCyclesChart"></canvas>
+      </div>
+
+      <div id="algaeCyclesChartContainer" style="margin-top:20px">
+        <div id="algaeCyclesChartTitle">
+          <h3 class="chart-title" style="margin: 0;">Algae Cycles</h3>
+        </div>
+        <canvas id="algaeCyclesChart"></canvas>
+      </div>
+
+    </div>
+
+    <!--INDIVIDUAL CONTENT-->
+
+    <div id="individual" class="tab-content">
+      <div class="individual-header">
+        <h1>Individual View</h1>
+        <div id="teamSearchPlacement">
+          <input type="text" id="teamSearch" placeholder="Team Number" autocomplete="off" />
+          <button id="search">Search</button>
+        </div>
+      </div>
+
+      <div id="flaggedMatchesPlacement">
+        <div id="flaggedMatchesContainer">
+          <h3 class="chart-title"> 🚩 Flagged Matches</h3>
+          <div id="flaggedMatches">
+          </div>
+        </div>
+        <div id="statsContainer">
+          <div class="statsContainerText">
+            <h3>Climb & Robot Stats</h3>
+            <div class="statsText">
+              <p><strong>Climb Success:</strong> <span id="climbSuccessRate">0.00</span>%</p>
+              <p><strong>Robot Died:</strong> <span id="robotDiedRate">0.00</span>%</p>
+              <p><strong>Ground Barge:</strong> <span id="groundBarge">❌</span></p>
+              <p><strong>Ground Processor:</strong> <span id="groundProcessor">❌</span></p>
+            </div>
+          </div>
+          <div class="statsContainerText">
+            <h3>Averages</h3>
+            <div class="statsText">
+              <p><strong>Avg EPA:</strong> <span id="averageEPA">0.00</span></p>
+              <p><strong>Avg Coral:</strong> <span id="averageCoral">0.00</span></p>
+              <p><strong>Avg Algae:</strong> <span id="averageAlgae">0.00</span></p>
+              <p><strong>Defense Rank:</strong> <span id="defenseRank">N/A</span> <a href="#"
+                  onclick="showTab(event, 'defenseRankingInfo')">
+                  <img src="/images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                </a></p>
+            </div>
+          </div>
+          <div class="statsContainerText">
+            <h3>Peak Performance</h3>
+            <div class="statsText">
+              <p><strong>Max Coral:</strong> <span id="maxCoral">0</span> </p>
+              <p class="invidualMatchNumbers"></p><strong>Match: </strong><span id="maxCoralMatch">N/A</span></p>
+              <p><strong>Max Barge:</strong> <span id="maxAlgae">0</span></p>
+              <p class="invidualMatchNumbers"><strong>Match: </strong><span id="maxAlgaeMatch">N/A</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="individualViewChartsContainer">
+
+        <div id="coralChartsContainer">
+
+          <div id="autoCoralContainer" style="margin-top: 15px;">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Coral</h3>
+              <select id="startingPositionFilter">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoCoral"></canvas>
+          </div>
+
+          <div id="teleCoralContainer">
+            <div class="containerStyling">
+              <h3 class="chart-title">Tele Coral</h3>
+            </div>
+            <canvas id="teleCoral"></canvas>
+          </div>
+
+          <div id="endGameContainer">
+            <div class="containerStyling">
+              <h3 class="chart-title">End Game</h3>
+            </div>
+            <canvas id="endGame"></canvas>
+          </div>
+
+        </div>
+
+        <div id="algaeChartsContainer">
+          <div id="autoAlgaeContainer" style="margin-top: 15px;">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Algae</h3>
+              <select id="startingPositionFilter">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoAlgae"></canvas>
+          </div>
+          <div id="teleAlgaeContainer">
+            <div class="autoCharts">
+              <h3 class="chart-title">Tele Algae</h3>
+              <select id="algaeTypeFilter" class="dropdown">
+                <option value="all">All</option>
+                <option value="remove">Remove</option>
+                <option value="process">Process</option>
+                <option value="barge">Barge</option>
+              </select>
+            </div>
+            <canvas id="teleAlgae"></canvas>
+          </div>
+          <div id="scouterCommentsContainer">
+            <div class="containerStyling">
+              <h3 class="chart-title">Scouter Comments</h3>
+            </div>
+            <div id="scouterComments"
+              style="padding: 10px; background-color: #1C1E21; color: white; border-radius: 4px;">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="epaTrendChartContainer" style="position:relative;">
+        <h3 class="chart-title">EPA Trend</h3>
+        <label class="slider-toggle"
+          style="position: absolute; right: 20px; margin-bottom: 35px; font-style: italic; color: #ccc;">
+          <input type="checkbox" id="hideEPAAvg" checked>
+          <span class="slider"></span>
+          Show Average
+        </label>
+
+        <canvas id="epaTrendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- COMPARISON VIEW -->
+
+    <div id="comparison" class="tab-content">
+      <h1>Comparison View</h1>
+
+      <div class="comparison-grid">
+        <div class="comparison-half left-half">
+          <div class="search-bar">
+            <input type="text" id="comparisonSearch1" placeholder="Team Number 1" autocomplete="off" />
+            <button onclick="searchComparison(1)">Search</button>
+          </div>
+
+          <div id="teamStatsComparison1">
+            <div class="teamStatsFormatting">
+              <div class="teamStatsFormatting2">
+                <h3 class="statsContainerText">Climb & Robot Stats</h3>
+                <div class="statsText">
+                  <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate1">0.00</span>%</p>
+                  <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate1">0.00</span>%</p>
+                  <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge1"></span></p>
+                  <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor1"></span></p>
+                </div>
+              </div>
+              <div class="teamStatsFormatting2">
+                <h3 class="statsContainerText">Averages</h3>
+                <div class="statsText">
+                  <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA1">0.00</span></p>
+                  <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral1">0.00</span></p>
+                  <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae1">0.00</span></p>
+                  <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank1">N/A</span> <a href="#"
+                      onclick="showTab(event, 'defenseRankingInfo')">
+                      <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                    </a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="comparisionAutoCoral1">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Coral</h3>
+              <select id="startingPositionFilter1" class="dropdown comparison-filter"
+                onchange="syncDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoCoralTeam1"></canvas>
+          </div>
+
+          <div id="comparisonResultAlgae1">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Algae</h3>
+              <select id="startingPositionFilter1" class="dropdown comparison-filter"
+                onchange="syncDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoAlgaeTeam1"></canvas>
+          </div>
+
+          <div id="comparisonResultTeleCoral1">
+            <div class="comparisonTele">
+              <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
+              <canvas id="teleCoralTeam1"></canvas>
+            </div>
+          </div>
+
+          <div id="comparisonResultTeleAlgae1">
+            <div class="autoCharts">
+              <h3 class="chart-title">Tele Algae</h3>
+              <select id="algaeTypeFilter1" class="dropdown comparison-filter"
+                onchange="syncAlgaeDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="remove">Remove</option>
+                <option value="process">Process</option>
+                <option value="barge">Barge</option>
+              </select>
+            </div>
+            <canvas id="teleAlgaeTeam1"></canvas>
+          </div>
+
+          <div id="comparisonResultEndGame1">
+            <div class="comparisonTele">
+              <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
+              <canvas id="endGameTeam1"></canvas>
+            </div>
+          </div>
+
+          <div id="comparisonEPATrend1">
+            <div class="comparisonTele" style="position: relative;">
+              <h3 class="chart-title" style="margin-bottom: 10px;">EPA Trend</h3>
+              <label class="slider-toggle"
+                style="position: absolute; top: 2%; right: 15px; margin-bottom: 10px; font-style: italic; color: #ccc;">
+                <input type="checkbox" class="hideEPAAvgComparison" checked>
+                <span class="slider"></span>
+                Show Average
+              </label>
+
+              <canvas id="epaTrendTeam1"></canvas>
+            </div>
+          </div>
+
+          <div id="scouterCommentsContainer1">
+            <div class="containerStyling">
+              <h3 class="chart-title">Scouter Comments</h3>
+            </div>
+            <div id="scouterComments1">
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-half right-half">
+          <div class="search-bar">
+            <input type="text" id="comparisonSearch2" placeholder="Team Number 2" autocomplete="off" />
+            <button onclick="searchComparison(2)">Search</button>
+          </div>
+
+          <div id="teamStatsComparison2">
+            <div class="teamStatsFormatting">
+              <div class="teamStatsFormatting2">
+                <h3 class="statsContainerText">Climb & Robot Stats</h3>
+                <div class="statsText">
+                  <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate2">0.00</span>%</p>
+                  <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate2">0.00</span>%</p>
+                  <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge2"></span></p>
+                  <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor2"></span></p>
+                </div>
+              </div>
+              <div class="teamStatsFormatting2">
+                <h3 class="statsContainerText">Averages</h3>
+                <div class="statsText">
+                  <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA2">0.00</span></p>
+                  <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral2">0.00</span></p>
+                  <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae2">0.00</span></p>
+                  <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank2">N/A</span> <a href="#"
+                      onclick="showTab(event, 'defenseRankingInfo')">
+                      <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                    </a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="comparisionAutoCoral2">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Coral</h3>
+              <select id="startingPositionFilter2" class="dropdown comparison-filter"
+                onchange="syncDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoCoralTeam2"></canvas>
+          </div>
+
+          <div id="comparisonResultAlgae2">
+            <div class="autoCharts">
+              <h3 class="chart-title">Auto Algae</h3>
+              <select id="startingPositionFilter2" class="dropdown comparison-filter"
+                onchange="syncDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="side">Side</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+            <canvas id="autoAlgaeTeam2"></canvas>
+          </div>
+
+          <div id="comparisonResultTeleCoral2">
+            <div class="comparisonTele">
+              <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
+              <canvas id="teleCoralTeam2"></canvas>
+            </div>
+          </div>
+
+          <div id="comparisonResultTeleAlgae2">
+            <div class="autoCharts">
+              <h3 class="chart-title">Tele Algae</h3>
+              <select id="algaeTypeFilter2" class="dropdown comparison-filter"
+                onchange="syncAlgaeDropdownsAndFilter(this.value)">
+                <option value="all">All</option>
+                <option value="remove">Remove</option>
+                <option value="process">Process</option>
+                <option value="barge">Barge</option>
+              </select>
+            </div>
+            <canvas id="teleAlgaeTeam2"></canvas>
+          </div>
+
+          <div id="comparisonResultEndGame2">
+            <div class="comparisonTele">
+              <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
+              <canvas id="endGameTeam2"></canvas>
+            </div>
+          </div>
+
+          <div id="comparisonEPATrend2">
+            <div class="comparisonTele" style="position: relative;">
+              <h3 class="chart-title" style="margin-bottom: 10px;">EPA Trend</h3>
+              <label class="slider-toggle"
+                style="position: absolute; top: 2%; right: 15px; margin-bottom: 10px; font-style: italic; color: #ccc;">
+                <input type="checkbox" class="hideEPAAvgComparison" checked>
+                <span class="slider"></span>
+                Show Average
+              </label>
+
+              <canvas id="epaTrendTeam2"></canvas>
+            </div>
+          </div>
+
+          <div id="scouterCommentsContainer2">
+            <div class="containerStyling">
+              <h3 class="chart-title">Scouter Comments</h3>
+            </div>
+            <div id="scouterComments2">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!--FILTER VIEW-->
+
+    <div id="filterTeams" class="tab-content">
+      <h1>Filter Teams</h1>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; gap: 20px; align-items: flex-start;">
+
+          <div style="display: flex; flex-direction: column; flex: 1; gap: 20px;">
+            <div id="filterCheckboxesContainer">
+              <div class="filter-row-inline">
+                <div class="filter-group-inline">
+                  <h3>Auto</h3>
+                  <label class="checkbox-label"><input type="checkbox" value="centerAuto">Center</label>
+                </div>
+
+                <div class="filter-group-inline">
+                  <h3>Coral</h3>
+                  <label class="checkbox-label"><input type="checkbox" value="L4">L4</label>
+                  <label class="checkbox-label"><input type="checkbox" value="L3">L3</label>
+                  <label class="checkbox-label"><input type="checkbox" value="L2">L2</label>
+                  <label class="checkbox-label"><input type="checkbox" value="L1">L1</label>
+                </div>
+
+                <div class="filter-group-inline">
+                  <h3>Algae</h3>
+                  <label class="checkbox-label"><input type="checkbox" value="RemoveAlgae">Remove</label>
+                  <label class="checkbox-label"><input type="checkbox" value="BargeAlgae">Barge</label>
+                  <label class="checkbox-label"><input type="checkbox" value="ProcessorAlgae">Processor</label>
+                </div>
+
+                <div class="filter-group-inline">
+                  <h3>Robot</h3>
+                  <label class="checkbox-label"><input type="checkbox" value="groundBarge">Ground Barge</label>
+                  <label class="checkbox-label"><input type="checkbox" value="groundProcessor">Ground Processor</label>
+                  <label class="checkbox-label"><input type="checkbox" value="swerve">Swerve</label>
+                </div>
+
+                <div class="filter-group-inline">
+                  <h3>Other</h3>
+                  <label class="checkbox-label"><input type="checkbox" value="defense">Defense</label>
+                  <label class="checkbox-label"><input type="checkbox" value="deepClimb">Deep Climb</label>
+                  <label class="checkbox-label"><input type="checkbox" value="shallowClimb">Shallow Climb</label>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <label for="filterTeamsDropdown" style="color: white; font-family: 'Lato'; font-size: medium;">
+                    Rank By:
+                  </label>
+                  <select id="filterTeamsDropdown" class="dropdown" style="font-size: 16px;">
+                    <option value="EPA">EPA</option>
+                    <option value="avgCoral">Avg. Coral</option>
+                    <option value="maxCoral">Max. Coral</option>
+                    <option value="avgBarge">Avg. Barge</option>
+                    <option value="maxBarge">Max. Barge</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="rankedTeamsContainer" style="width: 100%;">
+              <div id="filteredInTeams" class="row"></div>
+              <hr class="team-section-divider">
+              <div id="filteredOutTeams" class="row"></div>
+            </div>
+
+          </div>
+
+          <div id="hideTeamBox"
+            style="flex: 0 0 230px; background-color: #1C1E21; border-radius: 12px; box-shadow: #131416 0px 0px 20px; padding: 20px;">
+            <h3 style="color: white; margin-bottom: 15px;">Hide Team</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <input type="text" id="hideTeamInput" placeholder="Team #"
+                style="flex: 1; padding: 8px; border-radius: 4px; background-color: #2a2d31; color: white; border: 1px solid #888888; font-family: 'Lato'; font-size: medium;">
+              <button id="addHideTeamButton">Add</button>
+            </div>
+            <div id="hideTeamListContainer"
+              style="max-height: 300px; overflow-y: auto; transition: max-height 0.3s ease;">
+              <ul id="hideTeamList"
+                style="list-style: none; padding: 0; margin: 0; color: white; font-family: 'Lato'; font-size: medium;">
+              </ul>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+              <button id="resetHideTeamButton" style="background-color: #ff1e1e;">Reset</button>
+              <button id="toggleHiddenTeamsButton">Show Hidden Teams</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!--MATCH PREDICTOR-->
+<!-- MATCH PREDICTOR TAB CONTENT -->
+    <div id="matchPredictor" class="tab-content">
+  <!-- Header and Predict Button -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1 style="margin: 0;">Match Predictor</h1>
+    <button onclick="renderMatchPredictor()" class="blue-button" style="padding: 8px 16px; min-width: 120px;">
+      Predict Match
+    </button>
+  </div>
+
+  <!-- Alliance Inputs -->
+<!-- In the match predictor tab content, modify the alliance input sections -->
+<div style="display: flex; gap: 20px; margin-bottom: 20px;">
+  <!-- Red Alliance -->
+  <div style="flex: 1; background-color: #1C1E21; border-radius: 8px; padding: 15px; position: relative;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h4 style="margin: 0; color: #ff5c5c;">Red Alliance</h4>
+      <button onclick="openAllianceComparison('red')" class="blue-button" style="padding: 4px 8px; font-size: 14px;">
+        View
+      </button>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <input type="text" id="redTeam1" placeholder="Red 1" class="team-input red-alliance" autocomplete="off" style="flex: 1;">
+      <input type="text" id="redTeam2" placeholder="Red 2" class="team-input red-alliance" autocomplete="off" style="flex: 1;">
+      <input type="text" id="redTeam3" placeholder="Red 3" class="team-input red-alliance" autocomplete="off" style="flex: 1;">
+    </div>
+  </div>
+
+  <!-- Blue Alliance -->
+  <div style="flex: 1; background-color: #1C1E21; border-radius: 8px; padding: 15px; position: relative;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h4 style="margin: 0; color: #3EDBF0;">Blue Alliance</h4>
+      <button onclick="openAllianceComparison('blue')" class="blue-button" style="padding: 4px 8px; font-size: 14px;">
+        View
+      </button>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <input type="text" id="blueTeam1" placeholder="Blue 1" class="team-input blue-alliance" autocomplete="off" style="flex: 1;">
+      <input type="text" id="blueTeam2" placeholder="Blue 2" class="team-input blue-alliance" autocomplete="off" style="flex: 1;">
+      <input type="text" id="blueTeam3" placeholder="Blue 3" class="team-input blue-alliance" autocomplete="off" style="flex: 1;">
+    </div>
+  </div>
+</div>
+  <!-- Match Summary Table -->
+
+  <!-- Prediction Result -->
+<div id="matchPredictionResult">
+    <div class="prediction-content">
+        <p style="color: #888; font-style: italic; margin: 0;">Enter teams and click "Predict Match"</p>
+    </div>
+</div>
+
+<div style="background-color: #1C1E21; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px;" onclick="toggleMatchSummaryTable()">
+        <img id="matchSummaryToggleArrow" src="images/down_arrow.png" alt="Toggle" style="width: 14px; height: 14px; transition: transform 0.3s ease;">
+        <h3 style="margin: 0; color: white; font-size: 16px;">Match Summary</h3>
+    </div>
+    <div id="matchSummaryTableContainer">
+        <table id="matchSummaryTable" style="width: 100%; border-collapse: collapse; color: white; margin-top: 10px;">
+            <thead>
+                <tr style="border-bottom: 2px solid #444;">
+                    <th style="padding: 8px; text-align: left;">Team</th>
+                    <th style="padding: 8px; text-align: center;">EPA</th>
+                    <th style="padding: 8px; text-align: center;"># of Cycles</th>
+                    <th style="padding: 8px; text-align: center;">Most Common</th>
+                    <th style="padding: 8px; text-align: center;">Second Common</th>
+                    <th style="padding: 8px; text-align: center;">Barge</th>
+                    <th style="padding: 8px; text-align: center;">Process</th>
+                    <th style="padding: 8px; text-align: center;">Climb Rate</th>
+                    <th style="padding: 8px; text-align: center;">Defense Rating</th>
+                    <th style="padding: 8px; text-align: center;">Defense Rank</th>
+                </tr>
+            </thead>
+            <tbody id="matchSummaryBody">
+                <!-- Will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+  
+  
+
+<!-- Stats Table with Toggle -->
+<div style="background-color: #1C1E21; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px;" onclick="toggleStatsTable()">
+        <img id="statsToggleArrow" src="images/down_arrow.png" alt="Toggle" style="width: 14px; height: 14px;">
+        <h3 style="margin: 0; color: white; font-size: 16px;">Team Statistics</h3>
+    </div>
+    <div id="matchStatsTableContainer">
+        <table id="matchStatsTable" style="width: 100%; border-collapse: collapse; color: white;">
+            <!-- Table will be populated by JavaScript -->
+        </table>
+    </div>
+</div>
+</div>  <!-- This closing div was missing -->
+
+    <!--CSV UPLOAD-->
+
+    <div id="csvUpload" class="tab-content">
+      <h1>CSV Upload</h1>
+
+      <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+          <div style="flex: 1; margin-right: 20px;">
+            <label for="dataFile">Event Scouting CSV:</label>
+            <div class="file-upload-container">
+              <input type="file" id="dataFile" name="dataFile" accept=".csv" />
+              <button type="submit" id="submitData" style="margin-left: 10px;">Upload</button>
+              <button type="button" class="delete-btn" onclick="deleteFile('dataFile')">Delete</button>
+            </div>
+            <div id="statusData"></div>
+
+            <label for="pitFile">Pit Scouting CSV:</label>
+            <div class="file-upload-container">
+              <input type="file" id="pitFile" name="dataFile" accept=".csv" />
+              <button type="submit" id="submitPit" style="margin-left: 10px;"> Upload</button>
+              <button type="button" class="delete-btn" onclick="deleteFile('pitFile')">Delete</button>
+            </div>
+            <div id="statusPit"></div>
+          </div>
+
+          <div style="flex: 0 0 300px; background-color: #1C1E21; border-radius: 12px; padding: 15px;">
+            <h3 style="color: white; margin-top: 0;">TBA Event Verification</h3>
+
+            <div style="margin-bottom: 10px;">
+              <label for="tbaEventKey" style="display: block; margin-bottom: 5px;">Event Key:</label>
+              <input type="text" id="tbaEventKey" placeholder="e.g. 2025mitry"
+                style="width: 100%; background-color: #2a2d31; border: 1px solid #888888;">
+            </div>
+
+            <div style="position: relative; margin-bottom: 10px;">
+              <button id="verifyWithTBABtn"
+                style="width: 100%; background-color: #1e90ff; border: none; font-size:16px; padding: 8px 0;">
+                Verify With TBA
+              </button>
+            </div>
+            <div id="tbaStatus" style="margin-top: 5px; color: #aaa; font-size: 12px; font-style: italic;"></div>
+
+            <div style="position: relative; margin-top: 10px;">
+              <div style="position: absolute; left: -25px; top: 50%; transform: translateY(-50%);">
+                <a href="#" onclick="showTab(event, 'updateClimbInfo')">
+                  <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                </a>
+              </div>
+              <button id="updateClimbsBtn"
+                style="width: 100%; background-color: #ff1e1e; border: none; font-size:16px; padding: 8px 0;">
+                Update Climbs
+              </button>
+            </div>
+            <div id="downloadStatus" style="margin-top: 5px; color: #aaa; font-size: 14px;"></div>
+          </div>
+
+        </div>
+      </form>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <h2 style="margin: 0;">Matches to Re-Scout</h2>
+          <select id="rescoutFilter" class="dropdown" style="font-size: 16px; margin-right:15px">
+            <option value="all">All</option>
+            <option value="climb">Climb</option>
+            <option value="coral">Coral</option>
+            <option value="others">Other</option>
+          </select>
+        </div>
+        <input type="checkbox" id="hideCoralMismatch">
+        <label id="hideCoralMismatchLabel" for="hideCoralMismatch">
+          Hide matches with &lt; 3 coral incorrect
+        </label>
+      </div>
+
+      <div id="rescoutSection" class="rescout-section">
+        <div class="rescout-table-container">
+          <table id="rescoutTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 2px solid #1e90ff;">
+                <th>Qualification Match</th>
+                <th>Team # or Robot Color</th>
+                <th>Reasoning</th>
+              </tr>
+            </thead>
+            <tbody id="rescoutBody">
+              <tr>
+                <td colspan="3" class="no-rescout"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div id="updateClimbInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
+      <h1>Update Climbs</h1>
+      <div style="background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+        <p style="color: white;">This feature downloads updated climb data from <strong>The Blue Alliance (TBA)</strong>
+          and applies it to your local match records. Turn on permissions to download multiple files at once.</p>
+
+        <p style="color: white;">When you click <strong>Update Climbs</strong>, the system will:</p>
+        <ul style="color: white;">
+          <li>Download two files:
+            <ul>
+              <li style="margin-top:5px; font-size:14px;"><strong>Change Log:</strong> A summary of what changed</li>
+              <li style="margin-top:5px; font-size:14px;"><strong>New Match Data CSV:</strong> Updated with new climb
+                scores and total scores</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h4 style="color: #1e90ff; margin-top: 20px;">Examples of Changes</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+          <thead>
+            <tr>
+              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Scouter</th>
+              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">TBA</th>
+              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Final</th>
+            </tr>
+          </thead>
+          <tbody style="color: white;">
+            <tr>
+              <td style="padding: 8px;">Deep Climb</td>
+              <td style="padding: 8px;">Park</td>
+              <td style="padding: 8px;">Failed Climb</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px;">Shallow Climb</td>
+              <td style="padding: 8px;">Park</td>
+              <td style="padding: 8px;">Failed Climb</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px;">Deep Climb</td>
+              <td style="padding: 8px;">Shallow Climb</td>
+              <td style="padding: 8px;">Shallow Climb</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px;">Park</td>
+              <td style="padding: 8px;">Deep Climb</td>
+              <td style="padding: 8px;">Deep Climb</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px;">Park</td>
+              <td style="padding: 8px;">None</td>
+              <td style="padding: 8px;">None</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div id="defenseRankingInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
+      <h1>Defense Ranking</h1>
+      <div style="display: flex; gap: 20px;">
+        <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+          <p style="color: white;">The defense ranking measures how effectively a team plays defense against their
+            opponents.</p>
+
+          <h3 style="color: #1e90ff; margin-top: 20px;">How It's Calculated</h3>
+          <p style="color: white;">For each match where a team plays defense:</p>
+          <ol style="color: white;">
+            <li>Calculate the EPA of the opposing alliance</li>
+            <li>Compare this to the actual score the opposing alliance achieved in the match</li>
+            <li>The difference is the defense impact for that match</li>
+            <li>The defense ranking is based on the average impact across all matches</li>
+            <li>If an opponent robot died in the match, the robot's defense isn't taken into account</li>
+          </ol>
+
+          <h3 style="color: #1e90ff; margin-top: 20px;">Interpreting the Numbers</h3>
+          <ul style="color: white;">
+            <li><strong>Higher positive numbers</strong> mean the team is more effective at defense</li>
+            <li><strong>Negative numbers</strong> suggest the opposing alliance scored more than expected</li>
+            <li><strong>Rank</strong> shows how the team compares to others who play defense</li>
+          </ul>
+        </div>
+
+        <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+          <h3 style="color: #1e90ff; margin-top: 0;">Defense Team Rankings</h3>
+          <div style="max-height: 500px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; color: white;">
+              <thead>
+                <tr>
+                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Rank</th>
+                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Team</th>
+                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Avg Impact</th>
+                </tr>
+              </thead>
+              <tbody id="defenseRankingTableBody">
+                <!-- Will be populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div id="global-tooltip"></div>
+  <!-- Alliance View Modal -->
+<!-- Alliance Comparison Popup -->
+<div id="allianceComparisonPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px; box-sizing: border-box;">
+  <div style="background-color: #1C1E21; border-radius: 12px; padding: 20px; max-width: 1200px; margin: 0 auto; position: relative;">
+    <button onclick="closeAllianceComparison()" style="position: absolute; top: 15px; right: 15px; background: #ff5c5c; border: none; color: white; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer;">X</button>
+    <h2 id="allianceComparisonTitle" style="color: white; margin-top: 0; margin-bottom: 20px;"></h2>
+    
+    <div id="allianceComparisonContent" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+  <script src="js/script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+
+</html>

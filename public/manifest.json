@@ -1,0 +1,21 @@
+{
+  "name": "Shark Scout",
+  "short_name": "SharkScout",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1C1E21",
+  "theme_color": "#1C1E21",
+  "description": "FRC226 Reefscape Offseason Visualizer - works offline!",
+  "icons": [
+    {
+      "src": "images/app_logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/app_logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
