@@ -70,11 +70,11 @@ body {
 }
 
 .tab-content {
-    display: none; /* Hide all tabs initially */
+    display: none; 
 }
 
 .tab-content.active {
-    display: block; /* Show the active tab */
+    display: block; 
 }
 
 .individual-header {

@@ -33,7 +33,7 @@ async function handleDataUpload(e) {
     return;
   }
   const reader = new FileReader();
-  reader.onload = function(evt) {
+  reader.onload = function (evt) {
     csvText = evt.target.result;
     localStorage.setItem('csvText', csvText);
     statusEl.textContent = 'Event CSV uploaded!';
@@ -53,7 +53,7 @@ async function handlePitUpload(e) {
     return;
   }
   const reader = new FileReader();
-  reader.onload = function(evt) {
+  reader.onload = function (evt) {
     pitCsvText = evt.target.result;
     localStorage.setItem('pitCsvText', pitCsvText);
     statusEl.textContent = 'Pit CSV uploaded!';
@@ -377,6 +377,15 @@ document.getElementById('comparisonSearch2').addEventListener('keydown', functio
     searchComparisonBothTeams();
   }
 });
+/*document.getElementById('comparisonSearch1').addEventListener('input', function() {
+  const teamNumber = this.value.trim();
+  displayTeamNickname(teamNumber, 'teamNameDisplay1');
+});
+
+document.getElementById('comparisonSearch2').addEventListener('input', function() {
+  const teamNumber = this.value.trim();
+  displayTeamNickname(teamNumber, 'teamNameDisplay2');
+});*/
 document.querySelectorAll('.hideEPAAvgComparison').forEach(checkbox => {
   checkbox.addEventListener('change', function () {
     const isChecked = this.checked;
@@ -542,12 +551,12 @@ async function deleteFile(fileType) {
         clearRescoutTable();
       } else if (fileType === 'pitFile') {
         pitScoutingData = [];
-        
+
         const currentTeam = document.getElementById('teamSearch').value.trim();
         if (currentTeam) {
           const teamData = filterTeamData(currentTeam);
           if (teamData.length > 0) {
-            renderTeamStatistics(teamData, []); 
+            renderTeamStatistics(teamData, []);
           }
         }
 
@@ -571,7 +580,7 @@ async function deleteFile(fileType) {
     } else {
       document.getElementById(fileInputId).value = '';
       document.getElementById(statusId).textContent = 'File deleted successfully';
-      
+
       if (fileType === 'dataFile') {
         clearAllCharts();
         clearRescoutTable();
@@ -582,7 +591,7 @@ async function deleteFile(fileType) {
   } catch (error) {
     document.getElementById(fileInputId).value = '';
     document.getElementById(statusId).textContent = 'File deleted successfully';
-    
+
     if (fileType === 'dataFile') {
       clearAllCharts();
       clearRescoutTable();
@@ -651,7 +660,6 @@ function clearAllCharts() {
   document.getElementById('comparisonSearch2').value = '';
 }
 
-/*-----TBA DATA FETCHING-----*/
 
 /*-----TBA DATA FETCHING-----*/
 
@@ -955,6 +963,43 @@ async function updateClimbs() {
   };
 }
 
+/*-----TBA TEAM DATA FETCHING-----*/
+
+async function fetchTeamData(teamNumber) {
+  try {
+    const response = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNumber}`, {
+      headers: {
+        'X-TBA-Auth-Key': 'dkHdbc90y6rrKoG7w15O2YsLW3bWKySKjDItw93b8benEh0ZtNDTK4hYRseZnsT3'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`TBA API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching team data:', error);
+    return null;
+  }
+}
+
+function displayTeamNickname(teamNumber, elementId) {
+  if (!teamNumber) {
+    document.getElementById(elementId).textContent = '';
+    return;
+  }
+
+  fetchTeamData(teamNumber).then(teamData => {
+    const nickname = teamData?.nickname || '';
+    document.getElementById(elementId).textContent = nickname;
+  }).catch(() => {
+    document.getElementById(elementId).textContent = '';
+  });
+}
+
+/*-----RESCOUT TABLE----*/
+
 function filterRescoutTable() {
   const tableBody = document.getElementById('rescoutBody');
   const filterType = document.getElementById('rescoutFilter').value;
@@ -998,8 +1043,6 @@ function filterRescoutTable() {
       tableBody.appendChild(row);
     });
 }
-
-/*-----RESCOUT TABLE----*/
 
 function renderRescoutTable(data) {
   const rescoutSection = document.getElementById('rescoutSection');
@@ -1178,6 +1221,8 @@ function searchTeam() {
 
   document.getElementById('startingPositionFilter').value = startingPosition;
   document.getElementById('algaeTypeFilter').value = algaeFilter;
+
+  displayTeamNickname(teamNumber, 'teamNicknameDisplay');
 }
 
 function filterTeamData(teamNumber) {
@@ -1873,6 +1918,9 @@ function searchComparisonBothTeams() {
   const team1 = document.getElementById('comparisonSearch1').value.trim();
   const team2 = document.getElementById('comparisonSearch2').value.trim();
 
+  displayTeamNickname(team1, 'teamNameDisplay1');
+  displayTeamNickname(team2, 'teamNameDisplay2');
+
   const team1Data = filterTeamData(team1);
   const team2Data = filterTeamData(team2);
 
@@ -1887,9 +1935,7 @@ function searchComparisonBothTeams() {
 
   searchComparison(1, yMax, maxTeleopAlgae, maxEPA, maxAutoCoral, maxAutoAlgae);
   searchComparison(2, yMax, maxTeleopAlgae, maxEPA, maxAutoCoral, maxAutoAlgae);
-
 }
-
 function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = null, maxEPAOverride = null, maxAutoCoralOverride = null, maxAutoAlgaeOverride = null) {
 
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
@@ -1901,9 +1947,12 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   const endGameCanvasId = teamNumber === 1 ? 'endGameTeam1' : 'endGameTeam2';
   const scouterCommentsId = teamNumber === 1 ? 'scouterComments1' : 'scouterComments2';
   const epaTrendCanvasId = teamNumber === 1 ? 'epaTrendTeam1' : 'epaTrendTeam2';
+  const teamNameDisplayId = teamNumber === 1 ? 'teamNameDisplay1' : 'teamNameDisplay2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
   const otherTeamNumberInput = document.getElementById(otherTeamInputId).value.trim();
+
+  displayTeamNickname(teamNumberInput, teamNameDisplayId);
 
   document.getElementById(`startingPositionFilter${teamNumber}`).value = 'all';
   document.querySelectorAll('.hideEPAAvgComparison').forEach(cb => cb.checked = true);
@@ -3019,6 +3068,8 @@ function renderAlgaeCyclesChart(data) {
 }
 function handleOverviewSearch() {
   const input = document.getElementById('overviewSearch').value.trim();
+  document.getElementById('chartFilterDropdown').value = 'all';
+
   if (!input) return;
 
   highlightedOverviewTeam = input;
@@ -3030,6 +3081,7 @@ function handleOverviewSearch() {
 
 function clearOverviewSearch() {
   document.getElementById('overviewSearch').value = '';
+  document.getElementById('chartFilterDropdown').value = 'all';
   highlightedOverviewTeam = null;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
@@ -3424,7 +3476,7 @@ function renderMatchPredictor() {
 
     const stats = {
       auto: {
-        modes: {}, 
+        modes: {},
         mostCommon: null,
         mostCommonStats: null
       },
@@ -3549,18 +3601,17 @@ function renderMatchPredictor() {
   });
 
   const resultDiv = document.getElementById('matchPredictionResult');
-const isTie = redEPA === blueEPA;
-const redWins = redEPA > blueEPA;
+  const isTie = redEPA === blueEPA;
+  const redWins = redEPA > blueEPA;
 
-resultDiv.innerHTML = `
+  resultDiv.innerHTML = `
   <div class="alliance-prediction" style="flex: 1; text-align: center; padding: 15px; 
-        border-radius: 8px; ${
-          isTie
-            ? 'background-color: #FFD70030; border: 2px solid #FFD700;'
-            : redWins
-              ? 'background-color: #ff5c5c30; border: 2px solid #ff5c5c;'
-              : ''
-        }">
+        border-radius: 8px; ${isTie
+      ? 'background-color: #FFD70030; border: 2px solid #FFD700;'
+      : redWins
+        ? 'background-color: #ff5c5c30; border: 2px solid #ff5c5c;'
+        : ''
+    }">
     <h3 style="margin: 0 0 10px 0; color: ${redWins ? '#ff5c5c' : isTie ? '#FFD700' : 'white'};">Red Alliance</h3>
     <p style="margin: 5px 0;">${redTeams.join(', ')}</p>
     <p class="epa-total" style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; 
@@ -3568,13 +3619,12 @@ resultDiv.innerHTML = `
   </div>
   <div class="vs-divider" style="font-size: 24px; font-weight: bold; color: white;">VS</div>
   <div class="alliance-prediction" style="flex: 1; text-align: center; padding: 15px; 
-        border-radius: 8px; ${
-          isTie
-            ? 'background-color: #FFD70030; border: 2px solid #FFD700;'
-            : !redWins
-              ? 'background-color: #3EDBF030; border: 2px solid #3EDBF0;'
-              : ''
-        }">
+        border-radius: 8px; ${isTie
+      ? 'background-color: #FFD70030; border: 2px solid #FFD700;'
+      : !redWins
+        ? 'background-color: #3EDBF030; border: 2px solid #3EDBF0;'
+        : ''
+    }">
 <h3 style="margin: 0 0 10px 0; color: ${isTie ? '#FFD700' : !redWins ? '#3EDBF0' : 'white'};">Blue Alliance</h3>
     <p style="margin: 5px 0;">${blueTeams.join(', ')}</p>
   <p class="epa-total" style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; 
@@ -4169,50 +4219,50 @@ function openAllianceComparison(alliance) {
   const popup = document.getElementById('allianceComparisonPopup');
   const title = document.getElementById('allianceComparisonTitle');
   const content = document.getElementById('allianceComparisonContent');
-  
+
   content.innerHTML = '';
-  
+
   const teamNumbers = [];
   for (let i = 1; i <= 3; i++) {
     const team = document.getElementById(`${alliance}Team${i}`).value.trim();
     if (team) teamNumbers.push(team);
   }
-  
+
   if (teamNumbers.length === 0) {
     alert(`Please enter at least one team for the ${alliance} alliance`);
     return;
   }
-  
+
   title.textContent = `${alliance.toUpperCase()} Alliance Comparison: ${teamNumbers.join(', ')}`;
   title.style.color = alliance === 'red' ? '#ff5c5c' : '#3EDBF0';
-  
+
   teamNumbers.forEach((team, index) => {
     const teamData = filterTeamData(team);
     if (teamData.length === 0) return;
-    
+
     const teamContainer = document.createElement('div');
     teamContainer.style.backgroundColor = '#2a2d31';
     teamContainer.style.borderRadius = '8px';
     teamContainer.style.padding = '15px';
     teamContainer.style.color = 'white';
-    
+
     const teamHeader = document.createElement('div');
     teamHeader.style.display = 'flex';
     teamHeader.style.justifyContent = 'space-between';
     teamHeader.style.alignItems = 'center';
     teamHeader.style.marginBottom = '15px';
-    
+
     const teamTitle = document.createElement('h3');
     teamTitle.textContent = `Team ${team}`;
     teamTitle.style.margin = '0';
     teamTitle.style.color = alliance === 'red' ? '#ff5c5c' : '#3EDBF0';
-    
+
     teamHeader.appendChild(teamTitle);
     teamContainer.appendChild(teamHeader);
-    
+
     const statsContainer = document.createElement('div');
     statsContainer.style.marginBottom = '15px';
-    
+
     const stats = calculateTeamStats(teamData);
     statsContainer.innerHTML = `
       <div style="margin-bottom: 10px;">
@@ -4226,12 +4276,12 @@ function openAllianceComparison(alliance) {
       </div>
     `;
     teamContainer.appendChild(statsContainer);
-    
+
     const chartsContainer = document.createElement('div');
     chartsContainer.style.display = 'flex';
     chartsContainer.style.flexDirection = 'column';
     chartsContainer.style.gap = '15px';
-    
+
     const autoCoralCanvas = document.createElement('canvas');
     autoCoralCanvas.id = `allianceAutoCoral${index}`;
     autoCoralCanvas.style.width = '100%';
@@ -4241,22 +4291,22 @@ function openAllianceComparison(alliance) {
     autoAlgaeCanvas.id = `allianceAutoAlgae${index}`;
     autoAlgaeCanvas.style.width = '100%';
     autoAlgaeCanvas.style.height = '200px';
-    
+
     const teleCoralCanvas = document.createElement('canvas');
     teleCoralCanvas.id = `allianceTeleCoral${index}`;
     teleCoralCanvas.style.width = '100%';
     teleCoralCanvas.style.height = '200px';
-    
+
     const teleAlgaeCanvas = document.createElement('canvas');
     teleAlgaeCanvas.id = `allianceTeleAlgae${index}`;
     teleAlgaeCanvas.style.width = '100%';
     teleAlgaeCanvas.style.height = '200px';
-    
+
     const epaTrendCanvas = document.createElement('canvas');
     epaTrendCanvas.id = `allianceEPATrend${index}`;
     epaTrendCanvas.style.width = '100%';
     epaTrendCanvas.style.height = '200px';
-    
+
     const addChartTitle = (container, title) => {
       const titleDiv = document.createElement('div');
       titleDiv.textContent = title;
@@ -4265,39 +4315,39 @@ function openAllianceComparison(alliance) {
       titleDiv.style.color = '#ccc';
       container.appendChild(titleDiv);
     };
-    
+
     addChartTitle(chartsContainer, 'Auto Coral');
     chartsContainer.appendChild(autoCoralCanvas);
 
     addChartTitle(chartsContainer, 'Auto Algae');
     chartsContainer.appendChild(autoAlgaeCanvas);
-    
+
     addChartTitle(chartsContainer, 'Tele Coral');
     chartsContainer.appendChild(teleCoralCanvas);
-    
+
     addChartTitle(chartsContainer, 'Tele Algae');
     chartsContainer.appendChild(teleAlgaeCanvas);
-    
+
     addChartTitle(chartsContainer, 'EPA Trend');
     chartsContainer.appendChild(epaTrendCanvas);
-    
+
     teamContainer.appendChild(chartsContainer);
     content.appendChild(teamContainer);
-    
+
     const allTeamData = teamNumbers.map(t => filterTeamData(t));
     const maxTeleCoral = getMaxTeleCoral(...allTeamData);
     const maxTeleAlgae = getMaxTeleAlgae(...allTeamData);
     const maxEPA = getMaxEPA(...allTeamData);
     const maxAutoCoral = getMaxAutoCoral(...allTeamData);
     const maxAutoAlgae = getMaxAutoAlgae(...allTeamData);
-    
+
     renderAutoCoralChartForTeam(teamData, `allianceAutoCoral${index}`, maxAutoCoral);
     renderAutoAlgaeChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
     renderTeleCoralChartForTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
     renderTeleAlgaeChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
     renderEPATrendChartForTeam(teamData, `allianceEPATrend${index}`, maxEPA);
   });
-  
+
   popup.style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -4306,14 +4356,14 @@ function closeAllianceComparison() {
   const popup = document.getElementById('allianceComparisonPopup');
   popup.style.display = 'none';
   document.body.style.overflow = 'auto';
-  
+
   const chartIds = [
     'allianceAutoCoral0', 'allianceAutoCoral1', 'allianceAutoCoral2',
     'allianceTeleCoral0', 'allianceTeleCoral1', 'allianceTeleCoral2',
     'allianceTeleAlgae0', 'allianceTeleAlgae1', 'allianceTeleAlgae2',
     'allianceEPATrend0', 'allianceEPATrend1', 'allianceEPATrend2'
   ];
-  
+
   chartIds.forEach(id => {
     if (charts[id]) {
       charts[id].destroy();
@@ -4324,7 +4374,7 @@ function closeAllianceComparison() {
 
 function calculateTeamStats(teamData) {
   if (!teamData || teamData.length === 0) return {};
-  
+
   const climbScores = teamData.map(row => parseFloat(row['Climb Score'] || 0));
   const successfulClimbs = climbScores.filter(score => score === 12 || score === 6).length;
   const totalClimbAttempts = climbScores.filter(score => score === 12 || score === 6 || score === 2.1).length;
