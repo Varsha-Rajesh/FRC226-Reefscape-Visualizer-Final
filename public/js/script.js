@@ -83,6 +83,14 @@ function calculateDefenseRankings(data) {
   const teamMatches = {};
   const robotDiedMap = {};
 
+  const getAllianceFromColor = (color) => {
+    if (!color) return null;
+    const alliance = color.toLowerCase().trim();
+    if (alliance.startsWith('red') || alliance.startsWith('r')) return 'red';
+    if (alliance.startsWith('blue') || alliance.startsWith('b')) return 'blue';
+    return null;
+  };
+
   data.forEach(row => {
     const match = row['Match'];
     const teamNumber = row['Team No.'];
@@ -106,11 +114,13 @@ function calculateDefenseRankings(data) {
 
     if (!match || !teamNumber || !robotColor) return;
 
+    const alliance = getAllianceFromColor(robotColor);
+    if (!alliance) return;
+
     if (!matches[match]) {
       matches[match] = { red: [], blue: [] };
     }
 
-    const alliance = robotColor.toLowerCase().startsWith('red') ? 'red' : 'blue';
     matches[match][alliance].push({ teamNumber, totalScore });
 
     if (!teamMatches[teamNumber]) {
@@ -140,8 +150,10 @@ function calculateDefenseRankings(data) {
 
     if (!match || !teamNumber || isNaN(defenseRating) || defenseRating <= 0) return;
 
-    const isRed = robotColor.toLowerCase().startsWith('red');
-    const defendingAgainst = isRed ? 'blue' : 'red';
+    const alliance = getAllianceFromColor(robotColor);
+    if (!alliance) return;
+
+    const defendingAgainst = alliance === 'red' ? 'blue' : 'red';
 
     const thisMatch = matches[match];
     if (!thisMatch || thisMatch.red.length !== 3 || thisMatch.blue.length !== 3) return;
@@ -200,6 +212,7 @@ function calculateDefenseRankings(data) {
 
   return rankings;
 }
+
 let defenseRankings = [];
 
 function updateDefenseRankings(data) {
@@ -377,15 +390,7 @@ document.getElementById('comparisonSearch2').addEventListener('keydown', functio
     searchComparisonBothTeams();
   }
 });
-/*document.getElementById('comparisonSearch1').addEventListener('input', function() {
-  const teamNumber = this.value.trim();
-  displayTeamNickname(teamNumber, 'teamNameDisplay1');
-});
 
-document.getElementById('comparisonSearch2').addEventListener('input', function() {
-  const teamNumber = this.value.trim();
-  displayTeamNickname(teamNumber, 'teamNameDisplay2');
-});*/
 document.querySelectorAll('.hideEPAAvgComparison').forEach(checkbox => {
   checkbox.addEventListener('change', function () {
     const isChecked = this.checked;
@@ -1050,6 +1055,29 @@ function renderRescoutTable(data) {
   const matchCounts = {};
   const rescoutRows = [];
 
+
+  const normalizeRobotColor = (color) => {
+    if (!color) return color;
+
+    const cleaned = color.toString().toLowerCase().replace(/[\s-]/g, ''); 
+
+    if (cleaned.startsWith('r')) {
+      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      return `Red-${position}`;
+    }
+    else if (cleaned.startsWith('b')) {
+      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      return `Blue-${position}`;
+    }
+    else if (cleaned.match(/^(red|blue)\d+/)) {
+      const alliance = cleaned.startsWith('red') ? 'Red' : 'Blue';
+      const position = cleaned.match(/\d+/)?.[0] || '1';
+      return `${alliance}-${position}`;
+    }
+    console.warn(`Unrecognized robot position format: ${color}`);
+    return color;
+  };
+
   coralMismatchData.forEach(mismatch => {
     rescoutRows.push({
       match: mismatch.match,
@@ -1078,82 +1106,24 @@ function renderRescoutTable(data) {
       }
     }
   });
-  function renderRescoutTable(data) {
-    const rescoutSection = document.getElementById('rescoutSection');
-    const seenRows = new Set();
-    const matchCounts = {};
-    const rescoutRows = [];
 
-    coralMismatchData.forEach(mismatch => {
+  data.forEach(row => {
+    const match = row['Match']?.toString().replace(/^Q/i, '');
+    const team = row['Team No.']?.toString();
+    const robotColor = normalizeRobotColor(row['Robot Color']);
+    const matchKey = `${match}-${team}-${robotColor}`;
+
+    if (seenRows.has(matchKey)) {
       rescoutRows.push({
-        match: mismatch.match,
-        difference: mismatch.difference,
-        team: mismatch.alliance === 'red' ? 'Red' : 'Blue',
-        reason: mismatch.reason,
-        type: 'coral'
+        match,
+        team,
+        reason: 'Duplicate entry',
+        type: 'others'
       });
-    });
-
-    data.forEach(row => {
-      const match = row['Match']?.toString().replace(/^Q/i, '');
-      const team = row['Team No.']?.toString();
-      const scoutClimb = Math.round(parseFloat(row['Climb Score'] || 0));
-      const normalizedScoutClimb = classifyScoutClimb(scoutClimb);
-
-      if (tbaClimbData[match] && tbaClimbData[match][team] !== undefined) {
-        const tbaClimb = tbaClimbData[match][team];
-        if (Math.abs(normalizedScoutClimb - tbaClimb) > 1) {
-          rescoutRows.push({
-            match,
-            team,
-            reason: `Climb: Scouted ${getClimbName(normalizedScoutClimb)}, TBA shows ${getClimbName(tbaClimb)}`,
-            type: 'climb'
-          });
-        }
-      }
-    });
-
-    data.forEach(row => {
-      const match = row['Match']?.toString().replace(/^Q/i, '');
-      const team = row['Team No.']?.toString();
-      const robotColor = row['Robot Color'];
-      const matchKey = `${match}-${team}-${robotColor}`;
-
-      if (seenRows.has(matchKey)) {
-        rescoutRows.push({
-          match,
-          team,
-          reason: 'Duplicate entry',
-          type: 'others'
-        });
-      } else {
-        seenRows.add(matchKey);
-      }
-    });
-
-    Object.entries(matchCounts).forEach(([match, count]) => {
-      if (count < 6) {
-        const existingTeams = data
-          .filter(row => row['Match'] === match)
-          .map(row => row['Robot Color']);
-
-        const allPositions = ['Red-1', 'Red-2', 'Red-3', 'Blue-1', 'Blue-2', 'Blue-3'];
-        const missingPositions = allPositions.filter(pos => !existingTeams.includes(pos));
-
-        missingPositions.forEach(pos => {
-          rescoutRows.push({
-            match: match.replace(/^Q/i, ''),
-            team: pos,
-            reason: `Missing data for ${pos}`,
-            type: 'others'
-          });
-        });
-      }
-    });
-
-    window.rescoutData = rescoutRows;
-    filterRescoutTable();
-  }
+    } else {
+      seenRows.add(matchKey);
+    }
+  });
 
   data.forEach(row => {
     const matchKey = row['Match'];
@@ -1164,12 +1134,14 @@ function renderRescoutTable(data) {
 
   Object.entries(matchCounts).forEach(([match, count]) => {
     if (count < 6) {
-      const existingTeams = data
+      const existingPositions = data
         .filter(row => row['Match'] === match)
-        .map(row => row['Robot Color']);
+        .map(row => normalizeRobotColor(row['Robot Color']));
 
       const allPositions = ['Red-1', 'Red-2', 'Red-3', 'Blue-1', 'Blue-2', 'Blue-3'];
-      const missingPositions = allPositions.filter(pos => !existingTeams.includes(pos));
+      const missingPositions = allPositions.filter(pos => 
+        !existingPositions.includes(pos)
+      );
 
       missingPositions.forEach(pos => {
         rescoutRows.push({
@@ -1193,7 +1165,6 @@ function renderRescoutTable(data) {
     tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 12px; color: #888;font-style: italic;">No Matches to Rescout</td></tr>';
   }
 }
-
 function clearRescoutTable() {
   const tableBody = document.getElementById('rescoutBody');
   tableBody.innerHTML = '';

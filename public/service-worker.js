@@ -6,7 +6,7 @@ const ASSETS = [
   '/js/script.js',
   '/images/down_arrow.png',
   '/images/information_icon.png',
-  '/images/app_logo.png',
+  '/images/favicon.ico',
   '/manifest.json',
   '/lato-v24-latin-regular.woff2',
   'https://cdn.jsdelivr.net/npm/chart.js',
