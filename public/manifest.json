@@ -7,15 +7,15 @@
   "theme_color": "#1C1E21",
   "description": "FRC226 Reefscape Offseason Visualizer - works offline!",
   "icons": [
-    {
-      "src": "images/app_logo.png",
-      "sizes": "192x192",
+     {
+      "src": "/images/favicon.png",
+      "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "images/app_logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/images/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
     }
   ]
 }
