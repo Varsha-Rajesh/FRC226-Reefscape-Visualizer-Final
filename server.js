@@ -61,6 +61,8 @@ app.post('/uploads', upload.single('dataFile'), async (req, res) => {
     targetFilename = 'data.csv';
   } else if (uploadType === 'csvPitScouting') {
     targetFilename = 'pit_scouting.csv';
+  } else if (uploadType === 'csvSchedule') {
+    targetFilename = 'schedule.csv';
   } else {
     fs.unlinkSync(req.file.path);
     return res.status(400).json({ error: 'Invalid upload type' });
@@ -71,7 +73,7 @@ app.post('/uploads', upload.single('dataFile'), async (req, res) => {
 
     const newPath = path.join(uploadDir, targetFilename);
     fs.copyFileSync(req.file.path, newPath);
-    fs.unlinkSync(req.file.path); 
+    fs.unlinkSync(req.file.path);
 
     console.log(`Saved new file as ${targetFilename}`);
     return res.status(200).json({

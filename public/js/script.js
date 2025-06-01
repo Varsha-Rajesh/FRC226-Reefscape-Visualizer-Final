@@ -22,6 +22,7 @@ let showHiddenTeamsInFilter = false;
 let highlightedOverviewTeam = null;
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
+let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
 
 async function handleDataUpload(e) {
   e.preventDefault();
@@ -60,8 +61,40 @@ async function handlePitUpload(e) {
   };
   reader.readAsText(file);
 }
+
 document.getElementById('submitPit').addEventListener('click', handlePitUpload);
-document.getElementById('submitPit').addEventListener('click', handlePitUpload);
+
+async function handleScheduleUpload(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('scheduleFile');
+  const statusEl = document.getElementById('statusSchedule');
+  const file = fileInput.files[0];
+
+  if (!file || !file.name.endsWith('.csv')) {
+    statusEl.textContent = 'Please upload a valid .csv file.';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function (evt) {
+    try {
+      const text = evt.target.result;
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+      const matchCount = Math.max(0, lines.length - 1);
+      scheduleCsvText = text;
+      localStorage.setItem('scheduleCsvText', scheduleCsvText);
+      let uploadStatus = '';
+      statusEl.textContent = `Successfully uploaded ${matchCount} matches${uploadStatus}`;
+    } catch (err) {
+      statusEl.textContent = 'Error processing file';
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('submitSchedule').addEventListener('click', handleScheduleUpload);
+
 
 function deleteFile(type) {
   if (type === 'dataFile') {
@@ -74,7 +107,13 @@ function deleteFile(type) {
     localStorage.removeItem('pitCsvText');
     document.getElementById('pitFile').value = "";
     document.getElementById('statusPit').textContent = "Pit CSV deleted.";
+  } else if (type === 'scheduleFile') {
+    scheduleCsvText = "";
+    localStorage.removeItem('scheduleCsvText');
+    document.getElementById('scheduleFile').value = "";
+    document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
   }
+
 }
 
 /*-----DEFENSE RANKING FUNCTIONS----*/
@@ -537,61 +576,70 @@ async function handlePitUpload(fileInputId, statusId) {
   }
 }
 
+
+
 async function deleteFile(fileType) {
-  const filename = fileType === 'dataFile' ? 'data.csv' : 'pit_scouting.csv';
-  const statusId = fileType === 'dataFile' ? 'statusData' : 'statusPit';
-  const fileInputId = fileType === 'dataFile' ? 'dataFile' : 'pitFile';
+  let filename, statusId, fileInputId;
+
+  if (fileType === 'dataFile') {
+    filename = 'data.csv';
+    statusId = 'statusData';
+    fileInputId = 'dataFile';
+  } else if (fileType === 'pitFile') {
+    filename = 'pit_scouting.csv';
+    statusId = 'statusPit';
+    fileInputId = 'pitFile';
+  } else if (fileType === 'scheduleFile') {
+    filename = 'schedule.csv';
+    statusId = 'statusSchedule';
+    fileInputId = 'scheduleFile';
+  }
 
   try {
-    const response = await fetch(`/uploads/${filename}`, {
-      method: 'DELETE'
-    });
+    if (filename) {
+      await fetch(`/uploads/${filename}`, {
+        method: 'DELETE'
+      });
+    }
 
-    if (response.ok) {
-      document.getElementById(fileInputId).value = '';
-      document.getElementById(statusId).textContent = 'File deleted successfully';
+    document.getElementById(fileInputId).value = '';
+    document.getElementById(statusId).textContent = 'File deleted successfully';
 
-      if (fileType === 'dataFile') {
-        clearAllCharts();
-        clearRescoutTable();
-      } else if (fileType === 'pitFile') {
-        pitScoutingData = [];
+    if (fileType === 'dataFile') {
+      clearAllCharts();
+      clearRescoutTable();
+    } else if (fileType === 'pitFile') {
+      pitScoutingData = [];
 
-        const currentTeam = document.getElementById('teamSearch').value.trim();
-        if (currentTeam) {
-          const teamData = filterTeamData(currentTeam);
-          if (teamData.length > 0) {
-            renderTeamStatistics(teamData, []);
-          }
-        }
-
-        const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
-        const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
-
-        if (comparisonTeam1) {
-          const team1Data = filterTeamData(comparisonTeam1);
-          if (team1Data.length > 0) {
-            renderComparisonTeamStatistics(team1Data, [], 1);
-          }
-        }
-
-        if (comparisonTeam2) {
-          const team2Data = filterTeamData(comparisonTeam2);
-          if (team2Data.length > 0) {
-            renderComparisonTeamStatistics(team2Data, [], 2);
-          }
+      const currentTeam = document.getElementById('teamSearch').value.trim();
+      if (currentTeam) {
+        const teamData = filterTeamData(currentTeam);
+        if (teamData.length > 0) {
+          renderTeamStatistics(teamData, []);
         }
       }
-    } else {
-      document.getElementById(fileInputId).value = '';
-      document.getElementById(statusId).textContent = 'File deleted successfully';
 
-      if (fileType === 'dataFile') {
-        clearAllCharts();
-        clearRescoutTable();
-      } else if (fileType === 'pitFile') {
-        pitScoutingData = [];
+      const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
+      const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
+
+      if (comparisonTeam1) {
+        const team1Data = filterTeamData(comparisonTeam1);
+        if (team1Data.length > 0) {
+          renderComparisonTeamStatistics(team1Data, [], 1);
+        }
       }
+
+      if (comparisonTeam2) {
+        const team2Data = filterTeamData(comparisonTeam2);
+        if (team2Data.length > 0) {
+          renderComparisonTeamStatistics(team2Data, [], 2);
+        }
+      }
+    } else if (fileType === 'scheduleFile') {
+      scheduleCsvText = "";
+      localStorage.removeItem('scheduleCsvText');
+      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
+      document.getElementById('scheduleFile').value = "";
     }
   } catch (error) {
     document.getElementById(fileInputId).value = '';
@@ -602,10 +650,14 @@ async function deleteFile(fileType) {
       clearRescoutTable();
     } else if (fileType === 'pitFile') {
       pitScoutingData = [];
+    } else if (fileType === 'scheduleFile') {
+      scheduleCsvText = "";
+      localStorage.removeItem('scheduleCsvText');
+      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
+      document.getElementById('scheduleFile').value = "";
     }
   }
 }
-
 
 function clearAllCharts() {
   if (charts['overviewStackedChart']) {
@@ -663,6 +715,20 @@ function clearAllCharts() {
   document.getElementById('comparisonSearch2').value = '';
 }
 
+function parseScheduleCSV() {
+  const scheduleText = localStorage.getItem('scheduleCsvText');
+  if (!scheduleText) return { data: [] };
+  try {
+    return Papa.parse(scheduleText, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    });
+  } catch (e) {
+    console.error('Error parsing schedule CSV:', e);
+    return { data: [] };
+  }
+}
 
 /*-----TBA DATA FETCHING-----*/
 
@@ -1670,7 +1736,7 @@ function renderEpaTrendChart(data, canvasId) {
           pointHitRadius: 10,
           pointHoverRadius: 6,
           tension: 0,
-          hidden: !showAvg  // Use the showAvg variable
+          hidden: !showAvg  
         }
       ]
     },
@@ -3440,6 +3506,44 @@ function toggleEPAAvg(chartId, showAvg) {
 /*-----MATCH PREDICTOR FUNCTIONS----*/
 
 function renderMatchPredictor() {
+
+  const matchNumberInput = document.getElementById('matchNumberInput');
+  const matchNumber = matchNumberInput.value.trim();
+  const teamInputs = [
+    document.getElementById('redTeam1'),
+    document.getElementById('redTeam2'),
+    document.getElementById('redTeam3'),
+    document.getElementById('blueTeam1'),
+    document.getElementById('blueTeam2'),
+    document.getElementById('blueTeam3')
+  ];
+
+  if (matchNumber) {
+    const scheduleData = parseScheduleCSV().data;
+    if (scheduleData && scheduleData.length > 0) {
+      const match = scheduleData.find(row =>
+        String(row.Match).trim().replace(/^0+/, '') === matchNumber.replace(/^0+/, '')
+      );
+      if (match) {
+        teamInputs[0].value = match['Red 1'] || '';
+        teamInputs[1].value = match['Red 2'] || '';
+        teamInputs[2].value = match['Red 3'] || '';
+        teamInputs[3].value = match['Blue 1'] || '';
+        teamInputs[4].value = match['Blue 2'] || '';
+        teamInputs[5].value = match['Blue 3'] || '';
+      }
+    }
+  }
+
+['redTeam1','redTeam2','redTeam3','blueTeam1','blueTeam2','blueTeam3'].forEach(id => {
+  const input = document.getElementById(id);
+  if (input) {
+    input.addEventListener('input', function() {
+      document.getElementById('matchNumberInput').value = '';
+    });
+  }
+});
+
   const redTeams = [];
   const blueTeams = [];
 
@@ -4207,6 +4311,7 @@ function calculateTeamStatsForSummary(teamData) {
     defenseRank
   };
 }
+
 
 /*-----ALLIANCE COMPARISON FUNCTIONS-----*/
 
