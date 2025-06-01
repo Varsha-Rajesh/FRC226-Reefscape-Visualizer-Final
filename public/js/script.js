@@ -331,7 +331,7 @@ document.getElementById('algaeTypeFilter').addEventListener('change', function (
   renderTeleAlgaeChartFiltered(data, value);
 });
 
-document.getElementById('hideEPAAvg').addEventListener('change', function () {
+document.getElementById('showEPAAvg').addEventListener('change', function () {
   toggleEPAAvg('epaTrendChart', this.checked);
 });
 
@@ -391,10 +391,10 @@ document.getElementById('comparisonSearch2').addEventListener('keydown', functio
   }
 });
 
-document.querySelectorAll('.hideEPAAvgComparison').forEach(checkbox => {
+document.querySelectorAll('.showEPAAvgComparison').forEach(checkbox => {
   checkbox.addEventListener('change', function () {
     const isChecked = this.checked;
-    document.querySelectorAll('.hideEPAAvgComparison').forEach(cb => {
+    document.querySelectorAll('.showEPAAvgComparison').forEach(cb => {
       cb.checked = isChecked;
     });
     toggleEPAAvg('epaTrendTeam1', isChecked);
@@ -640,8 +640,6 @@ function clearAllCharts() {
     }
   });
 
-
-
   document.getElementById('teamSearch').value = '';
   document.getElementById('flaggedMatches').innerHTML = '';
   document.getElementById('scouterComments').innerHTML = '';
@@ -726,15 +724,15 @@ function verifyCoralCounts(matches, csvData) {
 
   const normalizeRobotColor = (color) => {
     if (!color) return color;
-    
-    const cleaned = color.toString().toLowerCase().replace(/[\s-]/g, ''); 
-    
+
+    const cleaned = color.toString().toLowerCase().replace(/[\s-]/g, '');
+
     if (cleaned.startsWith('r')) {
-      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      const position = cleaned.match(/\d+/)?.[0] || '1';
       return `Red-${position}`;
     }
     else if (cleaned.startsWith('b')) {
-      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      const position = cleaned.match(/\d+/)?.[0] || '1';
       return `Blue-${position}`;
     }
     else if (cleaned.match(/^(red|blue)\d+/)) {
@@ -985,9 +983,7 @@ async function updateClimbs() {
     logLink.click();
     document.body.removeChild(logLink);
 
-
     document.getElementById('downloadStatus').textContent = `Updated ${updatedRows} rows with climb data from TBA`;
-
 
   };
 }
@@ -1079,18 +1075,17 @@ function renderRescoutTable(data) {
   const matchCounts = {};
   const rescoutRows = [];
 
-
   const normalizeRobotColor = (color) => {
     if (!color) return color;
 
-    const cleaned = color.toString().toLowerCase().replace(/[\s-]/g, ''); 
+    const cleaned = color.toString().toLowerCase().replace(/[\s-]/g, '');
 
     if (cleaned.startsWith('r')) {
-      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      const position = cleaned.match(/\d+/)?.[0] || '1';
       return `Red-${position}`;
     }
     else if (cleaned.startsWith('b')) {
-      const position = cleaned.match(/\d+/)?.[0] || '1'; 
+      const position = cleaned.match(/\d+/)?.[0] || '1';
       return `Blue-${position}`;
     }
     else if (cleaned.match(/^(red|blue)\d+/)) {
@@ -1163,7 +1158,7 @@ function renderRescoutTable(data) {
         .map(row => normalizeRobotColor(row['Robot Color']));
 
       const allPositions = ['Red-1', 'Red-2', 'Red-3', 'Blue-1', 'Blue-2', 'Blue-3'];
-      const missingPositions = allPositions.filter(pos => 
+      const missingPositions = allPositions.filter(pos =>
         !existingPositions.includes(pos)
       );
 
@@ -1196,7 +1191,6 @@ function clearRescoutTable() {
 
 /*-----INDIVIDUAL VIEW----*/
 
-
 function searchTeam() {
   const teamNumber = document.getElementById('teamSearch').value.trim();
   let teamData = filterTeamData(teamNumber);
@@ -1212,6 +1206,8 @@ function searchTeam() {
   renderQualitativeNotes(teamData);
   renderFlaggedMatches(teamData);
   renderTeamStatistics(teamData, pitScoutingData);
+
+  document.getElementById('showEPAAvg').checked = true;
   renderEpaTrendChart(teamData, 'epaTrendChart');
 
   document.getElementById('startingPositionFilter').value = startingPosition;
@@ -1219,7 +1215,6 @@ function searchTeam() {
 
   displayTeamNickname(teamNumber, 'teamNicknameDisplay');
 }
-
 function filterTeamData(teamNumber) {
   const parsed = parseCSV();
   return parsed.data.filter(row => row['Team No.'] === teamNumber);
@@ -1353,10 +1348,6 @@ function renderTeleCharts(data) {
   );
 }
 
-
-
-
-
 function renderTeleAlgaeChartFiltered(data, filter) {
   const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   let filteredRows;
@@ -1415,8 +1406,6 @@ function renderTeleAlgaeChartFiltered(data, filter) {
     getChartOptions(true, 2)
   );
 }
-
-
 
 function renderTeamStatistics(data, pitData) {
   const clearValue = (id, defaultValue = '') => {
@@ -1622,10 +1611,18 @@ function renderEndGameChart(data) {
         }
       ]
     },
-    getChartOptions(false, 6)
+    {
+      ...getChartOptions(false, 6),
+      scales: {
+        ...getChartOptions(false, 6).scales,
+        y: {
+          ...getChartOptions(false, 6).scales.y,
+          max: 12
+        }
+      }
+    }
   );
 }
-
 
 function renderEpaTrendChart(data, canvasId) {
   destroyChart(canvasId);
@@ -1641,6 +1638,8 @@ function renderEpaTrendChart(data, canvasId) {
 
   const avgEPA = epaValues.reduce((sum, val) => sum + val, 0) / epaValues.length;
   const averageLine = Array(matchLabels.length).fill(avgEPA);
+
+  const showAvg = document.getElementById('showEPAAvg')?.checked ?? true;
 
   charts[canvasId] = createChart(
     document.getElementById(canvasId).getContext('2d'),
@@ -1671,7 +1670,7 @@ function renderEpaTrendChart(data, canvasId) {
           pointHitRadius: 10,
           pointHoverRadius: 6,
           tension: 0,
-          hidden: !document.getElementById('EPAAvg')?.checked
+          hidden: !showAvg  // Use the showAvg variable
         }
       ]
     },
@@ -1686,7 +1685,7 @@ function renderEpaTrendChart(data, canvasId) {
             beforeBody: function (tooltipItems) {
               const context = tooltipItems[0];
               const label = context.dataset.label;
-              const showAvg = document.getElementById('hideEPAAvg')?.checked;
+              const showAvg = document.getElementById('showEPAAvg')?.checked;
 
               if (label === 'Avg. EPA' || !showAvg) return null;
 
@@ -1698,7 +1697,7 @@ function renderEpaTrendChart(data, canvasId) {
             label: function (context) {
               const label = context.dataset.label;
               const value = context.parsed.y;
-              const showAvg = document.getElementById('hideEPAAvg')?.checked;
+              const showAvg = document.getElementById('showEPAAvg')?.checked;
 
               if (label === 'Avg. EPA') {
                 return showAvg ? `Avg. EPA: ${value.toFixed(2)}` : null;
@@ -1908,7 +1907,6 @@ function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
   return Math.ceil(max / 1) * 1;
 }
 
-
 function searchComparisonBothTeams() {
   const team1 = document.getElementById('comparisonSearch1').value.trim();
   const team2 = document.getElementById('comparisonSearch2').value.trim();
@@ -1950,7 +1948,7 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   displayTeamNickname(teamNumberInput, teamNameDisplayId);
 
   document.getElementById(`startingPositionFilter${teamNumber}`).value = 'all';
-  document.querySelectorAll('.hideEPAAvgComparison').forEach(cb => cb.checked = true);
+  document.querySelectorAll('.showEPAAvgComparison').forEach(cb => cb.checked = true);
 
 
   let teamData = filterTeamData(teamNumberInput);
@@ -1989,7 +1987,6 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   otherTeamData = otherTeamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
-
   renderAutoCoralChartForTeam(teamData, coralCanvasId, maxAutoCoral);
   renderAutoAlgaeChartForTeam(teamData, algaeCanvasId, maxAutoAlgae);
   renderTeleCoralChartForTeam(teamData, teleCoralCanvasId, yMax);
@@ -2022,7 +2019,6 @@ function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
 
   const stepSize = maxYValue > 16 ? 4 : 2;
   const newMax = Math.ceil(yMax / stepSize) * stepSize;
-
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
@@ -2116,8 +2112,6 @@ function renderAutoCoralChartForTeam(teamData, canvasId, maxY = null) {
 
   return yMax;
 }
-
-
 
 function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
@@ -2215,7 +2209,7 @@ function renderEPATrendChartForTeam(teamData, canvasId, maxY = null) {
           pointHitRadius: 10,
           pointHoverRadius: 6,
           tension: 0,
-          hidden: !document.getElementById('hideEPAAvg')?.checked
+          hidden: !document.getElementById('showEPAAvg')?.checked
         }
 
       ]
@@ -2232,7 +2226,7 @@ function renderEPATrendChartForTeam(teamData, canvasId, maxY = null) {
             beforeBody: function (tooltipItems) {
               const context = tooltipItems[0];
               const label = context.dataset.label;
-              const showAvg = document.querySelector('.hideEPAAvgComparison').checked;
+              const showAvg = document.querySelector('.showEPAAvgComparison').checked;
 
               if (label === 'Avg. EPA' || !showAvg) return null;
 
@@ -2319,7 +2313,6 @@ function filterAndRenderAlgaeCharts(teamNumber, filterValue) {
   renderFilteredTeleAlgaeChartForTeam(filteredData, teleAlgaeCanvasId, filterValue, maxY);
 }
 
-
 function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yMax = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
@@ -2395,7 +2388,6 @@ function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yM
   });
 }
 
-
 function renderTeleAlgaeChartForTeam(teamData, canvasId, yMax) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
@@ -2470,7 +2462,16 @@ function renderEndGameChartForTeam(teamData, canvasId) {
         }
       ]
     },
-    options: getChartOptions(false, 6)
+    options: {
+      ...getChartOptions(false, 6),
+      scales: {
+        ...getChartOptions(false, 6).scales,
+        y: {
+          ...getChartOptions(false, 6).scales.y,
+          max: 12
+        }
+      }
+    }
   });
 }
 
@@ -2665,8 +2666,6 @@ function getChartClickHandler() {
     }
   };
 }
-
-
 
 function updateOverviewCharts() {
   const parsedData = parseCSV();
@@ -3072,11 +3071,14 @@ function handleOverviewSearch() {
   renderOverviewStackedChart(parsedData.data, 'all');
   renderCoralCyclesChart(parsedData.data);
   renderAlgaeCyclesChart(parsedData.data);
+  displayTeamNickname(input, 'overviewTeamNicknameDisplay');
+
 }
 
 function clearOverviewSearch() {
   document.getElementById('overviewSearch').value = '';
   document.getElementById('chartFilterDropdown').value = 'all';
+  document.getElementById('overviewTeamNicknameDisplay').textContent = '';
   highlightedOverviewTeam = null;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
@@ -3112,7 +3114,6 @@ async function addHiddenTeam(e) {
     alert(`Team ${teamNumber} is already in the list.`);
   }
 }
-
 
 function renderHiddenTeamsList() {
   const list = document.getElementById('hideTeamList');
@@ -3388,13 +3389,11 @@ function renderTeamGroup(teams, container, sortBy) {
   container.appendChild(grid);
 }
 
-
 function adjustContainerHeight(container) {
   const list = container.querySelector('ul');
   container.style.height = list.children.length > 0 ?
     `${list.scrollHeight + 10}px` : 'auto';
 }
-
 
 function goToIndividualView(teamNumber) {
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
@@ -3409,8 +3408,8 @@ function goToIndividualView(teamNumber) {
 /*-----TOGGLE EPA FILTER----*/
 function toggleEPAAvg(chartId, showAvg) {
   if (!chartId) {
-    const isChecked = document.querySelector('.hideEPAAvgComparison').checked;
-    document.querySelectorAll('.hideEPAAvgComparison').forEach(cb => {
+    const isChecked = document.querySelector('.showEPAAvgComparison').checked;
+    document.querySelectorAll('.showEPAAvgComparison').forEach(cb => {
       cb.checked = isChecked;
     });
 
@@ -3439,7 +3438,6 @@ function toggleEPAAvg(chartId, showAvg) {
   }
 }
 /*-----MATCH PREDICTOR FUNCTIONS----*/
-
 
 function renderMatchPredictor() {
   const redTeams = [];
@@ -3573,10 +3571,12 @@ function renderMatchPredictor() {
       stats.tele.removed = (stats.tele.removed / stats.matches).toFixed(1);
 
       if (stats.endgame.deepAttempts > 0) {
-        stats.endgame.deepClimbRate = (stats.endgame.deepClimb / stats.endgame.deepAttempts * 100).toFixed(1) + '%';
+        const rate = (stats.endgame.deepClimb / stats.endgame.deepAttempts * 100);
+        stats.endgame.deepClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
       }
       if (stats.endgame.shallowAttempts > 0) {
-        stats.endgame.shallowClimbRate = (stats.endgame.shallowClimb / stats.endgame.shallowAttempts * 100).toFixed(1) + '%';
+        const rate = (stats.endgame.shallowClimb / stats.endgame.shallowAttempts * 100);
+        stats.endgame.shallowClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
       }
 
       stats.epa = (stats.epa / stats.matches).toFixed(1);
@@ -4300,7 +4300,7 @@ function openAllianceComparison(alliance) {
     const epaTrendCanvas = document.createElement('canvas');
     epaTrendCanvas.id = `allianceEPATrend${index}`;
     epaTrendCanvas.style.width = '100%';
-    epaTrendCanvas.style.height = '200px';
+    epaTrendCanvas.style.height = 'auto';
 
     const addChartTitle = (container, title) => {
       const titleDiv = document.createElement('div');

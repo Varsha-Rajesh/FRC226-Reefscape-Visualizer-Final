@@ -40,14 +40,17 @@
     <div id="overview" class="tab-content active">
       <div class="overview-header">
         <h1>Overview</h1>
-        <div class="overview-search-bar">
-          <input type="text" id="overviewSearch" placeholder="Team Number" autocomplete="off" />
-          <button id="comparisonSearch" onclick="handleOverviewSearch()">Search</button>
-          <button class="clear-btn" style="    background-color: #ff1e1e; padding: 10px"
-            onclick="clearOverviewSearch()">Clear</button>
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+          <div class="overview-search-bar">
+            <input type="text" id="overviewSearch" placeholder="Team Number" autocomplete="off" />
+            <button id="comparisonSearch" onclick="handleOverviewSearch()">Search</button>
+            <button class="clear-btn" style="background-color: #ff1e1e; padding: 10px"
+              onclick="clearOverviewSearch()">Clear</button>
+          </div>
+          <div id="overviewTeamNicknameDisplay"
+            style="color: white; font-size: 16px; text-align: right; margin-right: 160px;"></div>
         </div>
       </div>
-
       <div id="overviewStackedChartContainer">
         <div id="overviewStackedChartTitle">
           <h3 class="chart-title" style="margin: 0;">EPA</h3>
@@ -206,7 +209,7 @@
         <h3 class="chart-title">EPA Trend</h3>
         <label class="slider-toggle"
           style="position: absolute; right: 20px; margin-bottom: 35px; font-style: italic; color: #ccc;">
-          <input type="checkbox" id="hideEPAAvg" checked>
+          <input type="checkbox" id="showEPAAvg" checked>
           <span class="slider"></span>
           Show Average
         </label>
@@ -324,7 +327,7 @@
               <h3 class="chart-title" style="margin-bottom: 10px;">EPA Trend</h3>
               <label class="slider-toggle"
                 style="position: absolute; top: 2%; right: 15px; margin-bottom: 10px; font-style: italic; color: #ccc;">
-                <input type="checkbox" class="hideEPAAvgComparison" checked>
+                <input type="checkbox" class="showEPAAvgComparison" checked>
                 <span class="slider"></span>
                 Show Average
               </label>
@@ -444,7 +447,7 @@
               <h3 class="chart-title" style="margin-bottom: 10px;">EPA Trend</h3>
               <label class="slider-toggle"
                 style="position: absolute; top: 2%; right: 15px; margin-bottom: 10px; font-style: italic; color: #ccc;">
-                <input type="checkbox" class="hideEPAAvgComparison" checked>
+                <input type="checkbox" class="showEPAAvgComparison" checked>
                 <span class="slider"></span>
                 Show Average
               </label>
