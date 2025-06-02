@@ -85,7 +85,7 @@ async function handleScheduleUpload(e) {
       localStorage.setItem('scheduleCsvText', scheduleCsvText);
       let uploadStatus = '';
       statusEl.textContent = `Successfully uploaded ${matchCount} matches${uploadStatus}`;
-      generateTargetedScoutingBlocks(); 
+      generateTargetedScoutingBlocks();
     } catch (err) {
       statusEl.textContent = 'Error processing file';
       console.error(err);
@@ -349,11 +349,33 @@ function getChartOptions(stacked = false, stepSize = 1) {
 // Tab Navigation
 function showTab(event, tabId) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(button => {
+    button.classList.remove('active');
+    if (!button.getAttribute('onclick')?.includes('scoutingSchedule')) {
+      button.removeAttribute('disabled');
+      button.style.pointerEvents = 'auto';
+      button.style.opacity = '1';
+    }
+  });
+
   document.getElementById(tabId).classList.add('active');
   event.currentTarget.classList.add('active');
+
+  if (!event.currentTarget.getAttribute('onclick')?.includes('scoutingSchedule')) {
+    event.currentTarget.setAttribute('disabled', 'disabled');
+    event.currentTarget.style.pointerEvents = 'none';
+    event.currentTarget.style.opacity = '0.7';
+  }
+
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
+
+  if (tabId === 'scoutingSchedule') {
+    document.getElementById('strategyContent').style.display = 'block';
+    document.getElementById('targetedScoutingContainer').style.display = 'none';
+    generateTargetedScoutingBlocks();
+  }
 }
+
 
 // Individual View
 document.getElementById('search').addEventListener('click', searchTeam);
@@ -641,6 +663,10 @@ async function deleteFile(fileType) {
       localStorage.removeItem('scheduleCsvText');
       document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
       document.getElementById('scheduleFile').value = "";
+      const strategyContent = document.getElementById('strategyContent');
+      if (strategyContent) strategyContent.innerHTML = '';
+      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
+      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
     }
   } catch (error) {
     document.getElementById(fileInputId).value = '';
@@ -656,6 +682,10 @@ async function deleteFile(fileType) {
       localStorage.removeItem('scheduleCsvText');
       document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
       document.getElementById('scheduleFile').value = "";
+      const strategyContent = document.getElementById('strategyContent');
+      if (strategyContent) strategyContent.innerHTML = '';
+      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
+      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
     }
   }
 }
@@ -4515,7 +4545,7 @@ function calculateTeamStats(teamData) {
 /*-----SCOUTING SCHEDULE FUNCTIONS----*/
 function generateTargetedScoutingBlocks() {
   if (!scheduleCsvText) {
-    document.getElementById('targetedScoutingContainer').innerHTML =
+    document.getElementById('strategyContent').innerHTML =
       '<div style="color: #aaa; text-align: center; width: 100%;">Upload match schedule CSV first</div>';
     return;
   }
@@ -4529,7 +4559,7 @@ function generateTargetedScoutingBlocks() {
   const blueIndices = [headers.indexOf("Blue 1"), headers.indexOf("Blue 2"), headers.indexOf("Blue 3")];
 
   if (matchIndex === -1 || redIndices.includes(-1) || blueIndices.includes(-1)) {
-    document.getElementById('targetedScoutingContainer').innerHTML =
+    document.getElementById('strategyContent').innerHTML =
       '<div style="color: red;">Error: Could not find expected column headers in CSV</div>';
     return;
   }
@@ -4578,54 +4608,54 @@ function generateTargetedScoutingBlocks() {
 
   const sortedMatches = Object.keys(scoutingMap).map(n => parseInt(n)).sort((a, b) => a - b);
 
-  const container = document.getElementById('targetedScoutingContainer');
+  const container = document.getElementById('strategyContent');
   container.innerHTML = '';
 
-const currentQualSection = document.createElement('div');
-currentQualSection.style.marginBottom = '18px';
-currentQualSection.style.display = 'flex';
-currentQualSection.style.alignItems = 'center';
-currentQualSection.style.gap = '10px';
+  const currentQualSection = document.createElement('div');
+  currentQualSection.style.marginBottom = '18px';
+  currentQualSection.style.display = 'flex';
+  currentQualSection.style.alignItems = 'center';
+  currentQualSection.style.gap = '10px';
 
-const currentQualLabel = document.createElement('label');
-currentQualLabel.textContent = 'Current Qual Match:';
-currentQualLabel.style.color = 'white';
-currentQualLabel.style.fontWeight = 'bold';
-currentQualLabel.style.fontSize = '17px';
-currentQualLabel.setAttribute('for', 'currentQualMatch');
+  const currentQualLabel = document.createElement('label');
+  currentQualLabel.textContent = 'Current Qual Match:';
+  currentQualLabel.style.color = 'white';
+  currentQualLabel.style.fontWeight = 'bold';
+  currentQualLabel.style.fontSize = '17px';
+  currentQualLabel.setAttribute('for', 'currentQualMatch');
 
-const currentQualInput = document.createElement('input');
-currentQualInput.type = 'text';
-currentQualInput.id = 'currentQualMatch';
-currentQualInput.style.background = 'transparent';
-currentQualInput.style.border = 'none';
-currentQualInput.style.borderBottom = '2px solid white';
-currentQualInput.style.color = 'white';
-currentQualInput.style.fontSize = '17px';
-currentQualInput.style.fontFamily = 'inherit';
-currentQualInput.style.width = '70px';
-currentQualInput.style.marginLeft = '8px';
-currentQualInput.style.padding = '2px 0 2px 0';
-currentQualInput.style.outline = 'none';
-currentQualInput.style.boxShadow = 'none';
-currentQualInput.style.verticalAlign = 'middle';
-currentQualInput.style.textAlign = 'center';
+  const currentQualInput = document.createElement('input');
+  currentQualInput.type = 'text';
+  currentQualInput.id = 'currentQualMatch';
+  currentQualInput.style.background = 'transparent';
+  currentQualInput.style.border = 'none';
+  currentQualInput.style.borderBottom = '2px solid white';
+  currentQualInput.style.color = 'white';
+  currentQualInput.style.fontSize = '17px';
+  currentQualInput.style.fontFamily = 'inherit';
+  currentQualInput.style.width = '70px';
+  currentQualInput.style.marginLeft = '8px';
+  currentQualInput.style.padding = '2px 0 2px 0';
+  currentQualInput.style.outline = 'none';
+  currentQualInput.style.boxShadow = 'none';
+  currentQualInput.style.verticalAlign = 'middle';
+  currentQualInput.style.textAlign = 'center';
 
-const savedQual = localStorage.getItem('currentQualMatch');
-if (savedQual) currentQualInput.value = savedQual;
+  const savedQual = localStorage.getItem('currentQualMatch');
+  if (savedQual) currentQualInput.value = savedQual;
 
-currentQualInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    localStorage.setItem('currentQualMatch', currentQualInput.value);
-    generateTargetedScoutingBlocks();
-  }
-});
+  currentQualInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      localStorage.setItem('currentQualMatch', currentQualInput.value);
+      generateTargetedScoutingBlocks();
+    }
+  });
 
-currentQualSection.appendChild(currentQualLabel);
-currentQualSection.appendChild(currentQualInput);
-container.appendChild(currentQualSection);
+  currentQualSection.appendChild(currentQualLabel);
+  currentQualSection.appendChild(currentQualInput);
+  container.appendChild(currentQualSection);
 
-const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
+  const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
 
   if (sortedMatches.length === 0) {
     container.innerHTML += `
@@ -4654,7 +4684,7 @@ const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
   grid.style.width = '100%';
 
   sortedMatches.forEach(matchNum => {
-    if (matchNum < currentQual) return; 
+    if (matchNum < currentQual) return;
     const teams = Array.from(scoutingMap[matchNum]).filter(Boolean);
     if (teams.length === 0) return;
 
@@ -4722,7 +4752,7 @@ const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
   matchesWith226
     .sort((a, b) => a.matchNum - b.matchNum)
     .forEach(({ matchNum, opponents, partners }) => {
-      if (matchNum < currentQual) return; 
+      if (matchNum < currentQual) return;
       const matchObj = schedule.find(m => m.match === matchNum);
       let isRed = false, isBlue = false;
       if (matchObj) {
@@ -4770,10 +4800,23 @@ const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
       viewBtn.onclick = function (e) {
         e.stopPropagation();
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(button => {
+          button.classList.remove('active');
+          button.removeAttribute('disabled');
+          button.style.pointerEvents = 'auto';
+          button.style.opacity = '1';
+        });
+
         document.getElementById('matchPredictor').classList.add('active');
         document.querySelector('.tab[onclick*="matchPredictor"]').classList.add('active');
         document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
+
+        const scoutingTab = document.querySelector('.tab[onclick*="scoutingSchedule"]');
+        if (scoutingTab) {
+          scoutingTab.removeAttribute('disabled');
+          scoutingTab.style.pointerEvents = 'auto';
+          scoutingTab.style.opacity = '1';
+        }
 
         if (matchObj) {
           for (let i = 0; i < 3; i++) {
@@ -4786,7 +4829,6 @@ const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
           }
         }
       };
-
       toggleHeader.appendChild(arrowImg);
       toggleHeader.appendChild(qualLabel);
       toggleHeader.appendChild(viewBtn);
@@ -4867,3 +4909,278 @@ const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
   mainFlex.appendChild(rightPanel);
   container.appendChild(mainFlex);
 }
+
+function renderTargetedScouterView() {
+  const container = document.getElementById('targetedScoutingContainer');
+  container.innerHTML = '';
+
+  const mainFlex = document.createElement('div');
+  mainFlex.style.display = 'flex';
+  mainFlex.style.width = '100%';
+  mainFlex.style.gap = '20px';
+  mainFlex.style.alignItems = 'flex-start';
+
+  const leftPanel = document.createElement('div');
+  leftPanel.style.flex = '3 1 0';
+  leftPanel.style.maxWidth = '75%';
+
+  const currentQualSection = document.createElement('div');
+  currentQualSection.style.marginBottom = '18px';
+  currentQualSection.style.display = 'flex';
+  currentQualSection.style.alignItems = 'center';
+  currentQualSection.style.gap = '10px';
+
+  const currentQualLabel = document.createElement('label');
+  currentQualLabel.textContent = 'Current Qual Match:';
+  currentQualLabel.style.color = 'white';
+  currentQualLabel.style.fontWeight = 'bold';
+  currentQualLabel.style.fontSize = '17px';
+  currentQualLabel.setAttribute('for', 'currentQualMatchPicklist');
+
+  const currentQualInput = document.createElement('input');
+  currentQualInput.type = 'text';
+  currentQualInput.id = 'currentQualMatchPicklist';
+  currentQualInput.style.background = 'transparent';
+  currentQualInput.style.border = 'none';
+  currentQualInput.style.borderBottom = '2px solid white';
+  currentQualInput.style.color = 'white';
+  currentQualInput.style.fontSize = '17px';
+  currentQualInput.style.fontFamily = 'inherit';
+  currentQualInput.style.width = '70px';
+  currentQualInput.style.marginLeft = '8px';
+  currentQualInput.style.padding = '2px 0 2px 0';
+  currentQualInput.style.outline = 'none';
+  currentQualInput.style.boxShadow = 'none';
+  currentQualInput.style.verticalAlign = 'middle';
+  currentQualInput.style.textAlign = 'center';
+
+  const savedQual = localStorage.getItem('currentQualMatchPicklist');
+  if (savedQual) currentQualInput.value = savedQual;
+
+  currentQualInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      localStorage.setItem('currentQualMatchPicklist', currentQualInput.value);
+      renderTargetedBlocks();
+    }
+  });
+
+  currentQualSection.appendChild(currentQualLabel);
+  currentQualSection.appendChild(currentQualInput);
+  leftPanel.appendChild(currentQualSection);
+
+  const rightPanel = document.createElement('div');
+  rightPanel.style.flex = '1 1 0';
+  rightPanel.style.maxWidth = '25%';
+  rightPanel.style.background = '#1C1E21';
+  rightPanel.style.borderRadius = '12px';
+  rightPanel.style.padding = '18px 12px';
+  rightPanel.style.color = 'white';
+  rightPanel.style.boxShadow = '#131416 0px 0px 10px';
+  rightPanel.style.fontFamily = 'Lato';
+  rightPanel.style.display = 'flex';
+  rightPanel.style.flexDirection = 'column';
+  rightPanel.style.gap = '12px';
+
+  rightPanel.innerHTML = `
+  <h3 style="margin:0 0 10px 0; text-align:center; border-bottom: 2px solid #1e90ff;
+    padding-bottom: 8px; color:white;">Picklist Teams</h3>
+  <div style="display:flex;gap:10px;margin-bottom:15px;">
+    <input type="text" id="picklistInput" placeholder="Team #"
+      style="flex:1;padding:8px;border-radius:4px;background-color:#2a2d31;color:white;border:1px solid #888;font-family:'Lato';font-size:medium;">
+    <button id="addPicklistBtn" style="padding:8px 16px;background:#1e90ff;color:white;border:none;border-radius:4px;font-weight:bold;cursor:pointer;">Add</button>
+  </div>
+  <div id="picklistListContainer" style="max-height:300px;overflow-y:auto;transition:max-height 0.3s;">
+    <ul id="picklistList" style="list-style:none;padding:0;margin:0;color:white;font-family:'Lato';font-size:medium;"></ul>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:15px;justify-content:center;">
+    <button id="resetPicklistBtn" style="
+      background: #ff1e1e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      padding: 8px 28px;
+      cursor: pointer;
+    "
+    onmouseover="this.style.background='#ff7b7b';this.style.boxShadow='0 4px 16px #ff5c5c55';"
+    onmouseout="this.style.background='#ff5c5c';this.style.boxShadow='0 2px 8px #0003';"
+    >Reset</button>
+  </div>
+`;
+  let picklist = JSON.parse(localStorage.getItem('picklist') || '[]');
+  renderPicklist();
+
+  rightPanel.querySelector('#addPicklistBtn').onclick = function () {
+    const input = rightPanel.querySelector('#picklistInput');
+    const teamNumber = input.value.trim();
+    if (!teamNumber) return;
+    if (!picklist.includes(teamNumber)) {
+      picklist.push(teamNumber);
+      picklist.sort((a, b) => parseInt(a) - parseInt(b));
+      input.value = '';
+      renderPicklist();
+      localStorage.setItem('picklist', JSON.stringify(picklist));
+      renderTargetedBlocks();
+    }
+  };
+
+  rightPanel.querySelector('#resetPicklistBtn').onclick = function () {
+    picklist = [];
+    renderPicklist();
+    localStorage.setItem('picklist', JSON.stringify(picklist));
+    renderTargetedBlocks();
+  };
+
+  function renderPicklist() {
+    const list = rightPanel.querySelector('#picklistList');
+    list.innerHTML = '';
+    picklist.forEach(team => {
+      const listItem = document.createElement('li');
+      listItem.style.display = 'flex';
+      listItem.style.justifyContent = 'space-between';
+      listItem.style.alignItems = 'center';
+      listItem.style.marginBottom = '8px';
+      listItem.style.padding = '6px 10px';
+      listItem.style.backgroundColor = '#1C1E21';
+      listItem.style.borderRadius = '4px';
+      listItem.style.border = '1px solid #1e90ff';
+
+      const teamText = document.createElement('span');
+      teamText.textContent = `Team ${team}`;
+      teamText.style.color = 'white';
+      listItem.appendChild(teamText);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'X';
+      deleteButton.style.padding = '2px 8px';
+      deleteButton.style.backgroundColor = '#ff5c5c';
+      deleteButton.style.color = 'white';
+      deleteButton.style.border = 'none';
+      deleteButton.style.borderRadius = '4px';
+      deleteButton.style.cursor = 'pointer';
+
+      deleteButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        picklist = picklist.filter(t => t !== team);
+        renderPicklist();
+        localStorage.setItem('picklist', JSON.stringify(picklist));
+        renderTargetedBlocks();
+      });
+
+      listItem.appendChild(deleteButton);
+      list.appendChild(listItem);
+    });
+  }
+
+  const blocksContainer = document.createElement('div');
+  blocksContainer.id = 'targetedBlocksContainer';
+  leftPanel.appendChild(blocksContainer);
+
+  mainFlex.appendChild(leftPanel);
+  mainFlex.appendChild(rightPanel);
+  container.appendChild(mainFlex);
+
+  renderTargetedBlocks();
+
+  function renderTargetedBlocks() {
+    blocksContainer.innerHTML = '';
+    if (!scheduleCsvText) {
+      blocksContainer.innerHTML = '<div style="color: #aaa; text-align: center; width: 100%;">Upload match schedule CSV first</div>';
+      return;
+    }
+    const rows = scheduleCsvText.trim().split("\n").map(r => r.split(","));
+    const headers = rows[0].map(h => h.trim());
+    const matchIndex = headers.indexOf("Match");
+    const redIndices = [headers.indexOf("Red 1"), headers.indexOf("Red 2"), headers.indexOf("Red 3")];
+    const blueIndices = [headers.indexOf("Blue 1"), headers.indexOf("Blue 2"), headers.indexOf("Blue 3")];
+    if (matchIndex === -1 || redIndices.includes(-1) || blueIndices.includes(-1)) {
+      blocksContainer.innerHTML = '<div style="color: red;">Error: Could not find expected column headers in CSV</div>';
+      return;
+    }
+    const schedule = rows.slice(1).map(row => {
+      const match = parseInt(row[matchIndex]);
+      const red = redIndices.map(i => row[i]?.trim()).filter(Boolean);
+      const blue = blueIndices.map(i => row[i]?.trim()).filter(Boolean);
+      return { match, teams: [...red, ...blue] };
+    }).filter(m => !isNaN(m.match));
+
+    const matchesWithPicklist = [];
+    schedule.forEach(({ match, teams }) => {
+      picklist.forEach(team => {
+        if (teams.includes(team)) {
+          matchesWithPicklist.push({ match, team });
+        }
+      });
+    });
+
+    const uniqueMatches = [];
+    const seen = new Set();
+    matchesWithPicklist.forEach(({ match, team }) => {
+      const key = `${match}-${team}`;
+      if (!seen.has(key)) {
+        uniqueMatches.push({ match, team });
+        seen.add(key);
+      }
+    });
+
+    const currentQual = parseInt(localStorage.getItem('currentQualMatchPicklist')) || 1;
+
+    const filteredMatches = uniqueMatches.filter(({ match }) => match >= currentQual);
+
+    if (filteredMatches.length === 0) {
+      blocksContainer.innerHTML = `<div style="color: #aaa; text-align: center; width: 100%;">No matches found for picklist teams.</div>`;
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'row';
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(175px, 1fr))';
+    grid.style.gap = '15px';
+    grid.style.width = '100%';
+
+    filteredMatches.sort((a, b) => a.match - b.match || a.team.localeCompare(b.team)).forEach(({ match, team }) => {
+      const block = document.createElement('div');
+      block.style.backgroundColor = '#1C1E21';
+      block.style.borderRadius = '12px';
+      block.style.padding = '15px';
+      block.style.color = 'white';
+      block.style.boxShadow = '#131416 0px 0px 10px';
+      block.style.fontFamily = 'Lato';
+      block.style.display = 'flex';
+      block.style.flexDirection = 'column';
+      block.style.gap = '10px';
+
+      const header = document.createElement('h3');
+      header.textContent = `Match ${match}`;
+      header.style.margin = '0 0 10px 0';
+      header.style.color = '#1e90ff';
+      header.style.fontSize = '18px';
+      header.style.textAlign = 'center';
+      block.appendChild(header);
+
+      const teamDiv = document.createElement('div');
+      teamDiv.style.display = 'flex';
+      teamDiv.style.alignItems = 'center';
+      teamDiv.style.justifyContent = 'center';
+      teamDiv.style.gap = '8px';
+      teamDiv.style.width = '100%';
+
+      const teamLabel = document.createElement('span');
+      teamLabel.textContent = `Team ${team}`;
+      teamLabel.style.fontWeight = 'bold';
+      teamLabel.style.textAlign = 'center';
+      teamLabel.style.color = 'white';
+      teamDiv.appendChild(teamLabel);
+
+      block.appendChild(teamDiv);
+      grid.appendChild(block);
+    });
+
+    blocksContainer.appendChild(grid);
+  }
+}
+
+window.renderTargetedScouterView = renderTargetedScouterView;
+window.generateTargetedScoutingBlocks = generateTargetedScoutingBlocks;
+
