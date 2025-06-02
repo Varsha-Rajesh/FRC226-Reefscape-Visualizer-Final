@@ -24,6 +24,7 @@
     <div class="tab" onclick="showTab(event, 'comparison')">Comparison View</div>
     <div class="tab" onclick="showTab(event, 'filterTeams')">Filter Teams</div>
     <div class="tab" onclick="showTab(event, 'matchPredictor')">Match Predictor</div>
+    <div class="tab" onclick="showTab(event, 'scoutingSchedule')">Scouting Schedule</div>
     <div class="tab" onclick="showTab(event, 'csvUpload')">CSV Upload</div>
 
     <div id="latestMatchInfoSidebar"
@@ -569,8 +570,8 @@
           <input type="text" id="matchNumberInput"
             style="width: 75px; text-align: center; padding: 4px; border-radius: 4px; border-top: 2px solid transparent; border-left: 2px solid transparent; border-right: 2px solid transparent; border-bottom: 2px solid white; background-color: #1C1E21; color: #fff; font-family: 'Lato'; font-size: large; transition: border-color 0.2s ease; outline: none;"
             autocomplete="off">
-          <button onclick="renderMatchPredictor()" class="blue-button"
-            style="padding: 8px 16px; min-width: 120px;">Predict Match</button>
+          <button onclick="renderMatchPredictor()" id="predict-button"
+            style="padding: 8px 16px; min-width: 75px;">Predict</button>
         </div>
       </div>
 
@@ -659,208 +660,217 @@
         </div>
       </div>
     </div>
+    <!-- SCOUTING SCHEDULE -->
+    <div id="scoutingSchedule" class="tab-content">
+      <h1>Scouting Schedule</h1>
 
-    <!--CSV UPLOAD-->
+        <div id="scoutingScheduleHeader"
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3 id="scoutingScheduleTitle" style="margin: 0; color: white;">Strategist's View</h3>
+        </div>
+        <div id="targetedScoutingContainer"></div>
+      </div>
+  <!--CSV UPLOAD-->
 
-    <div id="csvUpload" class="tab-content">
-      <h1>CSV Upload</h1>
+  <div id="csvUpload" class="tab-content">
+    <h1>CSV Upload</h1>
 
-      <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-          <div style="flex: 1; margin-right: 20px;">
-            <label for="dataFile">Event Scouting CSV:</label>
-            <div class="file-upload-container">
-              <input type="file" id="dataFile" name="dataFile" accept=".csv" />
-              <button type="submit" id="submitData" style="margin-left: 10px;">Upload</button>
-              <button type="button" class="delete-btn" onclick="deleteFile('dataFile')">Delete</button>
-            </div>
-            <div id="statusData"></div>
+    <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <div style="flex: 1; margin-right: 20px;">
+          <label for="dataFile">Event Scouting CSV:</label>
+          <div class="file-upload-container">
+            <input type="file" id="dataFile" name="dataFile" accept=".csv" />
+            <button type="submit" id="submitData" style="margin-left: 10px;">Upload</button>
+            <button type="button" class="delete-btn" onclick="deleteFile('dataFile')">Delete</button>
+          </div>
+          <div id="statusData"></div>
 
-            <label for="pitFile">Pit Scouting CSV:</label>
-            <div class="file-upload-container">
-              <input type="file" id="pitFile" name="dataFile" accept=".csv" />
-              <button type="submit" id="submitPit" style="margin-left: 10px;"> Upload</button>
-              <button type="button" class="delete-btn" onclick="deleteFile('pitFile')">Delete</button>
-            </div>
-            <div id="statusPit"></div>
+          <label for="pitFile">Pit Scouting CSV:</label>
+          <div class="file-upload-container">
+            <input type="file" id="pitFile" name="dataFile" accept=".csv" />
+            <button type="submit" id="submitPit" style="margin-left: 10px;"> Upload</button>
+            <button type="button" class="delete-btn" onclick="deleteFile('pitFile')">Delete</button>
+          </div>
+          <div id="statusPit"></div>
 
-            <label for="scheduleFile">Match Schedule CSV:</label>
-            <div class="file-upload-container">
-              <input type="file" id="scheduleFile" name="dataFile" accept=".csv" />
-              <button type="submit" id="submitSchedule" style="margin-left: 10px;"> Upload</button>
-              <button type="button" class="delete-btn" onclick="deleteFile('scheduleFile')">Delete</button>
-            </div>
-            <div id="statusSchedule"></div>
+          <label for="scheduleFile">Match Schedule CSV:</label>
+          <div class="file-upload-container">
+            <input type="file" id="scheduleFile" name="dataFile" accept=".csv" />
+            <button type="submit" id="submitSchedule" style="margin-left: 10px;"> Upload</button>
+            <button type="button" class="delete-btn" onclick="deleteFile('scheduleFile')">Delete</button>
+          </div>
+          <div id="statusSchedule"></div>
+        </div>
+
+        <div style="flex: 0 0 300px; background-color: #1C1E21; border-radius: 12px; padding: 15px;">
+          <h3 style="color: white; margin-top: 0;">TBA Event Verification</h3>
+
+          <div style="margin-bottom: 10px;">
+            <label for="tbaEventKey" style="display: block; margin-bottom: 5px;">Event Key:</label>
+            <input type="text" id="tbaEventKey" placeholder="e.g. 2025mitry"
+              style="width: 100%; background-color: #2a2d31; border: 1px solid #888888;">
           </div>
 
-          <div style="flex: 0 0 300px; background-color: #1C1E21; border-radius: 12px; padding: 15px;">
-            <h3 style="color: white; margin-top: 0;">TBA Event Verification</h3>
-
-            <div style="margin-bottom: 10px;">
-              <label for="tbaEventKey" style="display: block; margin-bottom: 5px;">Event Key:</label>
-              <input type="text" id="tbaEventKey" placeholder="e.g. 2025mitry"
-                style="width: 100%; background-color: #2a2d31; border: 1px solid #888888;">
-            </div>
-
-            <div style="position: relative; margin-bottom: 10px;">
-              <button id="verifyWithTBABtn"
-                style="width: 100%; background-color: #1e90ff; border: none; font-size:16px; padding: 8px 0;">
-                Verify With TBA
-              </button>
-            </div>
-            <div id="tbaStatus" style="margin-top: 5px; color: #aaa; font-size: 12px; font-style: italic;"></div>
-
-            <div style="position: relative; margin-top: 10px;">
-              <div style="position: absolute; left: -25px; top: 50%; transform: translateY(-50%);">
-                <a href="#" onclick="showTab(event, 'updateClimbInfo')">
-                  <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
-                </a>
-              </div>
-              <button id="updateClimbsBtn"
-                style="width: 100%; background-color: #ff1e1e; border: none; font-size:16px; padding: 8px 0;">
-                Update Climbs
-              </button>
-            </div>
-            <div id="downloadStatus" style="margin-top: 5px; color: #aaa; font-size: 14px;"></div>
+          <div style="position: relative; margin-bottom: 10px;">
+            <button id="verifyWithTBABtn"
+              style="width: 100%; background-color: #1e90ff; border: none; font-size:16px; padding: 8px 0;">
+              Verify With TBA
+            </button>
           </div>
+          <div id="tbaStatus" style="margin-top: 5px; color: #aaa; font-size: 12px; font-style: italic;"></div>
 
+          <div style="position: relative; margin-top: 10px;">
+            <div style="position: absolute; left: -25px; top: 50%; transform: translateY(-50%);">
+              <a href="#" onclick="showTab(event, 'updateClimbInfo')">
+                <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+              </a>
+            </div>
+            <button id="updateClimbsBtn"
+              style="width: 100%; background-color: #ff1e1e; border: none; font-size:16px; padding: 8px 0;">
+              Update Climbs
+            </button>
+          </div>
+          <div id="downloadStatus" style="margin-top: 5px; color: #aaa; font-size: 14px;"></div>
         </div>
-      </form>
-      <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 style="margin: 0;">Matches to Re-Scout</h2>
-          <select id="rescoutFilter" class="dropdown" style="font-size: 16px; margin-right:15px">
-            <option value="all">All</option>
-            <option value="climb">Climb</option>
-            <option value="coral">Coral</option>
-            <option value="others">Other</option>
-          </select>
-        </div>
-        <input type="checkbox" id="hideCoralMismatch">
-        <label id="hideCoralMismatchLabel" for="hideCoralMismatch">
-          Hide matches with &lt; 3 coral incorrect
-        </label>
+
       </div>
-
-      <div id="rescoutSection" class="rescout-section">
-        <div class="rescout-table-container">
-          <table id="rescoutTable" style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="border-bottom: 2px solid #1e90ff;">
-                <th>Qualification Match</th>
-                <th>Team # or Robot Color</th>
-                <th>Reasoning</th>
-              </tr>
-            </thead>
-            <tbody id="rescoutBody">
-              <tr>
-                <td colspan="3" class="no-rescout"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    </form>
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2 style="margin: 0;">Matches to Re-Scout</h2>
+        <select id="rescoutFilter" class="dropdown" style="font-size: 16px; margin-right:15px">
+          <option value="all">All</option>
+          <option value="climb">Climb</option>
+          <option value="coral">Coral</option>
+          <option value="others">Other</option>
+        </select>
       </div>
-
+      <input type="checkbox" id="hideCoralMismatch">
+      <label id="hideCoralMismatchLabel" for="hideCoralMismatch">
+        Hide matches with &lt; 3 coral incorrect
+      </label>
     </div>
-    <div id="updateClimbInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
-      <h1>Update Climbs</h1>
-      <div style="background-color: #1C1E21; padding: 20px; border-radius: 8px;">
-        <p style="color: white;">This feature downloads updated climb data from <strong>The Blue Alliance (TBA)</strong>
-          and applies it to your local match records. Turn on permissions to download multiple files at once.</p>
 
-        <p style="color: white;">When you click <strong>Update Climbs</strong>, the system will:</p>
-        <ul style="color: white;">
-          <li>Download two files:
-            <ul>
-              <li style="margin-top:5px; font-size:14px;"><strong>Change Log:</strong> A summary of what changed</li>
-              <li style="margin-top:5px; font-size:14px;"><strong>New Match Data CSV:</strong> Updated with new climb
-                scores and total scores</li>
-            </ul>
-          </li>
-        </ul>
-
-        <h4 style="color: #1e90ff; margin-top: 20px;">Examples of Changes</h4>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+    <div id="rescoutSection" class="rescout-section">
+      <div class="rescout-table-container">
+        <table id="rescoutTable" style="width: 100%; border-collapse: collapse;">
           <thead>
-            <tr>
-              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Scouter</th>
-              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">TBA</th>
-              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Final</th>
+            <tr style="border-bottom: 2px solid #1e90ff;">
+              <th>Qualification Match</th>
+              <th>Team # or Robot Color</th>
+              <th>Reasoning</th>
             </tr>
           </thead>
-          <tbody style="color: white;">
+          <tbody id="rescoutBody">
             <tr>
-              <td style="padding: 8px;">Deep Climb</td>
-              <td style="padding: 8px;">Park</td>
-              <td style="padding: 8px;">Failed Climb</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">Shallow Climb</td>
-              <td style="padding: 8px;">Park</td>
-              <td style="padding: 8px;">Failed Climb</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">Deep Climb</td>
-              <td style="padding: 8px;">Shallow Climb</td>
-              <td style="padding: 8px;">Shallow Climb</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">Park</td>
-              <td style="padding: 8px;">Deep Climb</td>
-              <td style="padding: 8px;">Deep Climb</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">Park</td>
-              <td style="padding: 8px;">None</td>
-              <td style="padding: 8px;">None</td>
+              <td colspan="3" class="no-rescout"></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div id="defenseRankingInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
-      <h1>Defense Ranking</h1>
-      <div style="display: flex; gap: 20px;">
-        <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
-          <p style="color: white;">The defense ranking measures how effectively a team plays defense against their
-            opponents.</p>
 
-          <h3 style="color: #1e90ff; margin-top: 20px;">How It's Calculated</h3>
-          <p style="color: white;">For each match where a team plays defense:</p>
-          <ol style="color: white;">
-            <li>Calculate the EPA of the opposing alliance</li>
-            <li>Compare this to the actual score the opposing alliance achieved in the match</li>
-            <li>The difference is the defense impact for that match</li>
-            <li>The defense ranking is based on the average impact across all matches</li>
-            <li>If an opponent robot died in the match, the robot's defense isn't taken into account</li>
-          </ol>
+  </div>
+  <div id="updateClimbInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
+    <h1>Update Climbs</h1>
+    <div style="background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+      <p style="color: white;">This feature downloads updated climb data from <strong>The Blue Alliance (TBA)</strong>
+        and applies it to your local match records. Turn on permissions to download multiple files at once.</p>
 
-          <h3 style="color: #1e90ff; margin-top: 20px;">Interpreting the Numbers</h3>
-          <ul style="color: white;">
-            <li><strong>Higher positive numbers</strong> mean the team is more effective at defense</li>
-            <li><strong>Negative numbers</strong> suggest the opposing alliance scored more than expected</li>
-            <li><strong>Rank</strong> shows how the team compares to others who play defense</li>
+      <p style="color: white;">When you click <strong>Update Climbs</strong>, the system will:</p>
+      <ul style="color: white;">
+        <li>Download two files:
+          <ul>
+            <li style="margin-top:5px; font-size:14px;"><strong>Change Log:</strong> A summary of what changed</li>
+            <li style="margin-top:5px; font-size:14px;"><strong>New Match Data CSV:</strong> Updated with new climb
+              scores and total scores</li>
           </ul>
-        </div>
+        </li>
+      </ul>
 
-        <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
-          <h3 style="color: #1e90ff; margin-top: 0;">Defense Team Rankings</h3>
-          <div style="max-height: 500px; overflow-y: auto;">
-            <table style="width: 100%; border-collapse: collapse; color: white;">
-              <thead>
-                <tr>
-                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Rank</th>
-                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Team</th>
-                  <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Avg Impact</th>
-                </tr>
-              </thead>
-              <tbody id="defenseRankingTableBody">
-              </tbody>
-            </table>
-          </div>
+      <h4 style="color: #1e90ff; margin-top: 20px;">Examples of Changes</h4>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+          <tr>
+            <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Scouter</th>
+            <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">TBA</th>
+            <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Final</th>
+          </tr>
+        </thead>
+        <tbody style="color: white;">
+          <tr>
+            <td style="padding: 8px;">Deep Climb</td>
+            <td style="padding: 8px;">Park</td>
+            <td style="padding: 8px;">Failed Climb</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;">Shallow Climb</td>
+            <td style="padding: 8px;">Park</td>
+            <td style="padding: 8px;">Failed Climb</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;">Deep Climb</td>
+            <td style="padding: 8px;">Shallow Climb</td>
+            <td style="padding: 8px;">Shallow Climb</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;">Park</td>
+            <td style="padding: 8px;">Deep Climb</td>
+            <td style="padding: 8px;">Deep Climb</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;">Park</td>
+            <td style="padding: 8px;">None</td>
+            <td style="padding: 8px;">None</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="defenseRankingInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
+    <h1>Defense Ranking</h1>
+    <div style="display: flex; gap: 20px;">
+      <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+        <p style="color: white;">The defense ranking measures how effectively a team plays defense against their
+          opponents.</p>
+
+        <h3 style="color: #1e90ff; margin-top: 20px;">How It's Calculated</h3>
+        <p style="color: white;">For each match where a team plays defense:</p>
+        <ol style="color: white;">
+          <li>Calculate the EPA of the opposing alliance</li>
+          <li>Compare this to the actual score the opposing alliance achieved in the match</li>
+          <li>The difference is the defense impact for that match</li>
+          <li>The defense ranking is based on the average impact across all matches</li>
+          <li>If an opponent robot died in the match, the robot's defense isn't taken into account</li>
+        </ol>
+
+        <h3 style="color: #1e90ff; margin-top: 20px;">Interpreting the Numbers</h3>
+        <ul style="color: white;">
+          <li><strong>Higher positive numbers</strong> mean the team is more effective at defense</li>
+          <li><strong>Negative numbers</strong> suggest the opposing alliance scored more than expected</li>
+          <li><strong>Rank</strong> shows how the team compares to others who play defense</li>
+        </ul>
+      </div>
+
+      <div style="flex: 1; background-color: #1C1E21; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #1e90ff; margin-top: 0;">Defense Team Rankings</h3>
+        <div style="max-height: 500px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse; color: white;">
+            <thead>
+              <tr>
+                <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Rank</th>
+                <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Team</th>
+                <th style="border-bottom: 2px solid #1e90ff; padding: 8px; text-align: left;">Avg Impact</th>
+              </tr>
+            </thead>
+            <tbody id="defenseRankingTableBody">
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
+  </div>
   </div>
   <div id="global-tooltip"></div>
   <div id="allianceComparisonPopup"
@@ -883,6 +893,20 @@
         navigator.serviceWorker.register('service-worker.js');
       });
     }
+  </script>
+  <script>
+    // Load match schedule on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      loadMatchSchedule();
+    });
+
+    // Also call after schedule upload
+    document.getElementById('submitSchedule').addEventListener('click', function () {
+      setTimeout(loadMatchSchedule, 500); // Give time for upload to finish
+    });
+
+    // Update schedule when current match changes
+    document.getElementById('currentQualMatch').addEventListener('input', updateScoutingSchedule);
   </script>
 </body>
 

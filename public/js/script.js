@@ -85,6 +85,7 @@ async function handleScheduleUpload(e) {
       localStorage.setItem('scheduleCsvText', scheduleCsvText);
       let uploadStatus = '';
       statusEl.textContent = `Successfully uploaded ${matchCount} matches${uploadStatus}`;
+      generateTargetedScoutingBlocks(); 
     } catch (err) {
       statusEl.textContent = 'Error processing file';
       console.error(err);
@@ -1736,7 +1737,7 @@ function renderEpaTrendChart(data, canvasId) {
           pointHitRadius: 10,
           pointHoverRadius: 6,
           tension: 0,
-          hidden: !showAvg  
+          hidden: !showAvg
         }
       ]
     },
@@ -3535,14 +3536,14 @@ function renderMatchPredictor() {
     }
   }
 
-['redTeam1','redTeam2','redTeam3','blueTeam1','blueTeam2','blueTeam3'].forEach(id => {
-  const input = document.getElementById(id);
-  if (input) {
-    input.addEventListener('input', function() {
-      document.getElementById('matchNumberInput').value = '';
-    });
-  }
-});
+  ['redTeam1', 'redTeam2', 'redTeam3', 'blueTeam1', 'blueTeam2', 'blueTeam3'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', function () {
+        document.getElementById('matchNumberInput').value = '';
+      });
+    }
+  });
 
   const redTeams = [];
   const blueTeams = [];
@@ -4509,4 +4510,360 @@ function calculateTeamStats(teamData) {
     climbSuccessRate,
     robotDiedRate
   };
+}
+
+/*-----SCOUTING SCHEDULE FUNCTIONS----*/
+function generateTargetedScoutingBlocks() {
+  if (!scheduleCsvText) {
+    document.getElementById('targetedScoutingContainer').innerHTML =
+      '<div style="color: #aaa; text-align: center; width: 100%;">Upload match schedule CSV first</div>';
+    return;
+  }
+
+  const TEAM = "226";
+  const rows = scheduleCsvText.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim());
+
+  const matchIndex = headers.indexOf("Match");
+  const redIndices = [headers.indexOf("Red 1"), headers.indexOf("Red 2"), headers.indexOf("Red 3")];
+  const blueIndices = [headers.indexOf("Blue 1"), headers.indexOf("Blue 2"), headers.indexOf("Blue 3")];
+
+  if (matchIndex === -1 || redIndices.includes(-1) || blueIndices.includes(-1)) {
+    document.getElementById('targetedScoutingContainer').innerHTML =
+      '<div style="color: red;">Error: Could not find expected column headers in CSV</div>';
+    return;
+  }
+
+  const schedule = rows.slice(1).map(row => {
+    const match = parseInt(row[matchIndex]);
+    const red = redIndices.map(i => row[i]?.trim()).filter(Boolean);
+    const blue = blueIndices.map(i => row[i]?.trim()).filter(Boolean);
+    return { match, red, blue };
+  }).filter(m => !isNaN(m.match));
+
+  const teamMatches = {};
+  schedule.forEach(({ match, red, blue }) => {
+    [...red, ...blue].forEach(team => {
+      if (!teamMatches[team]) teamMatches[team] = [];
+      teamMatches[team].push(match);
+    });
+  });
+  Object.values(teamMatches).forEach(list => list.sort((a, b) => a - b));
+
+  const matchesWith226 = [];
+  schedule.forEach(({ match, red, blue }) => {
+    const isRed = red.includes(TEAM);
+    const isBlue = blue.includes(TEAM);
+    if (isRed || isBlue) {
+      const partners = (isRed ? red : blue).filter(t => t !== TEAM);
+      const opponents = isRed ? blue : red;
+      matchesWith226.push({ matchNum: match, opponents, partners });
+    }
+  });
+
+  const scoutingMap = {};
+  for (const { matchNum, opponents, partners } of matchesWith226) {
+    const teamsToScout = [...opponents, ...partners];
+    teamsToScout.forEach(team => {
+      const priorMatches = (teamMatches[team] || [])
+        .filter(m => m < matchNum)
+        .sort((a, b) => b - a)
+        .slice(0, 2);
+      priorMatches.forEach(m => {
+        if (!scoutingMap[m]) scoutingMap[m] = new Set();
+        scoutingMap[m].add(team);
+      });
+    });
+  }
+
+  const sortedMatches = Object.keys(scoutingMap).map(n => parseInt(n)).sort((a, b) => a - b);
+
+  const container = document.getElementById('targetedScoutingContainer');
+  container.innerHTML = '';
+
+const currentQualSection = document.createElement('div');
+currentQualSection.style.marginBottom = '18px';
+currentQualSection.style.display = 'flex';
+currentQualSection.style.alignItems = 'center';
+currentQualSection.style.gap = '10px';
+
+const currentQualLabel = document.createElement('label');
+currentQualLabel.textContent = 'Current Qual Match:';
+currentQualLabel.style.color = 'white';
+currentQualLabel.style.fontWeight = 'bold';
+currentQualLabel.style.fontSize = '17px';
+currentQualLabel.setAttribute('for', 'currentQualMatch');
+
+const currentQualInput = document.createElement('input');
+currentQualInput.type = 'text';
+currentQualInput.id = 'currentQualMatch';
+currentQualInput.style.background = 'transparent';
+currentQualInput.style.border = 'none';
+currentQualInput.style.borderBottom = '2px solid white';
+currentQualInput.style.color = 'white';
+currentQualInput.style.fontSize = '17px';
+currentQualInput.style.fontFamily = 'inherit';
+currentQualInput.style.width = '70px';
+currentQualInput.style.marginLeft = '8px';
+currentQualInput.style.padding = '2px 0 2px 0';
+currentQualInput.style.outline = 'none';
+currentQualInput.style.boxShadow = 'none';
+currentQualInput.style.verticalAlign = 'middle';
+currentQualInput.style.textAlign = 'center';
+
+const savedQual = localStorage.getItem('currentQualMatch');
+if (savedQual) currentQualInput.value = savedQual;
+
+currentQualInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    localStorage.setItem('currentQualMatch', currentQualInput.value);
+    generateTargetedScoutingBlocks();
+  }
+});
+
+currentQualSection.appendChild(currentQualLabel);
+currentQualSection.appendChild(currentQualInput);
+container.appendChild(currentQualSection);
+
+const currentQual = parseInt(localStorage.getItem('currentQualMatch')) || 1;
+
+  if (sortedMatches.length === 0) {
+    container.innerHTML += `
+      <div style="color: #aaa; text-align: center; width: 100%;">
+        No targeted scouting assignments found for team ${TEAM}.
+      </div>
+    `;
+    return;
+  }
+
+  const mainFlex = document.createElement('div');
+  mainFlex.style.display = 'flex';
+  mainFlex.style.width = '100%';
+  mainFlex.style.gap = '20px';
+  mainFlex.style.alignItems = 'flex-start';
+
+  const leftPanel = document.createElement('div');
+  leftPanel.style.flex = '3 1 0';
+  leftPanel.style.maxWidth = '75%';
+
+  const grid = document.createElement('div');
+  grid.className = 'row';
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(175px, 1fr))';
+  grid.style.gap = '15px';
+  grid.style.width = '100%';
+
+  sortedMatches.forEach(matchNum => {
+    if (matchNum < currentQual) return; 
+    const teams = Array.from(scoutingMap[matchNum]).filter(Boolean);
+    if (teams.length === 0) return;
+
+    const block = document.createElement('div');
+    block.style.backgroundColor = '#1C1E21';
+    block.style.borderRadius = '12px';
+    block.style.padding = '15px';
+    block.style.color = 'white';
+    block.style.boxShadow = '#131416 0px 0px 10px';
+    block.style.fontFamily = 'Lato';
+    block.style.display = 'flex';
+    block.style.flexDirection = 'column';
+    block.style.gap = '10px';
+
+    const header = document.createElement('h3');
+    header.textContent = `Match ${matchNum}`;
+    header.style.margin = '0 0 10px 0';
+    header.style.color = '#1e90ff';
+    header.style.fontSize = '18px';
+    header.style.textAlign = 'center';
+    block.appendChild(header);
+
+    const teamsList = document.createElement('div');
+    teamsList.style.display = 'flex';
+    teamsList.style.flexDirection = 'column';
+    teamsList.style.gap = '8px';
+    teamsList.style.alignItems = 'center';
+
+    teams.forEach(team => {
+      const teamDiv = document.createElement('div');
+      teamDiv.style.display = 'flex';
+      teamDiv.style.alignItems = 'center';
+      teamDiv.style.justifyContent = 'center';
+      teamDiv.style.gap = '8px';
+      teamDiv.style.width = '100%';
+
+      const teamLabel = document.createElement('span');
+      teamLabel.textContent = `Team ${team}`;
+      teamLabel.style.fontWeight = 'bold';
+      teamLabel.style.textAlign = 'center';
+      teamDiv.appendChild(teamLabel);
+      teamsList.appendChild(teamDiv);
+    });
+
+    block.appendChild(teamsList);
+    grid.appendChild(block);
+  });
+  leftPanel.appendChild(grid);
+
+  const rightPanel = document.createElement('div');
+  rightPanel.style.flex = '1 1 0';
+  rightPanel.style.maxWidth = '25%';
+  rightPanel.style.background = '#1C1E21';
+  rightPanel.style.borderRadius = '12px';
+  rightPanel.style.padding = '18px 12px';
+  rightPanel.style.color = 'white';
+  rightPanel.style.boxShadow = '#131416 0px 0px 10px';
+  rightPanel.style.fontFamily = 'Lato';
+  rightPanel.style.display = 'flex';
+  rightPanel.style.flexDirection = 'column';
+  rightPanel.style.gap = '12px';
+  rightPanel.innerHTML = `<h3 style="margin:0 0 10px 0; text-align:center; border-bottom: 2px solid #1e90ff;
+    padding-bottom: 8px; color:white;">226 Match Schedule</h3>`;
+
+  matchesWith226
+    .sort((a, b) => a.matchNum - b.matchNum)
+    .forEach(({ matchNum, opponents, partners }) => {
+      if (matchNum < currentQual) return; 
+      const matchObj = schedule.find(m => m.match === matchNum);
+      let isRed = false, isBlue = false;
+      if (matchObj) {
+        isRed = matchObj.red.includes(TEAM);
+        isBlue = matchObj.blue.includes(TEAM);
+      }
+
+      const matchRow = document.createElement('div');
+      matchRow.style.marginBottom = '10px';
+      matchRow.style.background = 'transparent';
+      matchRow.style.borderRadius = '8px';
+      matchRow.style.padding = '10px 8px';
+      matchRow.style.boxShadow = 'none';
+
+      const toggleHeader = document.createElement('div');
+      toggleHeader.style.display = 'flex';
+      toggleHeader.style.alignItems = 'center';
+      toggleHeader.style.cursor = 'pointer';
+
+      const arrowImg = document.createElement('img');
+      arrowImg.src = 'images/down_arrow.png';
+      arrowImg.alt = 'Toggle';
+      arrowImg.style.width = '16px';
+      arrowImg.style.height = '16px';
+      arrowImg.style.marginRight = '6px';
+      arrowImg.style.transition = 'transform 0.2s ease-in-out';
+
+      const qualLabel = document.createElement('span');
+      qualLabel.textContent = `Qualification Match ${matchNum}`;
+      qualLabel.style.fontWeight = 'bold';
+      qualLabel.style.color = '#fff';
+      qualLabel.style.flex = '1';
+
+      const viewBtn = document.createElement('button');
+      viewBtn.textContent = 'View';
+      viewBtn.className = 'blue-button';
+      viewBtn.style.marginLeft = '8px';
+      viewBtn.style.fontSize = '13px';
+      viewBtn.style.padding = '3px 10px';
+      viewBtn.style.height = '28px';
+      viewBtn.style.lineHeight = '1.2';
+      viewBtn.style.minWidth = 'unset';
+      viewBtn.style.borderRadius = '5px';
+
+      viewBtn.onclick = function (e) {
+        e.stopPropagation();
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
+        document.getElementById('matchPredictor').classList.add('active');
+        document.querySelector('.tab[onclick*="matchPredictor"]').classList.add('active');
+        document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
+
+        if (matchObj) {
+          for (let i = 0; i < 3; i++) {
+            document.getElementById(`redTeam${i + 1}`).value = matchObj.red[i] || '';
+            document.getElementById(`blueTeam${i + 1}`).value = matchObj.blue[i] || '';
+          }
+          document.getElementById('matchNumberInput').value = matchNum;
+          if (typeof renderMatchPredictor === 'function') {
+            renderMatchPredictor();
+          }
+        }
+      };
+
+      toggleHeader.appendChild(arrowImg);
+      toggleHeader.appendChild(qualLabel);
+      toggleHeader.appendChild(viewBtn);
+
+      matchRow.appendChild(toggleHeader);
+
+      const detailsDiv = document.createElement('div');
+      detailsDiv.style.marginTop = '10px';
+      detailsDiv.style.display = 'none';
+      detailsDiv.style.fontSize = '15px';
+
+      const redTeams = matchObj ? matchObj.red : [];
+      const blueTeams = matchObj ? matchObj.blue : [];
+
+      const listsWrapper = document.createElement('div');
+      listsWrapper.style.display = 'flex';
+      listsWrapper.style.flexDirection = 'row';
+      listsWrapper.style.gap = '8px';
+      listsWrapper.style.justifyContent = 'space-between';
+
+      const redDiv = document.createElement('div');
+      redDiv.style.display = 'flex';
+      redDiv.style.flexDirection = 'column';
+      redDiv.style.marginBottom = '8px';
+      redDiv.style.minWidth = '60px';
+      const redLabel = document.createElement('span');
+      redLabel.textContent = 'Red';
+      redLabel.style.color = '#ff5c5c';
+      redLabel.style.fontWeight = 'bold';
+      redLabel.style.marginBottom = '2px';
+      redLabel.style.fontSize = '18px';
+      redDiv.appendChild(redLabel);
+      redTeams.forEach(t => {
+        const teamSpan = document.createElement('span');
+        teamSpan.textContent = t;
+        teamSpan.style.color = t === TEAM ? '#ff5c5c' : '#fff';
+        teamSpan.style.fontWeight = t === TEAM ? 'bold' : 'normal';
+        teamSpan.style.fontSize = '17px';
+        redDiv.appendChild(teamSpan);
+      });
+
+      const blueDiv = document.createElement('div');
+      blueDiv.style.display = 'flex';
+      blueDiv.style.flexDirection = 'column';
+      blueDiv.style.marginBottom = '8px';
+      blueDiv.style.minWidth = '60px';
+      const blueLabel = document.createElement('span');
+      blueLabel.textContent = 'Blue';
+      blueLabel.style.color = '#3EDBF0';
+      blueLabel.style.fontWeight = 'bold';
+      blueLabel.style.marginBottom = '2px';
+      blueLabel.style.fontSize = '18px';
+      blueDiv.appendChild(blueLabel);
+      blueTeams.forEach(t => {
+        const teamSpan = document.createElement('span');
+        teamSpan.textContent = t;
+        teamSpan.style.color = t === TEAM ? '#3EDBF0' : '#fff';
+        teamSpan.style.fontWeight = t === TEAM ? 'bold' : 'normal';
+        teamSpan.style.fontSize = '17px';
+        blueDiv.appendChild(teamSpan);
+      });
+
+      listsWrapper.appendChild(redDiv);
+      listsWrapper.appendChild(blueDiv);
+      detailsDiv.appendChild(listsWrapper);
+
+      toggleHeader.addEventListener('click', () => {
+        const isOpen = detailsDiv.style.display === 'block';
+        detailsDiv.style.display = isOpen ? 'none' : 'block';
+        arrowImg.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      });
+
+      matchRow.appendChild(detailsDiv);
+      rightPanel.appendChild(matchRow);
+    });
+
+  mainFlex.appendChild(leftPanel);
+  mainFlex.appendChild(rightPanel);
+  container.appendChild(mainFlex);
 }
