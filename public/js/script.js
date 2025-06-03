@@ -351,21 +351,13 @@ function showTab(event, tabId) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(button => {
     button.classList.remove('active');
-    if (!button.getAttribute('onclick')?.includes('scoutingSchedule')) {
-      button.removeAttribute('disabled');
-      button.style.pointerEvents = 'auto';
-      button.style.opacity = '1';
-    }
+    button.removeAttribute('disabled');
+    button.style.pointerEvents = 'auto';
+    button.style.opacity = '1';
   });
 
   document.getElementById(tabId).classList.add('active');
   event.currentTarget.classList.add('active');
-
-  if (!event.currentTarget.getAttribute('onclick')?.includes('scoutingSchedule')) {
-    event.currentTarget.setAttribute('disabled', 'disabled');
-    event.currentTarget.style.pointerEvents = 'none';
-    event.currentTarget.style.opacity = '0.7';
-  }
 
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
 
@@ -373,9 +365,14 @@ function showTab(event, tabId) {
     document.getElementById('strategyContent').style.display = 'block';
     document.getElementById('targetedScoutingContainer').style.display = 'none';
     generateTargetedScoutingBlocks();
+    const btn = document.getElementById('viewToggleBtn');
+    const title = document.getElementById('scoutingScheduleTitle');
+    if (btn && title) {
+      title.textContent = "Strategist's View";
+      btn.textContent = "Switch to Targeted Scouting";
+    }
   }
 }
-
 
 // Individual View
 document.getElementById('search').addEventListener('click', searchTeam);
@@ -4436,7 +4433,7 @@ function openAllianceComparison(alliance) {
     const epaTrendCanvas = document.createElement('canvas');
     epaTrendCanvas.id = `allianceEPATrend${index}`;
     epaTrendCanvas.style.width = '100%';
-    epaTrendCanvas.style.height = 'auto';
+    epaTrendCanvas.style.height = '250px';
 
     const addChartTitle = (container, title) => {
       const titleDiv = document.createElement('div');
@@ -5104,28 +5101,19 @@ function renderTargetedScouterView() {
       return { match, teams: [...red, ...blue] };
     }).filter(m => !isNaN(m.match));
 
-    const matchesWithPicklist = [];
+    const matchToPicklistTeams = {};
     schedule.forEach(({ match, teams }) => {
-      picklist.forEach(team => {
-        if (teams.includes(team)) {
-          matchesWithPicklist.push({ match, team });
-        }
-      });
-    });
-
-    const uniqueMatches = [];
-    const seen = new Set();
-    matchesWithPicklist.forEach(({ match, team }) => {
-      const key = `${match}-${team}`;
-      if (!seen.has(key)) {
-        uniqueMatches.push({ match, team });
-        seen.add(key);
+      const presentPicklistTeams = picklist.filter(team => teams.includes(team));
+      if (presentPicklistTeams.length > 0) {
+        matchToPicklistTeams[match] = presentPicklistTeams;
       }
     });
 
     const currentQual = parseInt(localStorage.getItem('currentQualMatchPicklist')) || 1;
 
-    const filteredMatches = uniqueMatches.filter(({ match }) => match >= currentQual);
+    const filteredMatches = Object.entries(matchToPicklistTeams)
+      .filter(([match]) => parseInt(match) >= currentQual)
+      .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
 
     if (filteredMatches.length === 0) {
       blocksContainer.innerHTML = `<div style="color: #aaa; text-align: center; width: 100%;">No matches found for picklist teams.</div>`;
@@ -5139,7 +5127,7 @@ function renderTargetedScouterView() {
     grid.style.gap = '15px';
     grid.style.width = '100%';
 
-    filteredMatches.sort((a, b) => a.match - b.match || a.team.localeCompare(b.team)).forEach(({ match, team }) => {
+    filteredMatches.forEach(([match, teams]) => {
       const block = document.createElement('div');
       block.style.backgroundColor = '#1C1E21';
       block.style.borderRadius = '12px';
@@ -5159,27 +5147,40 @@ function renderTargetedScouterView() {
       header.style.textAlign = 'center';
       block.appendChild(header);
 
-      const teamDiv = document.createElement('div');
-      teamDiv.style.display = 'flex';
-      teamDiv.style.alignItems = 'center';
-      teamDiv.style.justifyContent = 'center';
-      teamDiv.style.gap = '8px';
-      teamDiv.style.width = '100%';
+      const teamsList = document.createElement('div');
+      teamsList.style.display = 'flex';
+      teamsList.style.flexDirection = 'column';
+      teamsList.style.gap = '8px';
+      teamsList.style.alignItems = 'center';
 
-      const teamLabel = document.createElement('span');
-      teamLabel.textContent = `Team ${team}`;
-      teamLabel.style.fontWeight = 'bold';
-      teamLabel.style.textAlign = 'center';
-      teamLabel.style.color = 'white';
-      teamDiv.appendChild(teamLabel);
+      teams.forEach(team => {
+        const teamDiv = document.createElement('div');
+        teamDiv.style.display = 'flex';
+        teamDiv.style.alignItems = 'center';
+        teamDiv.style.justifyContent = 'center';
+        teamDiv.style.gap = '8px';
+        teamDiv.style.width = '100%';
 
-      block.appendChild(teamDiv);
+        const teamLabel = document.createElement('span');
+        teamLabel.textContent = `Team ${team}`;
+        teamLabel.style.fontWeight = 'bold';
+        teamLabel.style.textAlign = 'center';
+        teamLabel.style.color = 'white';
+        teamDiv.appendChild(teamLabel);
+
+        teamsList.appendChild(teamDiv);
+      });
+
+      block.appendChild(teamsList);
       grid.appendChild(block);
     });
 
     blocksContainer.appendChild(grid);
   }
 }
+
+window.renderTargetedScouterView = renderTargetedScouterView;
+window.generateTargetedScoutingBlocks = generateTargetedScoutingBlocks;
 
 window.renderTargetedScouterView = renderTargetedScouterView;
 window.generateTargetedScoutingBlocks = generateTargetedScoutingBlocks;
