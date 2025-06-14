@@ -210,83 +210,76 @@
           </div>
         </div>
       </div>
-      <div id="reliabilityChartContainer" style="display: flex; flex-direction: column; align-items: flex-start;">
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px;">
-          <h3 class="chart-title" style="margin: 0;">Reliability (bug with toggle)</h3>
-          <div class="toggle-container">
-            <span style="color: #ccc; margin-right: 8px;">Line</span>
-            <label class="switch">
-              <input type="checkbox" id="chartTypeToggle">
-              <span class="slider round"></span>
-            </label>
-            <span style="color: #ccc; margin-left: 8px;">Box Plot</span>
-          </div>
-        </div>
+<div id="reliabilityChartContainer" style="display: flex; flex-direction: column; align-items: flex-start;">
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px;">
+    <h3 class="chart-title" style="margin: 0;">Reliability</h3>
+  </div>
 
-        <div style="display: flex; width: 100%; align-items: flex-start;">
-          <div id="reliabilityChartOptions"
-            style="display: flex; flex-direction: column; gap: 10px; min-width: 180px; margin-right: 30px;">
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityTotalPoints" checked>
-              Total Points
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityAutoPoints">
-              Auto Points
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityTelePoints">
-              Tele Points
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityTotalCycles">
-              Total Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityTotalCoralCycles">
-              Total Coral Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityL4Cycles">
-              L4 Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityL3Cycles">
-              L3 Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityL2Cycles">
-              L2 Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityL1Cycles">
-              L1 Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityTotalAlgaeCycles">
-              Total Algae Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityBargeCycles">
-              Barge Cycles
-            </label>
-            <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityProcessorCycles">
-              Processor Cycles
-            </label>
-            <label class="toggle-switch reliability-toggle-label">
-              <input type="checkbox" id="showEPAAvg" checked>
-              <span class="slider"></span>
-              <span class="toggle-label-text">Show Average</span>
-            </label>
-          </div>
+  <div style="display: flex; width: 100%; align-items: flex-start;">
+    <div id="reliabilityChartOptions"
+      style="display: flex; flex-direction: column; gap: 10px; min-width: 180px; margin-right: 30px;">
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityTotalPoints" checked>
+        Total Points
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityAutoPoints">
+        Auto Points
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityTelePoints">
+        Tele Points
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityTotalCycles">
+        Total Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityTotalCoralCycles">
+        Total Coral Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityL4Cycles">
+        L4 Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityL3Cycles">
+        L3 Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityL2Cycles">
+        L2 Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityL1Cycles">
+        L1 Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityTotalAlgaeCycles">
+        Total Algae Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityBargeCycles">
+        Barge Cycles
+      </label>
+      <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+        <input type="checkbox" id="reliabilityProcessorCycles">
+        Processor Cycles
+      </label>
+      <!--<label class="toggle-switch reliability-toggle-label">
+        <input type="checkbox" id="showEPAAvg" checked>
+        <span class="slider"></span>
+        <span class="toggle-label-text">Show Average</span>
+      </label>-->
+    </div>
 
-          <div style="flex: 1; display: flex; flex-direction: column;">
-            <div id="reliabilityChartsArea"></div>
-          </div>
-        </div>
-      </div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+      <div id="reliabilityChartsArea"></div>
+    </div>
+  </div>
+</div>
+
     </div>
 
     <!-- COMPARISON VIEW -->
@@ -514,23 +507,6 @@
               <canvas id="endGameTeam2"></canvas>
             </div>
           </div>
-
-          <!-- NEED TO CHANGE TO MATCH RELIABILITY IN INDIVIDUAL VIEW -->
-
-          <!--
-          <div id="comparisonEPATrend2">
-            <div class="comparisonTele" style="position: relative;">
-              <h3 class="chart-title" style="margin-bottom: 10px;">EPA Trend</h3>
-              <label class="slider-toggle"
-                style="position: absolute; top: 2%; right: 15px; margin-bottom: 10px; font-style: italic; color: #ccc;">
-                <input type="checkbox" class="showEPAAvgComparison" checked>
-                <span class="slider"></span>
-                Show Average
-              </label>
-
-              <canvas id="epaTrendTeam2"></canvas>
-            </div>
-          </div>-->
         
 
           <div id="scouterCommentsContainer2">

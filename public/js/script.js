@@ -441,11 +441,10 @@ document.getElementById('algaeTypeFilter').addEventListener('change', function (
   renderTeleAlgaeChartFiltered(data, value);
 });
 
-document.getElementById('showEPAAvg').addEventListener('change', function() {
+/*document.getElementById('showEPAAvg').addEventListener('change', function() {
   const container = document.getElementById('reliabilityChartsArea');
   if (!container) return;
   
-  const showBoxPlots = document.getElementById('chartTypeToggle')?.checked ?? false;
   const showAvg = this.checked;
   
   if (showBoxPlots) {
@@ -464,7 +463,8 @@ document.getElementById('showEPAAvg').addEventListener('change', function() {
       }
     });
   }
-});
+});*/
+
 // CSV Upload
 document.getElementById('submitData').addEventListener('click', handleDataUpload);
 document.getElementById('submitPit').addEventListener('click', function (e) {
@@ -1372,7 +1372,8 @@ function searchTeam() {
   renderFlaggedMatches(teamData);
   renderTeamStatistics(teamData, pitScoutingData);
 
-  document.getElementById('showEPAAvg').checked = true;
+  //document.getElementById('showEPAAvg').checked = true;
+
   renderReliabilityCharts(teamData, 'reliabilityChartsArea');
 
   document.getElementById('startingPositionFilter').value = startingPosition;
@@ -1791,7 +1792,10 @@ function renderEndGameChart(data) {
 
 let showBoxPlots = false;
 
+// Remove this line (around line 2200)
 document.getElementById('chartTypeToggle').addEventListener('change', renderReliabilityCharts);
+
+// Modify the renderReliabilityCharts function (around line 2202)
 function renderReliabilityCharts() {
   const container = document.getElementById('reliabilityChartsArea');
   if (!container) return;
@@ -1807,7 +1811,6 @@ function renderReliabilityCharts() {
   data = data.slice().sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
   const showAvg = document.getElementById('showEPAAvg')?.checked ?? true;
-  const showBoxPlots = document.getElementById('chartTypeToggle')?.checked ?? false;
 
   const metricsToShow = reliabilityMetrics.filter(metric => {
     const checkbox = document.getElementById(metric.id);
@@ -1853,109 +1856,12 @@ function renderReliabilityCharts() {
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
 
     try {
-      if (showBoxPlots) {
-        createBoxPlot(canvas, metric, values, avg, showAvg);
-      } else {
-        const matchLabels = data.map(row => 'Q' + row.Match);
-        const avgLine = Array(matchLabels.length).fill(avg);
-
-        new Chart(canvas.getContext('2d'), {
-          type: 'line',
-          data: {
-            labels: matchLabels,
-            datasets: [
-              {
-                label: metric.label,
-                data: values,
-                borderColor: metric.color,
-                backgroundColor: `${metric.color}40`,
-                borderWidth: 2,
-                pointBackgroundColor: metric.color,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: true,
-                tension: 0.3
-              },
-              {
-                label: 'Average',
-                data: avgLine,
-                borderColor: '#FFD700',
-                borderWidth: 2,
-                pointRadius: 0,
-                borderDash: [5, 5],
-                fill: false,
-                hidden: !showAvg
-              }
-            ]
-          },
-          options: getLineChartOptions()
-        });
-      }
+      createBoxPlot(canvas, metric, values, avg, showAvg);
     } catch (error) {
       console.error('Error creating chart:', error);
       canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
     }
   });
-}
-function getLineChartOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    devicePixelRatio: 3,
-    plugins: {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-        backgroundColor: '#1C1E21',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: '#000',
-        borderWidth: 1,
-        titleFont: { family: 'Lato', size: 14 },
-        bodyFont: { family: 'Lato', size: 14 },
-        padding: 10
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          color: 'rgba(255,255,255,0.1)',
-          drawBorder: false
-        },
-        ticks: {
-          color: 'white',
-          font: {
-            family: 'Lato',
-            size: 12,
-            weight: 'bold'
-          }
-        }
-      },
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(255,255,255,0.1)',
-          drawBorder: false
-        },
-        ticks: {
-          color: 'white',
-          font: {
-            family: 'Lato',
-            size: 14,
-            weight: 'bold'
-          }
-        }
-      }
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    }
-  };
 }
 
 function createBoxPlot(canvas, metric, values, avg, showAvg) {
@@ -2070,8 +1976,8 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
             }
           }
         }
-      },
-      animation: {
+      }
+     /* ,animation: {
         onComplete: function() {
           if (showAvg) {
             const ctx = this.ctx;
@@ -2096,7 +2002,7 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
             ctx.restore();
           }
         }
-      }
+      } */
     }
   });
 
@@ -2115,7 +2021,7 @@ const reliabilityCheckboxIds = [
   'reliabilityTotalAlgaeCycles',
   'reliabilityBargeCycles',
   'reliabilityProcessorCycles',
-  'showEPAAvg'
+  //'showEPAAvg'
 ];
 
 function setDefaultReliabilityCheckboxes() {
@@ -2148,13 +2054,6 @@ function setReliabilityCheckboxState(state) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setDefaultReliabilityCheckboxes();
-
-  const chartTypeToggle = document.getElementById('chartTypeToggle');
-  if (chartTypeToggle) {
-    chartTypeToggle.addEventListener('change', () => {
-      renderReliabilityCharts(); 
-    });
-  }
 });
 
 let lastReliabilityCheckboxState = getReliabilityCheckboxState();
@@ -4691,7 +4590,7 @@ function openAllianceComparison(alliance) {
   title.style.color = alliance === 'red' ? '#ff5c5c' : '#3EDBF0';
 
   teamNumbers.forEach((team, index) => {
-    const teamData = filterTeamData(team);
+    let teamData = filterTeamData(team);
     if (teamData.length === 0) return;
 
     teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
@@ -4758,10 +4657,10 @@ function openAllianceComparison(alliance) {
     teleAlgaeCanvas.style.width = '100%';
     teleAlgaeCanvas.style.height = '200px';
 
-    const epaTrendCanvas = document.createElement('canvas');
-    epaTrendCanvas.id = `allianceEPATrend${index}`;
-    epaTrendCanvas.style.width = '100%';
-    epaTrendCanvas.style.height = '250px';
+    const climbCanvas = document.createElement('canvas');
+    climbCanvas.id = `allianceClimb${index}`;
+    climbCanvas.style.width = '100%';
+    climbCanvas.style.height = '200px';
 
     const addChartTitle = (container, title) => {
       const titleDiv = document.createElement('div');
@@ -4784,8 +4683,8 @@ function openAllianceComparison(alliance) {
     addChartTitle(chartsContainer, 'Tele Algae');
     chartsContainer.appendChild(teleAlgaeCanvas);
 
-    addChartTitle(chartsContainer, 'EPA Trend');
-    chartsContainer.appendChild(epaTrendCanvas);
+    addChartTitle(chartsContainer, 'Endgame Climb');
+    chartsContainer.appendChild(climbCanvas);
 
     teamContainer.appendChild(chartsContainer);
     content.appendChild(teamContainer);
@@ -4793,7 +4692,6 @@ function openAllianceComparison(alliance) {
     const allTeamData = teamNumbers.map(t => filterTeamData(t));
     const maxTeleCoral = getMaxTeleCoral(...allTeamData);
     const maxTeleAlgae = getMaxTeleAlgae(...allTeamData);
-    const maxEPA = getMaxEPA(...allTeamData);
     const maxAutoCoral = getMaxAutoCoral(...allTeamData);
     const maxAutoAlgae = getMaxAutoAlgae(...allTeamData);
 
@@ -4801,7 +4699,7 @@ function openAllianceComparison(alliance) {
     renderAutoAlgaeChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
     renderTeleCoralChartForTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
     renderTeleAlgaeChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
-    renderEPATrendChartForTeam(teamData, `allianceEPATrend${index}`, maxEPA);
+    renderEndGameChartForTeam(teamData, `allianceClimb${index}`);
   });
 
   popup.style.display = 'block';
@@ -4816,8 +4714,7 @@ function closeAllianceComparison() {
   const chartIds = [
     'allianceAutoCoral0', 'allianceAutoCoral1', 'allianceAutoCoral2',
     'allianceTeleCoral0', 'allianceTeleCoral1', 'allianceTeleCoral2',
-    'allianceTeleAlgae0', 'allianceTeleAlgae1', 'allianceTeleAlgae2',
-    'allianceEPATrend0', 'allianceEPATrend1', 'allianceEPATrend2'
+    'allianceTeleAlgae0', 'allianceTeleAlgae1', 'allianceTeleAlgae2'
   ];
 
   chartIds.forEach(id => {
@@ -4866,7 +4763,6 @@ function calculateTeamStats(teamData) {
     robotDiedRate
   };
 }
-
 /*-----SCOUTING SCHEDULE FUNCTIONS----*/
 function generateTargetedScoutingBlocks() {
   if (!scheduleCsvText) {
@@ -5528,4 +5424,3 @@ window.generateTargetedScoutingBlocks = generateTargetedScoutingBlocks;
 
 window.renderTargetedScouterView = renderTargetedScouterView;
 window.generateTargetedScoutingBlocks = generateTargetedScoutingBlocks;
-
