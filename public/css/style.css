@@ -235,7 +235,7 @@ label {
 #scouterCommentsContainer1,
 #scouterCommentsContainer2,
 #scouterCommentsContainer,
-#epaTrendChartContainer {
+#reliabilityChartContainer {
     position: relative;
     width: 100%;
     background-color: #1C1E21;
@@ -247,7 +247,6 @@ label {
     box-shadow: #131416 0px 0px 20px;
     height: auto;
     overflow: hidden;
-
 
 }
 
@@ -821,15 +820,14 @@ label {
     cursor: pointer;
 }
 
-#epaTrendChart {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 400px;
-    display: block;
+#reliabilityChartsArea {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
 }
 
-
-#epaTrendChartContainer {
+#reliabilityChartContainer {
     width: 92%;
     margin: 30px auto 20px auto;
     background-color: #1C1E21;
@@ -932,51 +930,6 @@ label {
 * {
     scrollbar-width: thin;
     scrollbar-color: #131416 #1C1E21;
-}
-
-
-.slider-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-family: 'Lato';
-    color: white;
-    cursor: pointer;
-    user-select: none;
-}
-
-.slider-toggle input {
-    display: none;
-}
-
-.slider {
-    position: relative;
-    width: 40px;
-    height: 20px;
-    background-color: #888;
-    border-radius: 34px;
-    transition: background-color 0.2s;
-}
-
-.slider::before {
-    content: "";
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.2s;
-}
-
-.slider-toggle input:checked+.slider {
-    background-color: #1e90ff;
-}
-
-.slider-toggle input:checked+.slider::before {
-    transform: translateX(20px);
 }
 
 .team-section-divider {
@@ -1320,80 +1273,292 @@ label {
 }
 
 #scoutingCardsContainer .card {
-  background-color: #1e1e1e;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  color: white;
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: white;
 }
 
 #scoutingCardsContainer .card h3 {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #61dafb;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #61dafb;
 }
 
-#scoutingCardsContainer .card > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
+#scoutingCardsContainer .card>div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
 }
 
-#scoutingCardsContainer .card > div > div {
-  flex: 1;
+#scoutingCardsContainer .card>div>div {
+    flex: 1;
 }
 
 #scoutingCardsContainer .card h4 {
-  margin-bottom: 4px;
-  font-size: 14px;
-  color: #ccc;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #ccc;
 }
 
 #scoutingCardsContainer .scout-tasks {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #333;
-  font-size: 13px;
-  color: #bbb;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+    font-size: 13px;
+    color: #bbb;
 }
 
 .match-card {
-  transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .match-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .match-card h4 {
-  border-bottom: 1px solid #444;
-  padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
 }
 
 .match-block {
-  background-color: #2a2d31;
-  border-radius: 8px;
-  padding: 12px;
-  min-width: 100px;
-  text-align: center;
-  transition: transform 0.2s ease;
+    background-color: #2a2d31;
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 100px;
+    text-align: center;
+    transition: transform 0.2s ease;
 }
 
 .match-block:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .match-block strong {
-  display: block;
-  margin-bottom: 8px;
-  color: #3EDBF0;
+    display: block;
+    margin-bottom: 8px;
+    color: #3EDBF0;
 }
 
 #targetedScoutingContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px;
+}
+
+#reliabilityChartOptions label {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0;
+}
+
+#reliabilityChartOptions input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #888;
+    border-radius: 4px;
+    background-color: #1C1E21;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+#reliabilityChartOptions input[type="checkbox"]:not(:checked) {
+    background-color: #1C1E21;
+    border-color: #888;
+}
+
+#reliabilityChartOptions input[type="checkbox"]:checked::after {
+    content: "✓";
+    color: #fff;
+    font-size: 14px;
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+#reliabilityTotalPoints:checked {
+    background-color: #3ED098 !important;
+    border-color: #3ED098 !important;
+}
+
+#reliabilityAutoPoints:checked {
+    background-color: #51E7CF !important;
+    border-color: #51E7CF !important;
+}
+
+#reliabilityTelePoints:checked {
+    background-color: #3ecdd0 !important;
+    border-color: #3ecdd0 !important;
+}
+
+#reliabilityTotalCycles:checked {
+    background-color: #cf8ffc !important;
+    border-color: #cf8ffc !important;
+}
+
+#reliabilityTotalCoralCycles:checked {
+    background-color: #ff83fa !important;
+    border-color: #ff83fa !important;
+}
+
+#reliabilityL4Cycles:checked {
+    background-color: #ff8bfc !important;
+    border-color: #ff8bfc !important;
+}
+
+#reliabilityL3Cycles:checked {
+    background-color: #ed0cef !important;
+    border-color: #ed0cef !important;
+}
+
+#reliabilityL2Cycles:checked {
+    background-color: #BF02ff !important;
+    border-color: #BF02ff !important;
+}
+
+#reliabilityL1Cycles:checked {
+    background-color: #8105d8 !important;
+    border-color: #8105d8 !important;
+}
+
+#reliabilityTotalAlgaeCycles:checked {
+    background-color: #006fff !important;
+    border-color: #006fff !important;
+}
+
+#reliabilityBargeCycles:checked {
+    background-color: #3498db !important;
+    border-color: #3498db !important;
+}
+
+#reliabilityProcessorCycles:checked {
+    background-color: #14c7de !important;
+    border-color: #14c7de !important;
+}
+
+#reliabilityChartOptions input[type="checkbox"]:hover {
+    border-color: #fff;
+}
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-family: 'Lato';
+    color: #ccc;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-left: 28px;
+    height: 28px;
+    margin-top: 10px;
+}
+
+.toggle-switch input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 20px;
+    background-color: #1C1E21;
+    border: 2px solid #888;
+    border-radius: 12px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.toggle-switch .slider:before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.toggle-switch input[type="checkbox"]:checked + .slider {
+    background-color: #1e90ff;
+    border-color: #1e90ff;
+}
+
+.toggle-switch input[type="checkbox"]:checked + .slider:before {
+    transform: translate(16px, -50%);
+}
+
+.toggle-switch .toggle-label-text {
+    margin-left: 15px;
+    font-style: normal;
+}
+
+.toggle-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  padding: 10px;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #3B064D;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #1e90ff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
 }

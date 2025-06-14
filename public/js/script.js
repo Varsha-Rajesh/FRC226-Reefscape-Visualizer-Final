@@ -1,3 +1,9 @@
+
+if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
+  Chart.register(window.ChartBoxplot);
+} else {
+  console.error('Chart.js or Boxplot plugin not loaded');
+}
 /*-----VARIABLES----*/
 
 const charts = {
@@ -9,10 +15,41 @@ const charts = {
   overviewStackedChart: null,
   coralCyclesChart: null,
   algaeCyclesChart: null,
-  epaTrendChart: null,
+  reliabilityChartsArea: null,
   epaTrendChartTeam1: null,
   epaTrendChartTeam2: null
 };
+
+Chart.register({
+  id: 'boxplot',
+  beforeDraw: function(chart) {
+  }
+});
+
+const reliabilityMetrics = [
+  { id: 'reliabilityTotalPoints', label: 'Total Points', color: '#3ED098', getValue: row => parseFloat(row['Total Score'] || 0) },
+  { id: 'reliabilityAutoPoints', label: 'Auto Points', color: '#51E7CF', getValue: row => parseFloat(row['Auton Score'] || 0) },
+  { id: 'reliabilityTelePoints', label: 'Tele Points', color: '#3ecdd0', getValue: row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)) },
+  {
+    id: 'reliabilityTotalCycles', label: 'Total Cycles', color: '#cf8ffc', getValue: row =>
+    (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
+      parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  },
+  {
+    id: 'reliabilityTotalCoralCycles', label: 'Total Coral Cycles', color: '#ff83fa', getValue: row =>
+      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
+  },
+  { id: 'reliabilityL4Cycles', label: 'L4 Cycles', color: '#ff8bfc', getValue: row => parseInt(row['L4'] || 0) },
+  { id: 'reliabilityL3Cycles', label: 'L3 Cycles', color: '#ed0cef', getValue: row => parseInt(row['L3'] || 0) },
+  { id: 'reliabilityL2Cycles', label: 'L2 Cycles', color: '#BF02ff', getValue: row => parseInt(row['L2'] || 0) },
+  { id: 'reliabilityL1Cycles', label: 'L1 Cycles', color: '#8105d8', getValue: row => parseInt(row['L1'] || 0) },
+  {
+    id: 'reliabilityTotalAlgaeCycles', label: 'Total Algae Cycles', color: '#006fff', getValue: row =>
+      (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  },
+  { id: 'reliabilityBargeCycles', label: 'Barge Cycles', color: '#3498db', getValue: row => parseInt(row['Algae in Net'] || 0) },
+  { id: 'reliabilityProcessorCycles', label: 'Processor Cycles', color: '#14c7de', getValue: row => parseInt(row['Algae in Processor'] || 0) }
+];
 
 let pitScoutingData = [];
 let tbaClimbData = {};
@@ -375,10 +412,24 @@ function showTab(event, tabId) {
 }
 
 // Individual View
-document.getElementById('search').addEventListener('click', searchTeam);
+
+document.addEventListener('DOMContentLoaded', renderReliabilityCharts);
+document.querySelectorAll('input[type="checkbox"][id^="reliability"]').forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    renderReliabilityCharts();
+  });
+});
+
+
+document.getElementById('search').addEventListener('click', () => {
+  setReliabilityCheckboxState(lastReliabilityCheckboxState);
+  renderReliabilityCharts();
+});
 document.getElementById('teamSearch').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') {
     searchTeam();
+    setReliabilityCheckboxState(lastReliabilityCheckboxState);
+    renderReliabilityCharts();
   }
 });
 document.getElementById('algaeTypeFilter').addEventListener('change', function () {
@@ -390,10 +441,30 @@ document.getElementById('algaeTypeFilter').addEventListener('change', function (
   renderTeleAlgaeChartFiltered(data, value);
 });
 
-document.getElementById('showEPAAvg').addEventListener('change', function () {
-  toggleEPAAvg('epaTrendChart', this.checked);
+document.getElementById('showEPAAvg').addEventListener('change', function() {
+  const container = document.getElementById('reliabilityChartsArea');
+  if (!container) return;
+  
+  const showBoxPlots = document.getElementById('chartTypeToggle')?.checked ?? false;
+  const showAvg = this.checked;
+  
+  if (showBoxPlots) {
+    renderReliabilityCharts();
+  } else {
+    const charts = container.querySelectorAll('canvas');
+    charts.forEach(canvas => {
+      const chart = Chart.getChart(canvas);
+      if (chart) {
+        chart.data.datasets.forEach((dataset, i) => {
+          if (dataset.label === 'Average') {
+            chart.setDatasetVisibility(i, showAvg);
+          }
+        });
+        chart.update('none');
+      }
+    });
+  }
 });
-
 // CSV Upload
 document.getElementById('submitData').addEventListener('click', handleDataUpload);
 document.getElementById('submitPit').addEventListener('click', function (e) {
@@ -700,9 +771,9 @@ function clearAllCharts() {
     charts['algaeCyclesChart'].destroy();
     charts['algaeCyclesChart'] = null;
   }
-  if (charts['epaTrendChart']) {
-    charts['epaTrendChart'].destroy();
-    charts['epaTrendChart'] = null;
+  if (charts['reliabilityChartsArea']) {
+    charts['reliabilityChartsArea'].destroy();
+    charts['reliabilityChartsArea'] = null;
   }
   if (charts['epaTrendChartTeam1']) {
     charts['epaTrendChartTeam1'].destroy();
@@ -1302,7 +1373,7 @@ function searchTeam() {
   renderTeamStatistics(teamData, pitScoutingData);
 
   document.getElementById('showEPAAvg').checked = true;
-  renderEpaTrendChart(teamData, 'epaTrendChart');
+  renderReliabilityCharts(teamData, 'reliabilityChartsArea');
 
   document.getElementById('startingPositionFilter').value = startingPosition;
   document.getElementById('algaeTypeFilter').value = algaeFilter;
@@ -1718,117 +1789,385 @@ function renderEndGameChart(data) {
   );
 }
 
-function renderEpaTrendChart(data, canvasId) {
-  destroyChart(canvasId);
+let showBoxPlots = false;
 
-  if (!data || data.length === 0) {
-    renderBlankChart(canvasId, "No EPA Data");
-    return;
-  }
+document.getElementById('chartTypeToggle').addEventListener('change', renderReliabilityCharts);
+function renderReliabilityCharts() {
+  const container = document.getElementById('reliabilityChartsArea');
+  if (!container) return;
 
-  const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
-  const matchLabels = sortedData.map(row => 'Q' + row.Match);
-  const epaValues = sortedData.map(row => parseFloat(row['Total Score'] || 0));
+  const teamNumber = document.getElementById('teamSearch').value.trim();
+  if (!teamNumber) return;
 
-  const avgEPA = epaValues.reduce((sum, val) => sum + val, 0) / epaValues.length;
-  const averageLine = Array(matchLabels.length).fill(avgEPA);
+  let data = filterTeamData(teamNumber);
+  if (!data || data.length === 0) return;
+
+  container.innerHTML = '';
+
+  data = data.slice().sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
   const showAvg = document.getElementById('showEPAAvg')?.checked ?? true;
+  const showBoxPlots = document.getElementById('chartTypeToggle')?.checked ?? false;
 
-  charts[canvasId] = createChart(
-    document.getElementById(canvasId).getContext('2d'),
-    'line',
-    {
-      labels: matchLabels,
-      datasets: [
-        {
-          label: 'EPA',
-          data: epaValues,
-          borderColor: '#3EDBF0',
-          backgroundColor: 'rgba(93, 219, 254, 0.1)',
-          borderWidth: 3,
-          pointBackgroundColor: '#3EDBF0',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointHitRadius: 10,
-          pointHoverBorderWidth: 3,
-          fill: true,
-          tension: 0.3
-        },
-        {
-          label: 'Avg. EPA',
-          data: averageLine,
-          borderColor: '#0343FC',
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHitRadius: 10,
-          pointHoverRadius: 6,
-          tension: 0,
-          hidden: !showAvg
-        }
-      ]
+  const metricsToShow = reliabilityMetrics.filter(metric => {
+    const checkbox = document.getElementById(metric.id);
+    return checkbox && checkbox.checked;
+  });
+
+  const chartContainer = document.createElement('div');
+  chartContainer.className = 'reliability-charts-grid';
+  chartContainer.style.display = 'grid';
+  chartContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(400px, 1fr))';
+  chartContainer.style.gap = '20px';
+  container.appendChild(chartContainer);
+
+  metricsToShow.forEach(metric => {
+    const chartCard = document.createElement('div');
+    chartCard.className = 'reliability-chart-card';
+    chartCard.style.background = '#1C1E21';
+    chartCard.style.borderRadius = '8px';
+    chartCard.style.padding = '15px';
+    chartCard.style.boxShadow = '0 0 20px #131416';
+
+    const title = document.createElement('h3');
+    title.textContent = metric.label;
+    title.style.margin = '0 0 10px 0';
+    title.style.color = metric.color;
+    title.style.fontSize = '16px';
+    title.style.fontFamily = "'Lato', sans-serif";
+    chartCard.appendChild(title);
+
+    const canvasContainer = document.createElement('div');
+    canvasContainer.style.position = 'relative';
+    canvasContainer.style.height = '220px';
+    chartCard.appendChild(canvasContainer);
+
+    const canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvasContainer.appendChild(canvas);
+
+    chartContainer.appendChild(chartCard);
+
+    const values = data.map(metric.getValue);
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+    try {
+      if (showBoxPlots) {
+        createBoxPlot(canvas, metric, values, avg, showAvg);
+      } else {
+        const matchLabels = data.map(row => 'Q' + row.Match);
+        const avgLine = Array(matchLabels.length).fill(avg);
+
+        new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: matchLabels,
+            datasets: [
+              {
+                label: metric.label,
+                data: values,
+                borderColor: metric.color,
+                backgroundColor: `${metric.color}40`,
+                borderWidth: 2,
+                pointBackgroundColor: metric.color,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.3
+              },
+              {
+                label: 'Average',
+                data: avgLine,
+                borderColor: '#FFD700',
+                borderWidth: 2,
+                pointRadius: 0,
+                borderDash: [5, 5],
+                fill: false,
+                hidden: !showAvg
+              }
+            ]
+          },
+          options: getLineChartOptions()
+        });
+      }
+    } catch (error) {
+      console.error('Error creating chart:', error);
+      canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+    }
+  });
+}
+function getLineChartOptions() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    devicePixelRatio: 3,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        backgroundColor: '#1C1E21',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#000',
+        borderWidth: 1,
+        titleFont: { family: 'Lato', size: 14 },
+        bodyFont: { family: 'Lato', size: 14 },
+        padding: 10
+      }
     },
-    {
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          color: 'white',
+          font: {
+            family: 'Lato',
+            size: 12,
+            weight: 'bold'
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          color: 'white',
+          font: {
+            family: 'Lato',
+            size: 14,
+            weight: 'bold'
+          }
+        }
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    }
+  };
+}
+
+function createBoxPlot(canvas, metric, values, avg, showAvg) {
+  const sortedValues = [...values].sort((a, b) => a - b);
+  const q1 = calculatePercentile(sortedValues, 25);
+  const median = calculatePercentile(sortedValues, 50);
+  const q3 = calculatePercentile(sortedValues, 75);
+  const iqr = q3 - q1;
+  const lowerWhisker = Math.max(sortedValues[0], q1 - 1.5 * iqr);
+  const upperWhisker = Math.min(sortedValues[sortedValues.length - 1], q3 + 1.5 * iqr);
+  const outliers = values.filter(v => v < lowerWhisker || v > upperWhisker);
+
+  const boxPlotData = {
+    labels: [metric.label],
+    datasets: [{
+      backgroundColor: metric.color + '40',
+      borderColor: metric.color,
+      borderWidth: 2,
+      outlierBackgroundColor: '#ff5c5c',
+      outlierRadius: 5,
+      data: [{
+        min: lowerWhisker,
+        q1: q1,
+        median: median,
+        q3: q3,
+        max: upperWhisker,
+        outliers: outliers
+      }]
+    }]
+  };
+
+  const chart = new Chart(canvas.getContext('2d'), {
+    type: 'boxplot',
+    data: boxPlotData,
+    options: {
+      indexAxis: 'y', 
       responsive: true,
       maintainAspectRatio: false,
-      devicePixelRatio: 2,
+      devicePixelRatio: 3,
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: false
+        },
         tooltip: {
-          callbacks: {
-            beforeBody: function (tooltipItems) {
-              const context = tooltipItems[0];
-              const label = context.dataset.label;
-              const showAvg = document.getElementById('showEPAAvg')?.checked;
-
-              if (label === 'Avg. EPA' || !showAvg) return null;
-
-              const value = context.parsed.y;
-              const delta = value - avgEPA;
-              const sign = delta >= 0 ? '+' : '';
-              return `Δ: ${sign}${delta.toFixed(2)}`;
-            },
-            label: function (context) {
-              const label = context.dataset.label;
-              const value = context.parsed.y;
-              const showAvg = document.getElementById('showEPAAvg')?.checked;
-
-              if (label === 'Avg. EPA') {
-                return showAvg ? `Avg. EPA: ${value.toFixed(2)}` : null;
-              }
-
-              return `EPA: ${value.toFixed(2)}`;
-            }
-          },
+          mode: 'point',
+          intersect: true,
           backgroundColor: '#1C1E21',
           titleColor: '#fff',
           bodyColor: '#fff',
           borderColor: '#000',
           borderWidth: 1,
-          titleFont: { family: 'Lato', size: 14 },
-          bodyFont: { family: 'Lato', size: 14 },
+          titleFont: { 
+            family: 'Lato', 
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: { 
+            family: 'Lato', 
+            size: 14 
+          },
           padding: 10,
+          displayColors: false, 
+          callbacks: {
+            title: function() {
+              return metric.label; 
+            },
+            label: function(context) {
+              if (context.datasetIndex === 0 && context.dataIndex === 0) {
+                return null;
+              }
+              return `Outlier: ${context.raw}`;
+            },
+            beforeBody: function(context) {
+              if (context[0].datasetIndex === 0) {
+                const data = context[0].dataset.data[context[0].dataIndex];
+                return [
+                  `Minimum: ${data.min.toFixed(1)}`,
+                  `Q1: ${data.q1.toFixed(1)}`,
+                  `Median: ${data.median.toFixed(1)}`,
+                  `Q3: ${data.q3.toFixed(1)}`,
+                  `Maximum: ${data.max.toFixed(1)}`,
+                  `Outliers: ${data.outliers.length}`
+                ];
+              }
+              return null;
+            },
+            afterBody: function(context) {
+              if (context[0].datasetIndex === 0 && showAvg) {
+                return [`Average: ${avg.toFixed(1)}`];
+              }
+              return null;
+            }
+          }
         }
       },
       scales: {
-        x: {
-          ticks: {
-            color: 'white',
-            font: { family: 'Lato', size: 12, weight: 'bold' }
-          }
-        },
         y: {
+          display: false
+        },
+        x: {
           beginAtZero: true,
+          grid: {
+            color: 'rgba(255,255,255,0.1)',
+            drawBorder: false
+          },
           ticks: {
             color: 'white',
-            font: { family: 'Lato', size: 12, weight: 'bold' },
-            stepSize: 20,
+            font: {
+              family: 'Lato',
+              size: 14,
+              weight: 'bold'
+            }
+          }
+        }
+      },
+      animation: {
+        onComplete: function() {
+          if (showAvg) {
+            const ctx = this.ctx;
+            const xAxis = this.scales.x;
+            const xPos = xAxis.getPixelForValue(avg);
+            const chartArea = this.chartArea;
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xPos, chartArea.top);
+            ctx.lineTo(xPos, chartArea.bottom);
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 12px Lato';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Avg: ${avg.toFixed(1)}`, xPos, chartArea.top - 5);
+            ctx.restore();
           }
         }
       }
     }
-  );
+  });
+
+  return chart;
 }
+const reliabilityCheckboxIds = [
+  'reliabilityTotalPoints',
+  'reliabilityAutoPoints',
+  'reliabilityTelePoints',
+  'reliabilityTotalCycles',
+  'reliabilityTotalCoralCycles',
+  'reliabilityL4Cycles',
+  'reliabilityL3Cycles',
+  'reliabilityL2Cycles',
+  'reliabilityL1Cycles',
+  'reliabilityTotalAlgaeCycles',
+  'reliabilityBargeCycles',
+  'reliabilityProcessorCycles',
+  'showEPAAvg'
+];
+
+function setDefaultReliabilityCheckboxes() {
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === 'reliabilityTotalPoints' || id === 'showEPAAvg') {
+        el.checked = true;
+      } else {
+        el.checked = false;
+      }
+    }
+  });
+}
+
+function getReliabilityCheckboxState() {
+  const state = {};
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) state[id] = el.checked;
+  });
+  return state;
+}
+function setReliabilityCheckboxState(state) {
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && typeof state[id] === 'boolean') el.checked = state[id];
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setDefaultReliabilityCheckboxes();
+
+  const chartTypeToggle = document.getElementById('chartTypeToggle');
+  if (chartTypeToggle) {
+    chartTypeToggle.addEventListener('change', () => {
+      renderReliabilityCharts(); 
+    });
+  }
+});
+
+let lastReliabilityCheckboxState = getReliabilityCheckboxState();
+reliabilityCheckboxIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', () => {
+      lastReliabilityCheckboxState = getReliabilityCheckboxState();
+      renderReliabilityCharts(); 
+    });
+  }
+}); 
+
 function renderBlankChart(canvasId, label = "No Data") {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
@@ -3500,36 +3839,23 @@ function goToIndividualView(teamNumber) {
 }
 
 /*-----TOGGLE EPA FILTER----*/
-function toggleEPAAvg(chartId, showAvg) {
-  if (!chartId) {
-    const isChecked = document.querySelector('.showEPAAvgComparison').checked;
-    document.querySelectorAll('.showEPAAvgComparison').forEach(cb => {
-      cb.checked = isChecked;
-    });
-
-    if (charts['epaTrendTeam1']) {
-      const chart1 = charts['epaTrendTeam1'];
-      const avgDataset1 = chart1.data.datasets.find(d => d.label === 'Avg. EPA');
-      if (avgDataset1) avgDataset1.hidden = !isChecked;
-      chart1.update();
+function toggleEPAAvg(containerId, show) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const charts = container.querySelectorAll('canvas');
+  
+  charts.forEach(canvas => {
+    const chart = Chart.getChart(canvas);
+    if (chart) {
+      chart.data.datasets.forEach((dataset, i) => {
+        if (dataset.label === 'Average') {
+          chart.setDatasetVisibility(i, show);
+        }
+      });
+      chart.update('none'); 
     }
-
-    if (charts['epaTrendTeam2']) {
-      const chart2 = charts['epaTrendTeam2'];
-      const avgDataset2 = chart2.data.datasets.find(d => d.label === 'Avg. EPA');
-      if (avgDataset2) avgDataset2.hidden = !isChecked;
-      chart2.update();
-    }
-    return;
-  }
-
-  if (!charts[chartId]) return;
-  const chart = charts[chartId];
-  const avgDataset = chart.data.datasets.find(d => d.label === 'Avg. EPA');
-  if (avgDataset) {
-    avgDataset.hidden = !showAvg;
-    chart.update();
-  }
+  });
 }
 /*-----MATCH PREDICTOR FUNCTIONS----*/
 
@@ -4368,6 +4694,8 @@ function openAllianceComparison(alliance) {
     const teamData = filterTeamData(team);
     if (teamData.length === 0) return;
 
+    teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
+
     const teamContainer = document.createElement('div');
     teamContainer.style.backgroundColor = '#2a2d31';
     teamContainer.style.borderRadius = '8px';
@@ -5004,6 +5332,22 @@ function renderTargetedScouterView() {
     >Reset</button>
   </div>
 `;
+
+  const picklistInput = rightPanel.querySelector('#picklistInput');
+  picklistInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const teamNumber = picklistInput.value.trim();
+      if (!teamNumber) return;
+      if (!picklist.includes(teamNumber)) {
+        picklist.push(teamNumber);
+        picklist.sort((a, b) => parseInt(a) - parseInt(b));
+        picklistInput.value = '';
+        renderPicklist();
+        localStorage.setItem('picklist', JSON.stringify(picklist));
+        renderTargetedBlocks();
+      }
+    }
+  });
   let picklist = JSON.parse(localStorage.getItem('picklist') || '[]');
   renderPicklist();
 

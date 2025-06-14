@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sharkscout-cache-v1';
+const CACHE_NAME = 'sharkscout-cache-v2';  
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,8 +9,9 @@ const ASSETS = [
   '/images/favicon.ico',
   '/manifest.json',
   '/lato-v24-latin-regular.woff2',
-  'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js'
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4.4.4/build/index.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'
 ];
 
 self.addEventListener('install', event => {
