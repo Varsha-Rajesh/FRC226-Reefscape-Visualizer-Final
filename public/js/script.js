@@ -1,9 +1,9 @@
-
 if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
   Chart.register(window.ChartBoxplot);
 } else {
   console.error('Chart.js or Boxplot plugin not loaded');
 }
+
 /*-----VARIABLES----*/
 
 const charts = {
@@ -22,7 +22,7 @@ const charts = {
 
 Chart.register({
   id: 'boxplot',
-  beforeDraw: function(chart) {
+  beforeDraw: function (chart) {
   }
 });
 
@@ -60,6 +60,7 @@ let highlightedOverviewTeam = null;
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
 let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
+let isBoxPlot = true;
 
 async function handleDataUpload(e) {
   e.preventDefault();
@@ -432,6 +433,48 @@ document.getElementById('teamSearch').addEventListener('keydown', function (e) {
     renderReliabilityCharts();
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  document.getElementById('toggleChartTypeBtn').addEventListener('click', () => {
+    isBoxPlot = !isBoxPlot;
+
+    const btn = document.getElementById('toggleChartTypeBtn');
+    btn.textContent = isBoxPlot ? 'Switch to Line Chart' : 'Switch to Box Plot';
+
+    renderReliabilityCharts();
+  });
+
+  const tbaEventKeyInput = document.getElementById('tbaEventKey');
+  if (tbaEventKeyInput) {
+    tbaEventKeyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('verifyWithTBABtn')?.click();
+      }
+    });
+  }
+
+  const hideTeamInput = document.getElementById('hideTeamInput');
+  if (hideTeamInput) {
+    hideTeamInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addHideTeamButton')?.click();
+      }
+    });
+  }
+
+  const matchNumberInput = document.getElementById('matchNumberInput');
+  if (matchNumberInput) {
+    matchNumberInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('predict-button')?.click();
+      }
+    });
+  }
+});
 document.getElementById('algaeTypeFilter').addEventListener('change', function () {
   const value = this.value;
   const teamNumber = document.getElementById('teamSearch').value.trim();
@@ -440,30 +483,6 @@ document.getElementById('algaeTypeFilter').addEventListener('change', function (
   const data = filterTeamData(teamNumber);
   renderTeleAlgaeChartFiltered(data, value);
 });
-
-/*document.getElementById('showEPAAvg').addEventListener('change', function() {
-  const container = document.getElementById('reliabilityChartsArea');
-  if (!container) return;
-  
-  const showAvg = this.checked;
-  
-  if (showBoxPlots) {
-    renderReliabilityCharts();
-  } else {
-    const charts = container.querySelectorAll('canvas');
-    charts.forEach(canvas => {
-      const chart = Chart.getChart(canvas);
-      if (chart) {
-        chart.data.datasets.forEach((dataset, i) => {
-          if (dataset.label === 'Average') {
-            chart.setDatasetVisibility(i, showAvg);
-          }
-        });
-        chart.update('none');
-      }
-    });
-  }
-});*/
 
 // CSV Upload
 document.getElementById('submitData').addEventListener('click', handleDataUpload);
@@ -1372,8 +1391,6 @@ function searchTeam() {
   renderFlaggedMatches(teamData);
   renderTeamStatistics(teamData, pitScoutingData);
 
-  //document.getElementById('showEPAAvg').checked = true;
-
   renderReliabilityCharts(teamData, 'reliabilityChartsArea');
 
   document.getElementById('startingPositionFilter').value = startingPosition;
@@ -1790,12 +1807,6 @@ function renderEndGameChart(data) {
   );
 }
 
-let showBoxPlots = false;
-
-// Remove this line (around line 2200)
-document.getElementById('chartTypeToggle').addEventListener('change', renderReliabilityCharts);
-
-// Modify the renderReliabilityCharts function (around line 2202)
 function renderReliabilityCharts() {
   const container = document.getElementById('reliabilityChartsArea');
   if (!container) return;
@@ -1852,14 +1863,111 @@ function renderReliabilityCharts() {
 
     chartContainer.appendChild(chartCard);
 
-    const values = data.map(metric.getValue);
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    if (isBoxPlot) {
+      const values = data.map(metric.getValue);
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
 
-    try {
-      createBoxPlot(canvas, metric, values, avg, showAvg);
-    } catch (error) {
-      console.error('Error creating chart:', error);
-      canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+      try {
+        createBoxPlot(canvas, metric, values, avg, showAvg);
+      } catch (error) {
+        console.error('Error creating boxplot chart:', error);
+        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+      }
+    } else {
+      const labels = data.map(row => "Q" + row.Match);
+      const values = data.map(metric.getValue);
+      const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
+
+      const maxValue = Math.max(...values);
+      const stepSize = 1;
+      const yMax = Math.ceil(maxValue / stepSize) * stepSize;
+
+      try {
+        new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: metric.label,
+                data: values,
+                borderColor: metric.color,
+                backgroundColor: metric.color + '55',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Average',
+                data: Array(labels.length).fill(avgValue),
+                borderColor: '#FFD700',
+                borderWidth: 2,
+                borderDash: [6, 6],
+                pointRadius: 0,
+                fill: false,
+                tension: 0,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 3,
+            scales: {
+              x: {
+                ticks: {
+                  color: 'white',
+                  font: { family: 'Lato', size: 12, weight: 'bold' },
+                },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+              y: {
+                beginAtZero: true,
+                max: yMax,
+                ticks: {
+                  color: 'white',
+                  font: { family: 'Lato', size: 14, weight: 'bold' },
+                  stepSize: stepSize,
+                },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1C1E21',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#000',
+                borderWidth: 1,
+                titleFont: { family: 'Lato', size: 14 },
+                bodyFont: { family: 'Lato', size: 14 },
+                padding: 10,
+                callbacks: {
+                  label: function (context) {
+                    if (context.dataset.label === 'Average') {
+                      return `Average: ${avgValue.toFixed(2)}`;
+                    } else {
+                      const value = context.parsed.y;
+                      const delta = value - avgValue;
+                      const sign = delta >= 0 ? '+' : '';
+                      return [
+                        `Value: ${value}`,
+                        `Average: ${avgValue.toFixed(2)}`,
+                        `Δ: ${sign}${delta.toFixed(2)}`
+                      ];
+                    }
+                  }
+                }
+              }
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Error creating line chart:', error);
+        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+      }
     }
   });
 }
@@ -1897,7 +2005,7 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
     type: 'boxplot',
     data: boxPlotData,
     options: {
-      indexAxis: 'y', 
+      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
       devicePixelRatio: 3,
@@ -1913,28 +2021,28 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
           bodyColor: '#fff',
           borderColor: '#000',
           borderWidth: 1,
-          titleFont: { 
-            family: 'Lato', 
+          titleFont: {
+            family: 'Lato',
             size: 14,
             weight: 'bold'
           },
-          bodyFont: { 
-            family: 'Lato', 
-            size: 14 
+          bodyFont: {
+            family: 'Lato',
+            size: 14
           },
           padding: 10,
-          displayColors: false, 
+          displayColors: false,
           callbacks: {
-            title: function() {
-              return metric.label; 
+            title: function () {
+              return metric.label;
             },
-            label: function(context) {
+            label: function (context) {
               if (context.datasetIndex === 0 && context.dataIndex === 0) {
                 return null;
               }
               return `Outlier: ${context.raw}`;
             },
-            beforeBody: function(context) {
+            beforeBody: function (context) {
               if (context[0].datasetIndex === 0) {
                 const data = context[0].dataset.data[context[0].dataIndex];
                 return [
@@ -1948,7 +2056,7 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
               }
               return null;
             },
-            afterBody: function(context) {
+            afterBody: function (context) {
               if (context[0].datasetIndex === 0 && showAvg) {
                 return [`Average: ${avg.toFixed(1)}`];
               }
@@ -1977,32 +2085,6 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
           }
         }
       }
-     /* ,animation: {
-        onComplete: function() {
-          if (showAvg) {
-            const ctx = this.ctx;
-            const xAxis = this.scales.x;
-            const xPos = xAxis.getPixelForValue(avg);
-            const chartArea = this.chartArea;
-            
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(xPos, chartArea.top);
-            ctx.lineTo(xPos, chartArea.bottom);
-            ctx.strokeStyle = '#FFD700';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            
-            ctx.fillStyle = '#FFD700';
-            ctx.font = 'bold 12px Lato';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Avg: ${avg.toFixed(1)}`, xPos, chartArea.top - 5);
-            ctx.restore();
-          }
-        }
-      } */
     }
   });
 
@@ -2021,7 +2103,6 @@ const reliabilityCheckboxIds = [
   'reliabilityTotalAlgaeCycles',
   'reliabilityBargeCycles',
   'reliabilityProcessorCycles',
-  //'showEPAAvg'
 ];
 
 function setDefaultReliabilityCheckboxes() {
@@ -2062,10 +2143,10 @@ reliabilityCheckboxIds.forEach(id => {
   if (el) {
     el.addEventListener('change', () => {
       lastReliabilityCheckboxState = getReliabilityCheckboxState();
-      renderReliabilityCharts(); 
+      renderReliabilityCharts();
     });
   }
-}); 
+});
 
 function renderBlankChart(canvasId, label = "No Data") {
   const ctx = document.getElementById(canvasId).getContext('2d');
@@ -3741,9 +3822,9 @@ function goToIndividualView(teamNumber) {
 function toggleEPAAvg(containerId, show) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  
+
   const charts = container.querySelectorAll('canvas');
-  
+
   charts.forEach(canvas => {
     const chart = Chart.getChart(canvas);
     if (chart) {
@@ -3752,7 +3833,7 @@ function toggleEPAAvg(containerId, show) {
           chart.setDatasetVisibility(i, show);
         }
       });
-      chart.update('none'); 
+      chart.update('none');
     }
   });
 }
