@@ -1853,7 +1853,8 @@ function renderReliabilityCharts() {
 
     const canvasContainer = document.createElement('div');
     canvasContainer.style.position = 'relative';
-    canvasContainer.style.height = '220px';
+    canvasContainer.style.height = '320px';
+    canvasContainer.style.width = '100%';
     chartCard.appendChild(canvasContainer);
 
     const canvas = document.createElement('canvas');
