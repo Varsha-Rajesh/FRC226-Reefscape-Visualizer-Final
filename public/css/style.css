@@ -148,10 +148,20 @@ label {
 
 .comparison-grid {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    margin-top: 20px;
+    gap: 0;
+}
+
+.comparison-halves-row {
+    display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 20px;
-    position: relative;
+    gap: 20px;
+    width: 100%;
 }
 
 .comparison-half {
@@ -1451,6 +1461,7 @@ label {
 #reliabilityChartOptions input[type="checkbox"]:hover {
     border-color: #fff;
 }
+
 .toggle-switch {
     display: flex;
     align-items: center;
@@ -1499,12 +1510,12 @@ label {
     transition: transform 0.2s;
 }
 
-.toggle-switch input[type="checkbox"]:checked + .slider {
+.toggle-switch input[type="checkbox"]:checked+.slider {
     background-color: #1e90ff;
     border-color: #1e90ff;
 }
 
-.toggle-switch input[type="checkbox"]:checked + .slider:before {
+.toggle-switch input[type="checkbox"]:checked+.slider:before {
     transform: translate(16px, -50%);
 }
 
@@ -1514,54 +1525,55 @@ label {
 }
 
 .toggle-container {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
 }
 
 .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #3B064D;
-  transition: .4s;
-  border-radius: 24px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #3B064D;
+    transition: .4s;
+    border-radius: 24px;
 }
 
 .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
 }
 
-input:checked + .slider {
-  background-color: #1e90ff;
+input:checked+.slider {
+    background-color: #1e90ff;
 }
 
-input:checked + .slider:before {
-  transform: translateX(26px);
+input:checked+.slider:before {
+    transform: translateX(26px);
 }
+
 .reliability-chart-card {
     width: 100%;
     height: 320px;
@@ -1575,39 +1587,155 @@ input:checked + .slider:before {
     height: 100% !important;
     display: block;
 }
+
 #reliabilityComparisonChartArea {
-  position: relative;
-  width: 100%;
-  min-height: 400px;
+    position: relative;
+    width: 100%;
+    min-height: 400px;
 }
 
 #reliabilityComparisonChartArea canvas {
-  width: 100% !important;
-  height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 #comparisonReliabilityContainer {
-  margin-top: 30px;
-  margin-bottom: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
 #reliabilityChartOptionsComparison {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .checkbox-label-comparison {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #ccc;
+    font-family: 'Lato';
+    cursor: pointer;
+    padding: 4px 8px;
+    background-color: #2a2d31;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+
+.metrics-row {
+    padding-top: 1rem;
+}
+
+.metrics-half {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.metric-container {
+    display: flex;
+    justify-content: space-between;
+    background: #f8f8f8;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.metric-value {
+    font-weight: bold;
+    color: #0078d4;
+}
+
+.boxplot-container {
+    width: 100%;
+    height: 40px;
+    position: relative;
+    background-color: #f0f0f0;
+    margin-top: 5px;
+}
+
+.boxplot {
+    position: absolute;
+    height: 20px;
+    top: 10px;
+    background-color: #4a90e2;
+}
+
+.boxplot-median {
+    position: absolute;
+    height: 20px;
+    width: 2px;
+    background-color: #fff;
+    top: 10px;
+}
+
+.metric-chart-container {
+  width: 100%;
+  background-color: #1C1E21;
+  border-radius: 12px;
+  box-shadow: #131416 0px 0px 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  max-height: none;
+  height: auto;
+  overflow: visible;
+  box-sizing: border-box;
+  transition: none; 
+}
+.metric-chart-container .chart-title{
+    text-align: left !important;
+    width: 100%;
+    margin-left: 0;
+}
+
+#comparisonMetricChartOptions .checkbox-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  color: #ccc;
+  font-size: 16px;
+  color: white;
   font-family: 'Lato';
   cursor: pointer;
-  padding: 4px 8px;
-  background-color: #2a2d31;
+  margin-right: 12px;
+  margin-bottom: 6px;
+}
+#comparisonMetricChartOptions input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #888;
   border-radius: 4px;
-  white-space: nowrap;
+  background-color: #1C1E21;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+#comparisonMetricChartOptions input[type="checkbox"]:checked {
+  background-color: #1e90ff;
+  border-color: #1e90ff;
+}
+#comparisonMetricChartOptions input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: white;
+  font-size: 12px;
+  position: absolute;
+  top: -2px;
+  left: 3px;
+  font-weight: bold;
+}
+#comparisonMetricChartOptions .checkbox-label:hover input[type="checkbox"] {
+  border-color: #1e90ff;
 }

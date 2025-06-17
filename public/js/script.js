@@ -16,8 +16,6 @@ const charts = {
   coralCyclesChart: null,
   algaeCyclesChart: null,
   reliabilityChartsArea: null,
-  epaTrendChartTeam1: null,
-  epaTrendChartTeam2: null
 };
 
 Chart.register({
@@ -540,16 +538,7 @@ document.getElementById('comparisonSearch2').addEventListener('keydown', functio
   }
 });
 
-document.querySelectorAll('.showEPAAvgComparison').forEach(checkbox => {
-  checkbox.addEventListener('change', function () {
-    const isChecked = this.checked;
-    document.querySelectorAll('.showEPAAvgComparison').forEach(cb => {
-      cb.checked = isChecked;
-    });
-    toggleEPAAvg('epaTrendTeam1', isChecked);
-    toggleEPAAvg('epaTrendTeam2', isChecked);
-  });
-});
+
 
 // Overview
 document.getElementById('overviewSearch').addEventListener('keydown', function (e) {
@@ -793,14 +782,6 @@ function clearAllCharts() {
   if (charts['reliabilityChartsArea']) {
     charts['reliabilityChartsArea'].destroy();
     charts['reliabilityChartsArea'] = null;
-  }
-  if (charts['epaTrendChartTeam1']) {
-    charts['epaTrendChartTeam1'].destroy();
-    charts['epaTrendChartTeam1'] = null;
-  }
-  if (charts['epaTrendChartTeam2']) {
-    charts['epaTrendChartTeam2'].destroy();
-    charts['epaTrendChartTeam2'] = null;
   }
 
   Object.keys(charts).forEach(chartName => {
@@ -2052,7 +2033,7 @@ function createBoxPlot(canvas, metric, values, avg, showAvg) {
                   `Median: ${data.median.toFixed(1)}`,
                   `Q3: ${data.q3.toFixed(1)}`,
                   `Maximum: ${data.max.toFixed(1)}`,
-                  `Outliers: ${data.outliers.length}`
+                  `IQR: ${q3 - q1}`,
                 ];
               }
               return null;
@@ -2232,15 +2213,7 @@ function getMaxTeleCoral(team1Data, team2Data) {
 
   return maxTotal;
 }
-function getMaxEPA(team1Data, team2Data) {
-  const combined = [...team1Data, ...team2Data];
-  let max = 0;
-  combined.forEach(row => {
-    const score = parseFloat(row['Total Score'] || 0);
-    if (score > max) max = score;
-  });
-  return Math.ceil(max / 20) * 20;
-}
+
 
 function getMaxTeleAlgae(team1Data, team2Data, filter = 'all') {
   const combined = [...team1Data, ...team2Data];
@@ -2335,15 +2308,16 @@ function searchComparisonBothTeams() {
   const algaeFilter = document.getElementById('algaeTypeFilter1').value || 'all';
   const maxTeleopAlgae = getMaxTeleAlgae(team1Data, team2Data, algaeFilter);
   const yMax = Math.ceil(maxTeleopCoral / 2) * 2;
-  const maxEPA = getMaxEPA(team1Data, team2Data);
   const startFilter = document.getElementById('startingPositionFilter1').value || 'all';
   const maxAutoCoral = getMaxAutoCoral(team1Data, team2Data, startFilter);
   const maxAutoAlgae = getMaxAutoAlgae(team1Data, team2Data, startFilter);
 
-  searchComparison(1, yMax, maxTeleopAlgae, maxEPA, maxAutoCoral, maxAutoAlgae);
-  searchComparison(2, yMax, maxTeleopAlgae, maxEPA, maxAutoCoral, maxAutoAlgae);
+  searchComparison(1, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
+  searchComparison(2, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
+  renderComparisonMetricBoxPlots();
+
 }
-function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = null, maxEPAOverride = null, maxAutoCoralOverride = null, maxAutoAlgaeOverride = null) {
+function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = null, maxAutoCoralOverride = null, maxAutoAlgaeOverride = null) {
 
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
   const otherTeamInputId = teamNumber === 1 ? 'comparisonSearch2' : 'comparisonSearch1';
@@ -2353,7 +2327,6 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   const teleAlgaeCanvasId = teamNumber === 1 ? 'teleAlgaeTeam1' : 'teleAlgaeTeam2';
   const endGameCanvasId = teamNumber === 1 ? 'endGameTeam1' : 'endGameTeam2';
   const scouterCommentsId = teamNumber === 1 ? 'scouterComments1' : 'scouterComments2';
-  const epaTrendCanvasId = teamNumber === 1 ? 'epaTrendTeam1' : 'epaTrendTeam2';
   const teamNameDisplayId = teamNumber === 1 ? 'teamNameDisplay1' : 'teamNameDisplay2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
@@ -2376,9 +2349,6 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
     ? yMaxAlgaeOverride
     : Math.ceil(getTopAlgaeMatchFromTwoTeams(teamData, otherTeamData) / 2) * 2;
 
-  const maxEPA = maxEPAOverride !== null
-    ? maxEPAOverride
-    : Math.ceil(getMaxEPA(teamData, otherTeamData) / 20) * 20;
 
   const maxAutoCoral = maxAutoCoralOverride !== null
     ? maxAutoCoralOverride
@@ -2408,7 +2378,6 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   renderEndGameChartForTeam(teamData, endGameCanvasId);
   renderScouterCommentsForTeam(teamData, scouterCommentsId);
   renderComparisonTeamStatistics(teamData, pitScoutingData, teamNumber);
-  renderEPATrendChartForTeam(teamData, epaTrendCanvasId, maxEPA);
 
   const currentFilterValue = document.getElementById(`startingPositionFilter${teamNumber}`).value;
   syncDropdownsAndFilter(currentFilterValue);
@@ -2581,106 +2550,6 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
   });
 }
 
-function renderEPATrendChartForTeam(teamData, canvasId, maxY = null) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
-
-  if (charts[canvasId]) {
-    charts[canvasId].destroy();
-  }
-
-  const sortedData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
-  const matchLabels = sortedData.map(row => 'Q' + row.Match);
-  const epaValues = sortedData.map(row => parseFloat(row['Total Score'] || 0));
-
-  const avgEPA = epaValues.reduce((sum, val) => sum + val, 0) / epaValues.length;
-  const averageLine = Array(matchLabels.length).fill(avgEPA);
-
-  charts[canvasId] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: matchLabels,
-      datasets: [
-        {
-          label: 'EPA',
-          data: epaValues,
-          borderColor: '#3EDBF0',
-          backgroundColor: 'rgba(93, 219, 254, 0.1)',
-          borderWidth: 3,
-          pointBackgroundColor: '#3EDBF0',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointHitRadius: 10,
-          pointHoverBorderWidth: 3,
-          fill: true,
-          tension: 0.3
-        },
-        {
-          label: 'Avg. EPA',
-          data: averageLine,
-          borderColor: '#0343FC',
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHitRadius: 10,
-          pointHoverRadius: 6,
-          tension: 0,
-          hidden: !document.getElementById('showEPAAvg')?.checked
-        }
-
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 2,
-      devicePixelRatio: 2,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            beforeBody: function (tooltipItems) {
-              const context = tooltipItems[0];
-              const label = context.dataset.label;
-              const showAvg = document.querySelector('.showEPAAvgComparison').checked;
-
-              if (label === 'Avg. EPA' || !showAvg) return null;
-
-              const value = context.parsed.y;
-              const avgEPA = context.dataset.data[0];
-              const delta = value - avgEPA;
-              const sign = delta >= 0 ? '+' : '';
-              return `Δ: ${sign}${delta.toFixed(2)}`;
-            }
-          },
-          backgroundColor: '#1C1E21',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: '#000',
-          borderWidth: 1,
-          titleFont: { family: 'Lato', size: 14 },
-          bodyFont: { family: 'Lato', size: 14 },
-          padding: 10,
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: 'white',
-            font: { family: 'Lato', size: 12, weight: 'bold' }
-          }
-        },
-        y: {
-          beginAtZero: true,
-          max: maxY ?? undefined,
-          ticks: {
-            color: 'white',
-            font: { family: 'Lato', size: 12, weight: 'bold' },
-            stepSize: 20
-          }
-        }
-      }
-    }
-  });
-}
 
 function syncAlgaeDropdownsAndFilter(value) {
   document.querySelectorAll('#algaeTypeFilter1, #algaeTypeFilter2').forEach(dropdown => {
@@ -3057,6 +2926,201 @@ function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxCoral = nu
     renderBlankChart(algaeCanvasId);
   }
 }
+
+function getMetricValues(teamData, metricKey) {
+  switch (metricKey) {
+    case 'Total Points':
+      return teamData.map(row => parseFloat(row['Total Score'] || 0));
+    case 'Auto Points':
+      return teamData.map(row => parseFloat(row['Auton Score'] || 0));
+    case 'Tele Points':
+      return teamData.map(row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)));
+    case 'Total Cycles':
+      return teamData.map(row =>
+      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
+        parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+      );
+    case 'Total Coral Cycles':
+      return teamData.map(row =>
+        (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
+      );
+    case 'L4 Cycles':
+      return teamData.map(row => parseInt(row['L4'] || 0));
+    case 'L3 Cycles':
+      return teamData.map(row => parseInt(row['L3'] || 0));
+    case 'L2 Cycles':
+      return teamData.map(row => parseInt(row['L2'] || 0));
+    case 'L1 Cycles':
+      return teamData.map(row => parseInt(row['L1'] || 0));
+    case 'Total Algae Cycles':
+      return teamData.map(row =>
+        (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+      );
+    case 'Barge Cycles':
+      return teamData.map(row => parseInt(row['Algae in Net'] || 0));
+    case 'Processor Cycles':
+      return teamData.map(row => parseInt(row['Algae in Processor'] || 0));
+    default:
+      return [];
+  }
+}
+
+
+function calculatePercentile(sortedArray, percentile) {
+  if (sortedArray.length === 0) return 0;
+  const index = (percentile / 100) * (sortedArray.length - 1);
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sortedArray[lower];
+  return sortedArray[lower] + (sortedArray[upper] - sortedArray[lower]) * (index - lower);
+}
+
+function renderComparisonMetricBoxPlots() {
+  const team1 = document.getElementById('comparisonSearch1').value.trim();
+  const team2 = document.getElementById('comparisonSearch2').value.trim();
+  const team1Data = filterTeamData(team1);
+  const team2Data = filterTeamData(team2);
+
+  const metrics = [
+    { label: 'Total Points', left: 'leftTotalPointsChart', right: 'rightTotalPointsChart', color: '#3ED098' },
+    { label: 'Auto Points', left: 'leftAutoPointsChart', right: 'rightAutoPointsChart', color: '#51E7CF' },
+    { label: 'Tele Points', left: 'leftTelePointsChart', right: 'rightTelePointsChart', color: '#3ecdd0' },
+    { label: 'Total Cycles', left: 'leftTotalCyclesChart', right: 'rightTotalCyclesChart', color: '#cf8ffc' },
+    { label: 'Total Coral Cycles', left: 'leftTotalCoralCyclesChart', right: 'rightTotalCoralCyclesChart', color: '#ff83fa' },
+    { label: 'L4 Cycles', left: 'leftL4CyclesChart', right: 'rightL4CyclesChart', color: '#ff8bfc' },
+    { label: 'L3 Cycles', left: 'leftL3CyclesChart', right: 'rightL3CyclesChart', color: '#ed0cef' },
+    { label: 'L2 Cycles', left: 'leftL2CyclesChart', right: 'rightL2CyclesChart', color: '#BF02ff' },
+    { label: 'L1 Cycles', left: 'leftL1CyclesChart', right: 'rightL1CyclesChart', color: '#8105d8' },
+    { label: 'Total Algae Cycles', left: 'leftTotalAlgaeCyclesChart', right: 'rightTotalAlgaeCyclesChart', color: '#006fff' },
+    { label: 'Barge Cycles', left: 'leftBargeCyclesChart', right: 'rightBargeCyclesChart', color: '#3498db' },
+    { label: 'Processor Cycles', left: 'leftProcessorCyclesChart', right: 'rightProcessorCyclesChart', color: '#14c7de' }
+  ];
+
+  metrics.forEach(metric => {
+    const values1 = getMetricValues(team1Data, metric.label);
+    const values2 = getMetricValues(team2Data, metric.label);
+
+    const allValues = [...values1, ...values2].filter(v => typeof v === 'number' && !isNaN(v));
+    let min = 0, max = 1, stepSize = 1;
+    if (allValues.length > 0) {
+      let rawMin = Math.min(...allValues);
+      let rawMax = Math.max(...allValues);
+
+      const range = rawMax - rawMin;
+      if (range > 20) stepSize = 5;
+      else if (range > 10) stepSize = 2;
+      else stepSize = 1;
+
+      min = Math.floor(rawMin / stepSize) * stepSize;
+      max = Math.ceil(rawMax / stepSize) * stepSize;
+      if (max <= rawMax) max += stepSize;
+    }
+
+    renderMetricBoxPlot(metric.left, values1, metric.color, min, max, stepSize);
+    renderMetricBoxPlot(metric.right, values2, metric.color, min, max, stepSize);
+  });
+}
+
+function renderMetricBoxPlot(canvasId, values, color = '#3ED098', min = 0, max = 1, stepSize = 1) {
+  if (window.charts && window.charts[canvasId]) {
+    window.charts[canvasId].destroy();
+  }
+  if (!window.charts) window.charts = {};
+  const ctx = document.getElementById(canvasId).getContext('2d');
+
+  if (!values || values.length === 0) {
+    window.charts[canvasId] = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: ['No Data'], datasets: [{ data: [0], backgroundColor: '#888' }] },
+      options: { responsive: true }
+    });
+    return;
+  }
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const q1 = calculatePercentile(sorted, 25);
+  const median = calculatePercentile(sorted, 50);
+  const q3 = calculatePercentile(sorted, 75);
+  const iqr = q3 - q1;
+  const boxMin = Math.max(sorted[0], q1 - 1.5 * iqr);
+  const boxMax = Math.min(sorted[sorted.length - 1], q3 + 1.5 * iqr);
+  const outliers = values.filter(v => v < boxMin || v > boxMax);
+
+  window.charts[canvasId] = new Chart(ctx, {
+    type: 'boxplot',
+    data: {
+      labels: [''],
+      datasets: [{
+        backgroundColor: color + '40',
+        borderColor: color,
+        borderWidth: 2,
+        outlierBackgroundColor: '#ff5c5c',
+        outlierRadius: 5,
+        data: [{
+          min: boxMin,
+          q1: q1,
+          median: median,
+          q3: q3,
+          max: boxMax,
+          outliers: outliers
+        }]
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: true,
+      devicePixelRatio: 2,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'point',
+          intersect: true,
+          backgroundColor: '#1C1E21',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#000',
+          borderWidth: 1,
+          titleFont: { family: 'Lato', size: 14, weight: 'bold' },
+          bodyFont: { family: 'Lato', size: 14 },
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            title: () => '',
+            label: context => {
+              if (context.datasetIndex === 0 && context.dataIndex === 0) {
+                return [
+                  `Min: ${boxMin}`,
+                  `Q1: ${q1}`,
+                  `Median: ${median}`,
+                  `Q3: ${q3}`,
+                  `Max: ${boxMax}`,
+                  `IQR: ${q3 - q1}`,
+                ];
+              }
+              return '';
+            }
+          }
+        }
+      },
+      scales: {
+        y: { display: false },
+        x: {
+          min: min,
+          max: max,
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.1)', drawBorder: false },
+          ticks: {
+            color: 'white',
+            font: { family: 'Lato', size: 14, weight: 'bold' },
+            stepSize: stepSize
+          }
+        }
+      }
+    }
+  });
+}
+
 /*-----OVERVIEW STACKED CHART----*/
 
 function getChartClickHandler() {

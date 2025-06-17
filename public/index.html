@@ -214,8 +214,9 @@
         <div
           style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px;">
           <h3 class="chart-title" style="margin: 0;">Reliability</h3>
-          <button id="toggleChartTypeBtn" class="blue-button" style="padding: 6px 14px; font-size: 14px;">Switch to Line
-            Chart</button>
+          <button id="toggleChartTypeBtn" class="blue-button" style="padding: 6px 14px; font-size: 14px;">
+            Switch to Line Chart
+          </button>
         </div>
 
         <div style="display: flex; width: 100%; align-items: flex-start;">
@@ -276,7 +277,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- COMPARISON VIEW -->
@@ -285,285 +285,388 @@
       <h1>Comparison View</h1>
 
       <div class="comparison-grid">
-        <div class="comparison-half left-half">
-          <div class="search-bar">
-            <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
-              <div style="display: flex; gap: 10px; width: 100%;">
-                <input type="text" id="comparisonSearch1" placeholder="Team Number 1" autocomplete="off"
-                  style="min-width: 160px;" />
-                <button onclick="searchComparison(1)">Search</button>
-              </div>
-              <div id="teamNameDisplay1"
-                style="color:white; font-size:16px; margin-top:8px; text-align: center; width: 100%; max-width: 300px; align-self: center;">
-              </div>
-            </div>
-          </div>
-
-          <div id="teamStatsComparison1">
-            <div class="teamStatsFormatting">
-              <div class="teamStatsFormatting2">
-                <h3 class="statsContainerText">Climb & Robot Stats</h3>
-                <div class="statsText">
-                  <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate1">0.00</span>%</p>
-                  <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate1">0.00</span>%</p>
-                  <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge1"></span></p>
-                  <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor1"></span></p>
+        <div class="comparison-halves-row">
+          <div class="comparison-half left-half">
+            <div class="search-bar">
+              <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
+                <div style="display: flex; gap: 10px; width: 100%;">
+                  <input type="text" id="comparisonSearch1" placeholder="Team Number 1" autocomplete="off"
+                    style="min-width: 160px;" />
+                  <button onclick="searchComparison(1)">Search</button>
                 </div>
-              </div>
-              <div class="teamStatsFormatting2">
-                <h3 class="statsContainerText">Averages</h3>
-                <div class="statsText">
-                  <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA1">0.00</span></p>
-                  <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral1">0.00</span></p>
-                  <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae1">0.00</span></p>
-                  <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank1">N/A</span> <a href="#"
-                      onclick="showTab(event, 'defenseRankingInfo')">
-                      <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
-                    </a></p>
+                <div id="teamNameDisplay1"
+                  style="color:white; font-size:16px; margin-top:8px; text-align: center; width: 100%; max-width: 300px; align-self: center;">
                 </div>
               </div>
             </div>
+
+            <div id="teamStatsComparison1">
+              <div class="teamStatsFormatting">
+                <div class="teamStatsFormatting2">
+                  <h3 class="statsContainerText">Climb & Robot Stats</h3>
+                  <div class="statsText">
+                    <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate1">0.00</span>%</p>
+                    <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate1">0.00</span>%</p>
+                    <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge1"></span></p>
+                    <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor1"></span></p>
+                  </div>
+                </div>
+                <div class="teamStatsFormatting2">
+                  <h3 class="statsContainerText">Averages</h3>
+                  <div class="statsText">
+                    <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA1">0.00</span></p>
+                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral1">0.00</span></p>
+                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae1">0.00</span></p>
+                    <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank1">N/A</span> <a href="#"
+                        onclick="showTab(event, 'defenseRankingInfo')">
+                        <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                      </a></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="comparisionAutoCoral1">
+              <div class="autoCharts">
+                <h3 class="chart-title">Auto Coral</h3>
+                <select id="startingPositionFilter1" class="dropdown comparison-filter"
+                  onchange="syncDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="side">Side</option>
+                  <option value="center">Center</option>
+                  <option value="processor">Side - Processor</option>
+                  <option value="barge">Side - Barge</option>
+                </select>
+              </div>
+              <canvas id="autoCoralTeam1"></canvas>
+            </div>
+
+            <div id="comparisonResultAlgae1">
+              <div class="autoCharts">
+                <h3 class="chart-title">Auto Algae</h3>
+                <select id="startingPositionFilter1" class="dropdown comparison-filter"
+                  onchange="syncDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="side">Side</option>
+                  <option value="center">Center</option>
+                  <option value="processor">Side - Processor</option>
+                  <option value="barge">Side - Barge</option>
+                </select>
+              </div>
+              <canvas id="autoAlgaeTeam1"></canvas>
+            </div>
+
+            <div id="comparisonResultTeleCoral1">
+              <div class="comparisonTele">
+                <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
+                <canvas id="teleCoralTeam1"></canvas>
+              </div>
+            </div>
+
+            <div id="comparisonResultTeleAlgae1">
+              <div class="autoCharts">
+                <h3 class="chart-title">Tele Algae</h3>
+                <select id="algaeTypeFilter1" class="dropdown comparison-filter"
+                  onchange="syncAlgaeDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="remove">Remove</option>
+                  <option value="process">Process</option>
+                  <option value="barge">Barge</option>
+                </select>
+              </div>
+              <canvas id="teleAlgaeTeam1"></canvas>
+            </div>
+
+            <div id="comparisonResultEndGame1">
+              <div class="comparisonTele">
+                <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
+                <canvas id="endGameTeam1"></canvas>
+              </div>
+            </div>
+
+            <div id="scouterCommentsContainer1">
+              <div class="containerStyling">
+                <h3 class="chart-title">Scouter Comments</h3>
+              </div>
+              <div id="scouterComments1">
+              </div>
+            </div>
           </div>
 
-          <div id="comparisionAutoCoral1">
-            <div class="autoCharts">
-              <h3 class="chart-title">Auto Coral</h3>
-              <select id="startingPositionFilter1" class="dropdown comparison-filter"
-                onchange="syncDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="side">Side</option>
-                <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
-              </select>
+          <div class="comparison-half right-half">
+            <div class="search-bar">
+              <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
+                <div style="display: flex; gap: 10px; width: 100%;">
+                  <input type="text" id="comparisonSearch2" placeholder="Team Number 2" autocomplete="off"
+                    style="min-width: 160px;" />
+                  <button onclick="searchComparison(2)">Search</button>
+                </div>
+                <div id="teamNameDisplay2"
+                  style="color:white; font-size:16px; margin-top:8px; text-align: center; width: 100%; max-width: 300px; align-self: center;">
+                </div>
+              </div>
             </div>
-            <canvas id="autoCoralTeam1"></canvas>
-          </div>
+            <div id="teamStatsComparison2">
+              <div class="teamStatsFormatting">
+                <div class="teamStatsFormatting2">
+                  <h3 class="statsContainerText">Climb & Robot Stats</h3>
+                  <div class="statsText">
+                    <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate2">0.00</span>%</p>
+                    <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate2">0.00</span>%</p>
+                    <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge2"></span></p>
+                    <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor2"></span></p>
+                  </div>
+                </div>
+                <div class="teamStatsFormatting2">
+                  <h3 class="statsContainerText">Averages</h3>
+                  <div class="statsText">
+                    <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA2">0.00</span></p>
+                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral2">0.00</span></p>
+                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae2">0.00</span></p>
+                    <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank2">N/A</span> <a href="#"
+                        onclick="showTab(event, 'defenseRankingInfo')">
+                        <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
+                      </a></p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <div id="comparisonResultAlgae1">
-            <div class="autoCharts">
-              <h3 class="chart-title">Auto Algae</h3>
-              <select id="startingPositionFilter1" class="dropdown comparison-filter"
-                onchange="syncDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="side">Side</option>
-                <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
-              </select>
+            <div id="comparisionAutoCoral2">
+              <div class="autoCharts">
+                <h3 class="chart-title">Auto Coral</h3>
+                <select id="startingPositionFilter2" class="dropdown comparison-filter"
+                  onchange="syncDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="side">Side</option>
+                  <option value="center">Center</option>
+                  <option value="processor">Side - Processor</option>
+                  <option value="barge">Side - Barge</option>
+                </select>
+              </div>
+              <canvas id="autoCoralTeam2"></canvas>
             </div>
-            <canvas id="autoAlgaeTeam1"></canvas>
-          </div>
 
-          <div id="comparisonResultTeleCoral1">
-            <div class="comparisonTele">
-              <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
-              <canvas id="teleCoralTeam1"></canvas>
+            <div id="comparisonResultAlgae2">
+              <div class="autoCharts">
+                <h3 class="chart-title">Auto Algae</h3>
+                <select id="startingPositionFilter2" class="dropdown comparison-filter"
+                  onchange="syncDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="side">Side</option>
+                  <option value="center">Center</option>
+                  <option value="processor">Side - Processor</option>
+                  <option value="barge">Side - Barge</option>
+                </select>
+              </div>
+              <canvas id="autoAlgaeTeam2"></canvas>
             </div>
-          </div>
 
-          <div id="comparisonResultTeleAlgae1">
-            <div class="autoCharts">
-              <h3 class="chart-title">Tele Algae</h3>
-              <select id="algaeTypeFilter1" class="dropdown comparison-filter"
-                onchange="syncAlgaeDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="remove">Remove</option>
-                <option value="process">Process</option>
-                <option value="barge">Barge</option>
-              </select>
+            <div id="comparisonResultTeleCoral2">
+              <div class="comparisonTele">
+                <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
+                <canvas id="teleCoralTeam2"></canvas>
+              </div>
             </div>
-            <canvas id="teleAlgaeTeam1"></canvas>
-          </div>
 
-          <div id="comparisonResultEndGame1">
-            <div class="comparisonTele">
-              <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
-              <canvas id="endGameTeam1"></canvas>
+            <div id="comparisonResultTeleAlgae2">
+              <div class="autoCharts">
+                <h3 class="chart-title">Tele Algae</h3>
+                <select id="algaeTypeFilter2" class="dropdown comparison-filter"
+                  onchange="syncAlgaeDropdownsAndFilter(this.value)">
+                  <option value="all">All</option>
+                  <option value="remove">Remove</option>
+                  <option value="process">Process</option>
+                  <option value="barge">Barge</option>
+                </select>
+              </div>
+              <canvas id="teleAlgaeTeam2"></canvas>
             </div>
-          </div>
-          <div id="scouterCommentsContainer1">
-            <div class="containerStyling">
-              <h3 class="chart-title">Scouter Comments</h3>
+
+            <div id="comparisonResultEndGame2">
+              <div class="comparisonTele">
+                <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
+                <canvas id="endGameTeam2"></canvas>
+              </div>
             </div>
-            <div id="scouterComments1">
+
+            <div id="scouterCommentsContainer2">
+              <div class="containerStyling">
+                <h3 class="chart-title">Scouter Comments</h3>
+              </div>
+              <div id="scouterComments2">
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="comparison-half right-half">
-          <div class="search-bar">
-            <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
-              <div style="display: flex; gap: 10px; width: 100%;">
-                <input type="text" id="comparisonSearch2" placeholder="Team Number 2" autocomplete="off"
-                  style="min-width: 160px;" />
-                <button onclick="searchComparison(2)">Search</button>
-              </div>
-              <div id="teamNameDisplay2"
-                style="color:white; font-size:16px; margin-top:8px; text-align: center; width: 100%; max-width: 300px; align-self: center;">
-              </div>
-            </div>
-          </div>
-          <div id="teamStatsComparison2">
-            <div class="teamStatsFormatting">
-              <div class="teamStatsFormatting2">
-                <h3 class="statsContainerText">Climb & Robot Stats</h3>
-                <div class="statsText">
-                  <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate2">0.00</span>%</p>
-                  <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate2">0.00</span>%</p>
-                  <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge2"></span></p>
-                  <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor2"></span></p>
-                </div>
-              </div>
-              <div class="teamStatsFormatting2">
-                <h3 class="statsContainerText">Averages</h3>
-                <div class="statsText">
-                  <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA2">0.00</span></p>
-                  <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral2">0.00</span></p>
-                  <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae2">0.00</span></p>
-                  <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank2">N/A</span> <a href="#"
-                      onclick="showTab(event, 'defenseRankingInfo')">
-                      <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
-                    </a></p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- ...inside <div id="comparison" class="tab-content"> ... -->
 
-          <div id="comparisionAutoCoral2">
-            <div class="autoCharts">
-              <h3 class="chart-title">Auto Coral</h3>
-              <select id="startingPositionFilter2" class="dropdown comparison-filter"
-                onchange="syncDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="side">Side</option>
-                <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
-              </select>
-            </div>
-            <canvas id="autoCoralTeam2"></canvas>
-          </div>
+        <div id="comparisonMetricCheckboxes" style="margin-bottom: 18px; display: flex; flex-wrap: wrap; gap: 18px;">
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonTotalPoints" checked>
+            Total Points
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonAutoPoints" checked>
+            Auto Points
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonTelePoints" checked>
+            Tele Points
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonTotalCycles" checked>
+            Total Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonTotalCoralCycles" checked>
+            Total Coral Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonL4Cycles" checked>
+            L4 Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonL3Cycles" checked>
+            L3 Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonL2Cycles" checked>
+            L2 Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonL1Cycles" checked>
+            L1 Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonTotalAlgaeCycles" checked>
+            Total Algae Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonBargeCycles" checked>
+            Barge Cycles
+          </label>
+          <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
+            <input type="checkbox" class="comparison-metric-checkbox" id="comparisonProcessorCycles" checked>
+            Processor Cycles
+          </label>
+        </div>
 
-          <div id="comparisonResultAlgae2">
-            <div class="autoCharts">
-              <h3 class="chart-title">Auto Algae</h3>
-              <select id="startingPositionFilter2" class="dropdown comparison-filter"
-                onchange="syncDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="side">Side</option>
-                <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
-              </select>
+        <div class="comparison-halves-row metrics-row">
+          <div class="comparison-half left-half">
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Points</h3>
+              <canvas id="leftTotalPointsChart"></canvas>
             </div>
-            <canvas id="autoAlgaeTeam2"></canvas>
-          </div>
-
-          <div id="comparisonResultTeleCoral2">
-            <div class="comparisonTele">
-              <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
-              <canvas id="teleCoralTeam2"></canvas>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Auto Points</h3>
+              <canvas id="leftAutoPointsChart"></canvas>
             </div>
-          </div>
-
-          <div id="comparisonResultTeleAlgae2">
-            <div class="autoCharts">
-              <h3 class="chart-title">Tele Algae</h3>
-              <select id="algaeTypeFilter2" class="dropdown comparison-filter"
-                onchange="syncAlgaeDropdownsAndFilter(this.value)">
-                <option value="all">All</option>
-                <option value="remove">Remove</option>
-                <option value="process">Process</option>
-                <option value="barge">Barge</option>
-              </select>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Tele Points</h3>
+              <canvas id="leftTelePointsChart"></canvas>
             </div>
-            <canvas id="teleAlgaeTeam2"></canvas>
-          </div>
-
-          <div id="comparisonResultEndGame2">
-            <div class="comparisonTele">
-              <h3 class="chart-title" style="margin-bottom: 10px;">End Game</h3>
-              <canvas id="endGameTeam2"></canvas>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Cycles</h3>
+              <canvas id="leftTotalCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Coral Cycles</h3>
+              <canvas id="leftTotalCoralCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L4 Cycles</h3>
+              <canvas id="leftL4CyclesChart"></canvas>
             </div>
           </div>
 
-
-          <div id="scouterCommentsContainer2">
-            <div class="containerStyling">
-              <h3 class="chart-title">Scouter Comments</h3>
+          <div class="comparison-half right-half">
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Points</h3>
+              <canvas id="rightTotalPointsChart"></canvas>
             </div>
-            <div id="scouterComments2">
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Auto Points</h3>
+              <canvas id="rightAutoPointsChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Tele Points</h3>
+              <canvas id="rightTelePointsChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Cycles</h3>
+              <canvas id="rightTotalCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Coral Cycles</h3>
+              <canvas id="rightTotalCoralCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L4 Cycles</h3>
+              <canvas id="rightL4CyclesChart"></canvas>
             </div>
           </div>
         </div>
+
+        <div class="comparison-halves-row metrics-row">
+          <div class="comparison-half left-half">
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L3 Cycles</h3>
+              <canvas id="leftL3CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L2 Cycles</h3>
+              <canvas id="leftL2CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L1 Cycles</h3>
+              <canvas id="leftL1CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Algae Cycles</h3>
+              <canvas id="leftTotalAlgaeCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Barge Cycles</h3>
+              <canvas id="leftBargeCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Processor Cycles</h3>
+              <canvas id="leftProcessorCyclesChart"></canvas>
+            </div>
+          </div>
+
+          <div class="comparison-half right-half">
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L3 Cycles</h3>
+              <canvas id="rightL3CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L2 Cycles</h3>
+              <canvas id="rightL2CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">L1 Cycles</h3>
+              <canvas id="rightL1CyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Total Algae Cycles</h3>
+              <canvas id="rightTotalAlgaeCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Barge Cycles</h3>
+              <canvas id="rightBargeCyclesChart"></canvas>
+            </div>
+            <div class="metric-chart-container">
+              <h3 class="chart-title">Processor Cycles</h3>
+              <canvas id="rightProcessorCyclesChart"></canvas>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div id="comparisonReliabilityContainer" style="width: 100%; margin-top: 20px;">
-        <div
-          style="width: 100%; background-color: #1C1E21; border-radius: 12px; box-shadow: #131416 0px 0px 20px; padding: 20px;">
-          <div
-            style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px;">
-            <h3 class="chart-title" style="margin: 0;">Reliability</h3>
-            <button id="toggleChartTypeBtnComparison" class="blue-button" style="padding: 6px 14px; font-size: 14px;">
-              Switch to Line Chart
-            </button>
-          </div>
 
-          <div id="reliabilityChartOptionsComparison"
-            style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityTotalPointsComparison" checked>
-              Total Points
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityAutoPointsComparison">
-              Auto Points
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityTelePointsComparison">
-              Tele Points
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityTotalCyclesComparison">
-              Total Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityTotalCoralCyclesComparison">
-              Coral Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityL4CyclesComparison">
-              L4 Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityL3CyclesComparison">
-              L3 Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityL2CyclesComparison">
-              L2 Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityL1CyclesComparison">
-              L1 Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityTotalAlgaeCyclesComparison">
-              Algae Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityBargeCyclesComparison">
-              Barge Cycles
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="reliabilityProcessorCyclesComparison">
-              Processor Cycles
-            </label>
-          </div>
-
-          <div id="reliabilityComparisonChartArea" style="width: 100%; height: 400px;"></div>
-        </div>
-      </div>
     </div>
 
     <!--FILTER VIEW-->
@@ -1027,19 +1130,6 @@
     });
 
     document.getElementById('currentQualMatch').addEventListener('input', updateScoutingSchedule);
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').then(reg => {
-        reg.onupdatefound = () => {
-          const newWorker = reg.installing;
-          newWorker.onstatechange = () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              window.location.reload();
-            }
-          };
-        };
-      });
-    }
 
   </script>
 </body>
