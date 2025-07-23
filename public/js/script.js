@@ -4,6 +4,42 @@ if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
   console.error('Chart.js or Boxplot plugin not loaded');
 }
 
+fetch('/api/data')
+  .then((res) => res.json())
+  .then((json) => {
+    const pre = document.getElementById('data-output');
+    pre.textContent = JSON.stringify(json.data, null, 2);
+  })
+  .catch(() => {
+    document.getElementById('data-output').textContent = 'Failed to load Data tab';
+  });
+
+fetch('/api/schedule')
+  .then((res) => res.json())
+  .then((json) => {
+    const pre = document.getElementById('schedule-output');
+    pre.textContent = JSON.stringify(json.schedule, null, 2);
+  })
+  .catch(() => {
+    document.getElementById('schedule-output').textContent = 'Failed to load Match Schedule tab';
+  });
+
+async function fetchAndStoreGoogleSheetDataTab() {
+  try {
+    const res = await fetch('/api/data');
+    const json = await res.json();
+    if (json.data && Array.isArray(json.data)) {
+      const csv = Papa.unparse(json.data);
+      localStorage.setItem('csvText', csv);
+      csvText = csv;
+      console.log('Google Sheet Data tab saved to localStorage.');
+    } else {
+      console.warn('No data received from /api/data');
+    }
+  } catch (err) {
+    console.error('Failed to fetch Google Sheet Data tab:', err);
+  }
+}
 /*-----VARIABLES----*/
 
 const charts = {
@@ -396,6 +432,10 @@ function showTab(event, tabId) {
   event.currentTarget.classList.add('active');
 
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
+
+  if (['individual', 'overview', 'comparison', 'filterTeams', 'matchPredictor'].includes(tabId)) {
+    fetchAndStoreGoogleSheetDataTab();
+  }
 
   if (tabId === 'scoutingSchedule') {
     document.getElementById('strategyContent').style.display = 'block';
@@ -2122,6 +2162,7 @@ function setReliabilityCheckboxState(state) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setDefaultReliabilityCheckboxes();
+  fetchAndStoreGoogleSheetDataTab();
 });
 
 let lastReliabilityCheckboxState = getReliabilityCheckboxState();
