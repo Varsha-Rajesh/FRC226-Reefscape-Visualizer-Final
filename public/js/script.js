@@ -4,42 +4,6 @@ if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
   console.error('Chart.js or Boxplot plugin not loaded');
 }
 
-fetch('/api/data')
-  .then((res) => res.json())
-  .then((json) => {
-    const pre = document.getElementById('data-output');
-    pre.textContent = JSON.stringify(json.data, null, 2);
-  })
-  .catch(() => {
-    document.getElementById('data-output').textContent = 'Failed to load Data tab';
-  });
-
-fetch('/api/schedule')
-  .then((res) => res.json())
-  .then((json) => {
-    const pre = document.getElementById('schedule-output');
-    pre.textContent = JSON.stringify(json.schedule, null, 2);
-  })
-  .catch(() => {
-    document.getElementById('schedule-output').textContent = 'Failed to load Match Schedule tab';
-  });
-
-async function fetchAndStoreGoogleSheetDataTab() {
-  try {
-    const res = await fetch('/api/data');
-    const json = await res.json();
-    if (json.data && Array.isArray(json.data)) {
-      const csv = Papa.unparse(json.data);
-      localStorage.setItem('csvText', csv);
-      csvText = csv;
-      console.log('Google Sheet Data tab saved to localStorage.');
-    } else {
-      console.warn('No data received from /api/data');
-    }
-  } catch (err) {
-    console.error('Failed to fetch Google Sheet Data tab:', err);
-  }
-}
 /*-----VARIABLES----*/
 
 const charts = {
@@ -432,10 +396,6 @@ function showTab(event, tabId) {
   event.currentTarget.classList.add('active');
 
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
-
-  if (['individual', 'overview', 'comparison', 'filterTeams', 'matchPredictor'].includes(tabId)) {
-    fetchAndStoreGoogleSheetDataTab();
-  }
 
   if (tabId === 'scoutingSchedule') {
     document.getElementById('strategyContent').style.display = 'block';
@@ -1748,18 +1708,24 @@ function renderFlaggedMatches(data) {
     .filter(row => {
       const score = parseFloat(row['Total Score'] || 0);
       const isOutlier = score < lowerBound || score > upperBound;
+      const startingPos = (row['Auton Starting Position'] || '').toLowerCase().trim();
+      const isNoShow = startingPos === 'r.';
 
       return (
         row['Died or Immobilized'] === '1' ||
         row['Defense was played on robot'] === '1' ||
         parseFloat(row['Defense Rating'] || 0) > 1 ||
         row.Match === lowestScoreMatch.match ||
-        (isOutlier && row['Died or Immobilized'] !== '1')
+        (isOutlier && row['Died or Immobilized'] !== '1') ||
+        isNoShow
       );
     })
     .map(row => {
       const reasons = [];
-      if (row['Died or Immobilized'] === '1') reasons.push(' Robot Died');
+      const startingPos = (row['Auton Starting Position'] || '').toLowerCase().trim();
+      if (startingPos === 'r.' || startingPos === 'r' || startingPos.includes('no show')) {
+        reasons.push('<span style="color:#ff5c5c;font-weight:bold;text-transform:uppercase;">NO SHOW</span>');
+      } if (row['Died or Immobilized'] === '1') reasons.push(' Robot Died');
       if (row['Defense was played on robot'] === '1') reasons.push(' Defended On');
       if (parseFloat(row['Defense Rating'] || 0) > 1) reasons.push(' Played Defense');
       if (row.Match === lowestScoreMatch.match) reasons.push(' Lowest Score');
@@ -1769,9 +1735,8 @@ function renderFlaggedMatches(data) {
         reasons.push(' Outlier Score');
       }
 
-      return `<p><strong>Q${row.Match}:</strong> ${reasons} </p>`;
+      return `<p><strong>Q${row.Match}:</strong> ${reasons.join(', ')} </p>`;
     });
-
   if (flaggedMatches.length > 0) {
     flaggedMatchesDiv.innerHTML = flaggedMatches.join('<hr style="border: 0; margin: 10px 0;">');
   } else {
@@ -2157,7 +2122,6 @@ function setReliabilityCheckboxState(state) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setDefaultReliabilityCheckboxes();
-  fetchAndStoreGoogleSheetDataTab();
 });
 
 let lastReliabilityCheckboxState = getReliabilityCheckboxState();
