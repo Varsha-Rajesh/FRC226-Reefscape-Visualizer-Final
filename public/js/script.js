@@ -1,3 +1,24 @@
+function getGradientColor(value, min, mid, max) {
+  if (isNaN(value)) return 'transparent';
+
+  const redDark = [110, 40, 60];    
+  const white = [44, 46, 49];       
+  const greenDark = [60, 120, 80];  
+  if (value <= mid) {
+    const ratio = (value - min) / (mid - min || 1);
+    const r = Math.round(redDark[0] * (1 - ratio) + white[0] * ratio);
+    const g = Math.round(redDark[1] * (1 - ratio) + white[1] * ratio);
+    const b = Math.round(redDark[2] * (1 - ratio) + white[2] * ratio);
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const ratio = (value - mid) / (max - mid || 1);
+    const r = Math.round(white[0] * (1 - ratio) + greenDark[0] * ratio);
+    const g = Math.round(white[1] * (1 - ratio) + greenDark[1] * ratio);
+    const b = Math.round(white[2] * (1 - ratio) + greenDark[2] * ratio);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
 function renderRankingTable() {
   if (typeof Papa === 'undefined' || typeof csvText === 'undefined') return;
   const parsed = Papa.parse(csvText, { header: true }).data;
@@ -12,25 +33,53 @@ function renderRankingTable() {
     teams[team].push(row);
   });
 
-  function avg(arr, key) {
-    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
-  }
-  function max(arr, key) {
-    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? Math.max(...vals) : 0;
-  }
-  function count(arr, key) {
-    return arr.filter(r => r[key] !== undefined && r[key] !== '').length;
-  }
-  function percent(arr, key, val = '1') {
-    const total = arr.length;
-    const count = arr.filter(r => r[key] === val).length;
-    return total ? ((count / total) * 100).toFixed(1) : '0.0';
-  }
+  const metricKeys = [
+    'Total Score', 'Auton Score', 'Teleop Score', 'Climb Score', 'Auton L4', 'Auton Leave starting line',
+    'L4', 'L3', 'L2', 'L1', 'Tele Coral', 'Algae removed', 'Algae in Processor', 'Algae in Net',
+    'Tele Algae', 'Climb Attempts', 'Climb Success', 'Driver skill', 'Defense Rating', 'MAX Defense Rating',
+    'Died or Immobilized', 'Algae in Net', 'Tele Coral'
+  ];
+
+  const metricStats = metricKeys.map(key => {
+    const vals = Object.values(teams).map(arr => {
+      if (key === 'Tele Coral') {
+        return arr.map(r =>
+          (parseInt(r['L1'] || 0)) +
+          (parseInt(r['L2'] || 0)) +
+          (parseInt(r['L3'] || 0)) +
+          (parseInt(r['L4'] || 0))
+        ).reduce((a, b) => a + b, 0) / arr.length;
+      }
+      if (key === 'Tele Algae') {
+        return arr.map(r =>
+          (parseInt(r['Algae in Net'] || 0)) +
+          (parseInt(r['Algae in Processor'] || 0))
+        ).reduce((a, b) => a + b, 0) / arr.length;
+      }
+      if (key === 'Climb Attempts') {
+        return arr.filter(r => r['Climb Score'] !== undefined && r['Climb Score'] !== '').length;
+      }
+      if (key === 'Climb Success') {
+        return arr.filter(r => r['Climb Score'] === '12' || r['Climb Score'] === '6').length;
+      }
+      if (key === 'MAX Defense Rating' || key === 'Algae in Net' || key === 'Tele Coral') {
+        return Math.max(...arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v)), 0);
+      }
+      const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+      return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+    });
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const mid = min + (max - min) / 2;
+    return { min, max, mid, vals };
+  });
 
   const sortedTeams = Object.keys(teams)
-    .sort((a, b) => parseFloat(avg(teams[b], 'Total Score')) - parseFloat(avg(teams[a], 'Total Score')));
+    .sort((a, b) => {
+      const avgA = metricStats[0].vals[Object.keys(teams).indexOf(a)];
+      const avgB = metricStats[0].vals[Object.keys(teams).indexOf(b)];
+      return avgB - avgA;
+    });
 
   tableBody.innerHTML = '';
   sortedTeams.forEach((team, idx) => {
@@ -48,37 +97,62 @@ function renderRankingTable() {
     const climbAttempts = arr.filter(r => r['Climb Score'] !== undefined && r['Climb Score'] !== '').length;
     const climbSuccess = arr.filter(r => r['Climb Score'] === '12' || r['Climb Score'] === '6').length;
 
+    const metricValues = [
+      avg(arr, 'Total Score'),
+      avg(arr, 'Auton Score'),
+      avg(arr, 'Teleop Score'),
+      avg(arr, 'Climb Score'),
+      avg(arr, 'Auton L4'),
+      avg(arr, 'Auton Leave starting line'),
+      avg(arr, 'L4'),
+      avg(arr, 'L3'),
+      avg(arr, 'L2'),
+      avg(arr, 'L1'),
+      teleCoralCycles.length ? (teleCoralCycles.reduce((a, b) => a + b, 0) / teleCoralCycles.length).toFixed(2) : '0.00',
+      avg(arr, 'Algae removed'),
+      avg(arr, 'Algae in Processor'),
+      avg(arr, 'Algae in Net'),
+      teleAlgaeCycles.length ? (teleAlgaeCycles.reduce((a, b) => a + b, 0) / teleAlgaeCycles.length).toFixed(2) : '0.00',
+      climbAttempts,
+      climbSuccess,
+      avg(arr, 'Driver skill'),
+      count(arr, 'Defense Rating'),
+      max(arr, 'Defense Rating'),
+      percent(arr, 'Died or Immobilized', '1'),
+      max(arr, 'Algae in Net'),
+      max(teleCoralCycles, null)
+    ];
+
     const row = document.createElement('tr');
     if (team === "226") row.classList.add('team-226');
-    row.innerHTML = `
-      <td>${idx + 1}</td>
-      <td>${team}</td>
-      <td>${avg(arr, 'Total Score')}</td>
-      <td>${avg(arr, 'Auton Score')}</td>
-      <td>${avg(arr, 'Teleop Score')}</td>
-      <td>${avg(arr, 'Climb Score')}</td>
-      <td>${avg(arr, 'Auton L4')}</td>
-      <td>${avg(arr, 'Auton Leave starting line')}</td>
-      <td>${avg(arr, 'L4')}</td>
-      <td>${avg(arr, 'L3')}</td>
-      <td>${avg(arr, 'L2')}</td>
-      <td>${avg(arr, 'L1')}</td>
-      <td>${teleCoralCycles.length ? (teleCoralCycles.reduce((a, b) => a + b, 0) / teleCoralCycles.length).toFixed(2) : '0.00'}</td>
-      <td>${avg(arr, 'Algae removed')}</td>
-      <td>${avg(arr, 'Algae in Processor')}</td>
-      <td>${avg(arr, 'Algae in Net')}</td>
-      <td>${teleAlgaeCycles.length ? (teleAlgaeCycles.reduce((a, b) => a + b, 0) / teleAlgaeCycles.length).toFixed(2) : '0.00'}</td>
-      <td>${climbAttempts}</td>
-      <td>${climbSuccess * 10}%</td>
-      <td>${avg(arr, 'Driver skill')}</td>
-      <td>${count(arr, 'Defense Rating')}</td>
-      <td>${max(arr, 'Defense Rating')}</td>
-      <td>${percent(arr, 'Died or Immobilized', '1')}</td>
-      <td>${max(arr, 'Algae in Net')}</td>
-      <td>${max(teleCoralCycles, null)}</td>
-    `;
+    let html = `<td>${idx + 1}</td><td>${team}</td>`;
+    metricValues.forEach((val, i) => {
+      const numVal = parseFloat(val);
+      const { min, mid, max } = metricStats[i];
+      const bg = getGradientColor(numVal, min, mid, max);
+      html += `<td style="background:${bg};">${val}</td>`;
+    });
+    row.innerHTML = html;
     tableBody.appendChild(row);
   });
+
+  function avg(arr, key) {
+    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+  }
+  function max(arr, key) {
+    if (key === null) return Math.max(...arr.filter(v => !isNaN(v)), 0);
+    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? Math.max(...vals) : 0;
+  }
+  function count(arr, key) {
+    return arr.filter(r => r[key] !== undefined && r[key] !== '').length;
+  }
+  function percent(arr, key, val = '1') {
+    const total = arr.length;
+    const count = arr.filter(r => r[key] === val).length;
+    return total ? ((count / total) * 100).toFixed(1) : '0.0';
+  }
 }
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', function (e) {
