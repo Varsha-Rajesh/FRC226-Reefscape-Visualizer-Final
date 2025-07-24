@@ -24,8 +24,8 @@
   <!--SIDEBAR CONTENT-->
   <div class="sidebar" style="position: relative;">
     <h2>SharkScout</h2>
-    <div style="color: #aaa; font-size: 15px; margin-bottom: 18px; text-align: center; margin-top: -10px;">Worlds Tester Ver.</div>
     <div class="tab active" onclick="showTab(event, 'overview')">Overview</div>
+    <div class="tab" onclick="showTab(event, 'ranking')">Ranking</div>
     <div class="tab" onclick="showTab(event, 'individual')">Individual View</div>
     <div class="tab" onclick="showTab(event, 'comparison')">Comparison View</div>
     <div class="tab" onclick="showTab(event, 'filterTeams')">Filter Teams</div>
@@ -85,6 +85,50 @@
         <canvas id="algaeCyclesChart"></canvas>
       </div>
 
+    </div>
+
+    <!--Ranking CONTENT-->
+    <div id="ranking" class="tab-content">
+      <div class="ranking-header">
+        <h1>Rankings</h1>
+      </div>
+      <div class="ranking-table-container">
+        <table id="rankingTable" style="width:100%;border-collapse:collapse; color:white;">
+          <thead>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>AVG<br>Total Score</th>
+                <th>AVG<br>Auto Score</th>
+                <th>AVG<br>Tele Score</th>
+                <th>AVG<br>Climb Score</th>
+                <th>AVG<br>Auto L4</th>
+                <th>AVG<br>Auto Leave<br>Start</th>
+                <th>AVG<br>Tele L4</th>
+                <th>AVG<br>Tele L3</th>
+                <th>AVG<br>Tele L2</th>
+                <th>AVG<br>Tele L1</th>
+                <th>AVG<br>Tele Coral</th>
+                <th>AVG<br>Algae Removed</th>
+                <th>AVG<br>Algae Processed</th>
+                <th>AVG<br>Algae Barge</th>
+                <th>AVG<br>Tele Algae</th>
+                <th>Climb<br>Attempts</th>
+                <th>Climb<br>Success</th>
+                <th>Driver<br>Skill</th>
+                <th>Count<br>Defense Rating</th>
+                <th>MAX<br>Defense Rating</th>
+                <th>Died<br>Rate</th>
+                <th>MAX<br>Algae Net</th>
+                <th>MAX<br>Tele Coral</th>
+              </tr>
+            </thead>
+          </thead>
+          <tbody id="rankingTableBody">
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!--INDIVIDUAL CONTENT-->
@@ -795,7 +839,22 @@
           </table>
         </div>
       </div>
-
+      <div style="background-color: #1C1E21; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px;"
+          onclick="toggleAllianceCompareTable()">
+          <img id="allianceCompareToggleArrow" src="images/down_arrow.png" alt="Toggle"
+            style="width: 14px; height: 14px; transition: transform 0.3s ease; transform: rotate(0deg);">
+          <h3 style="margin: 0; color: white; font-size: 16px;">Comparison</h3>
+        </div>
+        <div id="allianceCompareTableContainer" style="display: none;">
+          <table id="allianceCompareTable" style="width: 100%; border-collapse: collapse; color: white;">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <div style="background-color: #1C1E21; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px;"
           onclick="toggleStatsTable()">
@@ -888,18 +947,6 @@
 
         </div>
       </form>
-      <div style="margin-top: 30px; display: flex; gap: 30px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 320px;">
-          <h3 style="color: #ff5c5c; margin-bottom: 8px;">Data Google Sheets API Output</h3>
-          <pre id="data-output"
-            style="background: #222; color: #fff; padding: 12px; border-radius: 6px; min-height: 60px; font-size: 13px; overflow-x: auto;">Loading...</pre>
-        </div>
-        <div style="flex: 1; min-width: 320px;">
-          <h3 style="color: #1e90ff; margin-bottom: 8px;">Schedule Google Sheets API Output</h3>
-          <pre id="schedule-output"
-            style="background: #222; color: #fff; padding: 12px; border-radius: 6px; min-height: 60px; font-size: 13px; overflow-x: auto;">Loading...</pre>
-        </div>
-      </div>
       <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <h2 style="margin: 0;">Matches to Re-Scout</h2>

@@ -1739,3 +1739,128 @@ input:checked+.slider:before {
 #comparisonMetricChartOptions .checkbox-label:hover input[type="checkbox"] {
   border-color: #1e90ff;
 }
+.ranking-table-container {
+  width: 100%;
+  overflow: auto;
+  margin-top: 20px;
+  background: #181a1b;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px #131416;
+  padding: 18px 0 18px 0;
+  position: relative;
+  
+}
+
+#rankingTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: white;
+  font-family: 'Lato', Arial, sans-serif;
+  font-size: 16px;
+  background: transparent;
+}
+
+#rankingTable th, #rankingTable td {
+  padding: 12px 18px;
+  border-bottom: 1px solid #222;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#rankingTable th {
+  background-color: #23242a;
+  font-size: 17px;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #1e90ff;
+  box-shadow: 0 2px 8px #131416;
+  vertical-align: middle;
+  line-height: 1.2;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#rankingTable tr {
+  transition: background 0.2s;
+}
+
+#rankingTable tr:nth-child(even) {
+  background-color: #202225;
+}
+
+#rankingTable tr:nth-child(odd) {
+  background-color: #181a1b;
+}
+
+#rankingTable tr:hover {
+  background-color: #2a2d31;
+}
+
+#rankingTable td {
+  border-right: 1px solid #222;
+}
+
+#rankingTable td:last-child {
+  border-right: none;
+}
+
+#rankingTable {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+
+#rankingTable tbody tr:nth-child(even) td:first-child {
+  background-color: #183a5a; 
+  color: #fff;
+}
+#rankingTable tbody tr:nth-child(odd) td:first-child {
+  background-color: #205080;  
+  color: #fff;
+}
+
+#rankingTable tbody tr:nth-child(even) td:nth-child(2) {
+  background-color: #142a40;
+  color: #fff;
+}
+#rankingTable tbody tr:nth-child(odd) td:nth-child(2) {
+  background-color: #19335a; 
+  color: #fff;
+}
+.ranking-header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  font-family: 'Lato', Arial, sans-serif;
+  text-shadow: 0 2px 8px #131416;
+}
+
+#rankingTable tbody tr.team-226:nth-child(even) td:first-child {
+  background-color: #3a185a !important; 
+  color: #fff !important;
+  font-weight: bold;
+}
+#rankingTable tbody tr.team-226:nth-child(odd) td:first-child {
+  background-color: #502080 !important; 
+  color: #fff !important;
+  font-weight: bold;
+}
+#rankingTable tbody tr.team-226:nth-child(even) td:nth-child(2) {
+  background-color: #2a1440 !important; 
+  color: #fff !important;
+  font-weight: bold;
+}
+#rankingTable tbody tr.team-226:nth-child(odd) td:nth-child(2) {
+  background-color: #33195a !important; 
+  color: #fff !important;
+  font-weight: bold;
+}
+
+#allianceCompareTable tbody tr:hover td,
+#allianceCompareTable tbody tr:hover th {
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}

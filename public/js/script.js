@@ -1,45 +1,97 @@
+function renderRankingTable() {
+  if (typeof Papa === 'undefined' || typeof csvText === 'undefined') return;
+  const parsed = Papa.parse(csvText, { header: true }).data;
+  const tableBody = document.getElementById('rankingTableBody');
+  if (!tableBody) return;
+
+  const teams = {};
+  parsed.forEach(row => {
+    const team = row['Team No.'];
+    if (!team) return;
+    if (!teams[team]) teams[team] = [];
+    teams[team].push(row);
+  });
+
+  function avg(arr, key) {
+    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+  }
+  function max(arr, key) {
+    const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? Math.max(...vals) : 0;
+  }
+  function count(arr, key) {
+    return arr.filter(r => r[key] !== undefined && r[key] !== '').length;
+  }
+  function percent(arr, key, val = '1') {
+    const total = arr.length;
+    const count = arr.filter(r => r[key] === val).length;
+    return total ? ((count / total) * 100).toFixed(1) : '0.0';
+  }
+
+  const sortedTeams = Object.keys(teams)
+    .sort((a, b) => parseFloat(avg(teams[b], 'Total Score')) - parseFloat(avg(teams[a], 'Total Score')));
+
+  tableBody.innerHTML = '';
+  sortedTeams.forEach((team, idx) => {
+    const arr = teams[team];
+    const teleCoralCycles = arr.map(r =>
+      (parseInt(r['L1'] || 0)) +
+      (parseInt(r['L2'] || 0)) +
+      (parseInt(r['L3'] || 0)) +
+      (parseInt(r['L4'] || 0))
+    );
+    const teleAlgaeCycles = arr.map(r =>
+      (parseInt(r['Algae in Net'] || 0)) +
+      (parseInt(r['Algae in Processor'] || 0))
+    );
+    const climbAttempts = arr.filter(r => r['Climb Score'] !== undefined && r['Climb Score'] !== '').length;
+    const climbSuccess = arr.filter(r => r['Climb Score'] === '12' || r['Climb Score'] === '6').length;
+
+    const row = document.createElement('tr');
+    if (team === "226") row.classList.add('team-226');
+    row.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${team}</td>
+      <td>${avg(arr, 'Total Score')}</td>
+      <td>${avg(arr, 'Auton Score')}</td>
+      <td>${avg(arr, 'Teleop Score')}</td>
+      <td>${avg(arr, 'Climb Score')}</td>
+      <td>${avg(arr, 'Auton L4')}</td>
+      <td>${avg(arr, 'Auton Leave starting line')}</td>
+      <td>${avg(arr, 'L4')}</td>
+      <td>${avg(arr, 'L3')}</td>
+      <td>${avg(arr, 'L2')}</td>
+      <td>${avg(arr, 'L1')}</td>
+      <td>${teleCoralCycles.length ? (teleCoralCycles.reduce((a, b) => a + b, 0) / teleCoralCycles.length).toFixed(2) : '0.00'}</td>
+      <td>${avg(arr, 'Algae removed')}</td>
+      <td>${avg(arr, 'Algae in Processor')}</td>
+      <td>${avg(arr, 'Algae in Net')}</td>
+      <td>${teleAlgaeCycles.length ? (teleAlgaeCycles.reduce((a, b) => a + b, 0) / teleAlgaeCycles.length).toFixed(2) : '0.00'}</td>
+      <td>${climbAttempts}</td>
+      <td>${climbSuccess * 10}%</td>
+      <td>${avg(arr, 'Driver skill')}</td>
+      <td>${count(arr, 'Defense Rating')}</td>
+      <td>${max(arr, 'Defense Rating')}</td>
+      <td>${percent(arr, 'Died or Immobilized', '1')}</td>
+      <td>${max(arr, 'Algae in Net')}</td>
+      <td>${max(teleCoralCycles, null)}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function (e) {
+    if (tab.textContent.trim().toLowerCase().includes('ranking')) {
+    }
+  });
+});
 if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
   Chart.register(window.ChartBoxplot);
 } else {
   console.error('Chart.js or Boxplot plugin not loaded');
 }
 
-fetch('/api/data')
-  .then((res) => res.json())
-  .then((json) => {
-    const pre = document.getElementById('data-output');
-    pre.textContent = JSON.stringify(json.data, null, 2);
-  })
-  .catch(() => {
-    document.getElementById('data-output').textContent = 'Failed to load Data tab';
-  });
-
-fetch('/api/schedule')
-  .then((res) => res.json())
-  .then((json) => {
-    const pre = document.getElementById('schedule-output');
-    pre.textContent = JSON.stringify(json.schedule, null, 2);
-  })
-  .catch(() => {
-    document.getElementById('schedule-output').textContent = 'Failed to load Match Schedule tab';
-  });
-
-async function fetchAndStoreGoogleSheetDataTab() {
-  try {
-    const res = await fetch('/api/data');
-    const json = await res.json();
-    if (json.data && Array.isArray(json.data)) {
-      const csv = Papa.unparse(json.data);
-      localStorage.setItem('csvText', csv);
-      csvText = csv;
-      console.log('Google Sheet Data tab saved to localStorage.');
-    } else {
-      console.warn('No data received from /api/data');
-    }
-  } catch (err) {
-    console.error('Failed to fetch Google Sheet Data tab:', err);
-  }
-}
 /*-----VARIABLES----*/
 
 const charts = {
@@ -433,10 +485,6 @@ function showTab(event, tabId) {
 
   document.querySelector('.content').scrollTo({ top: 0, behavior: 'auto' });
 
-  if (['individual', 'overview', 'comparison', 'filterTeams', 'matchPredictor'].includes(tabId)) {
-    fetchAndStoreGoogleSheetDataTab();
-  }
-
   if (tabId === 'scoutingSchedule') {
     document.getElementById('strategyContent').style.display = 'block';
     document.getElementById('targetedScoutingContainer').style.display = 'none';
@@ -578,8 +626,6 @@ document.getElementById('comparisonSearch2').addEventListener('keydown', functio
   }
 });
 
-
-
 // Overview
 document.getElementById('overviewSearch').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') {
@@ -644,9 +690,12 @@ async function handleDataUpload(e) {
     if (latestMatch) {
       document.getElementById('latestMatchInfoSidebar').textContent = `Data up till Q${latestMatch}`;
     }
+
+    const tableBody = document.getElementById('rankingTableBody');
+    if (tableBody) tableBody.innerHTML = '';
+    renderRankingTable();
   });
 };
-
 async function handlePitUpload(fileInputId, statusId) {
   const fileInput = document.getElementById(fileInputId);
   const statusEl = document.getElementById(statusId);
@@ -2162,7 +2211,6 @@ function setReliabilityCheckboxState(state) {
 
 document.addEventListener('DOMContentLoaded', () => {
   setDefaultReliabilityCheckboxes();
-  fetchAndStoreGoogleSheetDataTab();
 });
 
 let lastReliabilityCheckboxState = getReliabilityCheckboxState();
@@ -4341,21 +4389,211 @@ function renderMatchPredictor() {
     `).join('')}
   `;
   table.appendChild(epaRow);
+
+  updateAllianceCompareTable(redTeams, blueTeams);
 }
+
+function updateAllianceCompareTable(redTeams, blueTeams) {
+  const table = document.getElementById('allianceCompareTable');
+  if (!table) return;
+
+  table.style.border = "2px solid #444";
+  table.style.borderRadius = "8px";
+  table.style.overflow = "hidden";
+
+  const headerRow = document.createElement('tr');
+  headerRow.innerHTML = `
+    <th style="background-color: #1C1E21; color: white; text-align: center; padding: 8px; width: 180px; border-bottom: 2px solid #444;">Stat</th>
+    ${redTeams.map(team => `
+      <th style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333;">
+        ${team}
+      </th>
+    `).join('')}
+    <th style="background-color: #ffb6e630; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333; font-weight:bold;">
+      Red Total
+    </th>
+    <th style="background-color: #b6a6ff30; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333; font-weight:bold;">
+      Blue Total
+    </th>
+    ${blueTeams.map(team => `
+      <th style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333;">
+        ${team}
+      </th>
+    `).join('')}
+  `;
+
+  const thead = table.querySelector('thead');
+  const tbody = table.querySelector('tbody');
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+  thead.appendChild(headerRow);
+
+  const parsedData = parseCSV().data;
+  function getTeamRows(team) {
+    return parsedData.filter(row => row['Team No.'] === team);
+  }
+  function avg(rows, key) {
+    const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+  }
+  function sum(rows, key) {
+    const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? vals.reduce((a, b) => a + b, 0) : '-';
+  }
+  function max(rows, key) {
+    const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
+    return vals.length ? Math.max(...vals) : '-';
+  }
+  function count(rows, key) {
+    return rows.filter(r => r[key] !== undefined && r[key] !== '').length;
+  }
+
+  const statDefs = [
+    { label: "Avg Total Points", fn: rows => avg(rows, 'Total Score') },
+    { label: "Avg Auto Points", fn: rows => avg(rows, 'Auton Score') },
+    { label: "Avg TeleOp Points", fn: rows => avg(rows, 'Teleop Score') },
+    { label: "Avg Climb Points", fn: rows => avg(rows, 'Climb Score') },
+    { label: "Avg Auto L4", fn: rows => avg(rows, 'Auton L4') },
+    { label: "Avg Leave", fn: rows => avg(rows, 'Auton Leave starting line') },
+    { label: "Avg L4", fn: rows => avg(rows, 'L4') },
+    { label: "Avg L3", fn: rows => avg(rows, 'L3') },
+    { label: "Avg L2", fn: rows => avg(rows, 'L2') },
+    { label: "Avg L1", fn: rows => avg(rows, 'L1') },
+    {
+      label: "Avg Coral Cycles", fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r['L1'] || 0)) +
+          (parseInt(r['L2'] || 0)) +
+          (parseInt(r['L3'] || 0)) +
+          (parseInt(r['L4'] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+      }
+    },
+    {
+      label: "Avg A+T L4", fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r['Auton L4'] || 0)) +
+          (parseInt(r['L4'] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+      }
+    },
+    { label: "Avg Algae Remove", fn: rows => avg(rows, 'Algae removed') },
+    { label: "Avg Alg in Processor", fn: rows => avg(rows, 'Algae in Processor') },
+    { label: "Avg Alg in Net", fn: rows => avg(rows, 'Algae in Net') },
+    { label: "Max Alg in Net", fn: rows => max(rows, 'Algae in Net') },
+    {
+      label: "Avg Alg Cycles", fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r['Algae in Net'] || 0)) +
+          (parseInt(r['Algae in Processor'] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+      }
+    },
+    {
+      label: "Attempted Climbs", fn: rows => {
+        return rows.filter(r => {
+          const v = parseFloat(r['Climb Score'] || 0);
+          return v === 12 || v === 6 || v === 2.1;
+        }).length;
+      }
+    },
+    {
+      label: "Successful Climbs", fn: rows => {
+        return rows.filter(r => {
+          const v = parseFloat(r['Climb Score'] || 0);
+          return v === 12 || v === 6;
+        }).length;
+      }
+    },
+    {
+      label: "Climb Rate", fn: rows => {
+        const attempts = rows.filter(r => {
+          const v = parseFloat(r['Climb Score'] || 0);
+          return v === 12 || v === 6 || v === 2.1;
+        }).length;
+        const successes = rows.filter(r => {
+          const v = parseFloat(r['Climb Score'] || 0);
+          return v === 12 || v === 6;
+        }).length;
+        return attempts > 0 ? ((successes / attempts) * 100).toFixed(1) + "%" : "-";
+      }
+    },
+    { label: "Avg Driver Skill", fn: rows => avg(rows, 'Driver skill') },
+    { label: "Defense Count", fn: rows => count(rows, 'Defense Rating') },
+    { label: "Max Def. Rating", fn: rows => max(rows, 'Defense Rating') },
+    { label: "SUM of Immobolized", fn: rows => sum(rows, 'Died or Immobilized') }
+  ];
+
+  statDefs.forEach((stat, idx) => {
+    const borderStyle = "border-bottom: 1px solid #333;";
+    const statCell = `<td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left; width: 180px; ${borderStyle}">${stat.label}</td>`;
+    const redCells = redTeams.map((team, i) => {
+      const bgColor = idx % 2 === 0 ? "#ff5c5c30" : "#ff7b7b30";
+      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
+    }).join('');
+    const redTotalBg = idx % 2 === 0 ? "#ff83fa30" : "#ffb6e630";
+    const redTotal = (() => {
+      const vals = redTeams.map(team => {
+        const rows = getTeamRows(team);
+        const v = stat.fn(rows);
+        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+      }).filter(v => typeof v === 'number' && !isNaN(v));
+      if (typeof stat.fn(getTeamRows(redTeams[0])) === 'string' && stat.fn(getTeamRows(redTeams[0])).includes('%')) {
+        return '-';
+      }
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
+    })();
+    const redTotalCell = `<td style="background-color: ${redTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${redTotal}</td>`;
+
+    const blueTotalBg = idx % 2 === 0 ? "#b083ff30" : "#b6a6ff30";
+    const blueTotal = (() => {
+      const vals = blueTeams.map(team => {
+        const rows = getTeamRows(team);
+        const v = stat.fn(rows);
+        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+      }).filter(v => typeof v === 'number' && !isNaN(v));
+      if (typeof stat.fn(getTeamRows(blueTeams[0])) === 'string' && stat.fn(getTeamRows(blueTeams[0])).includes('%')) {
+        return '-';
+      }
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
+    })();
+    const blueTotalCell = `<td style="background-color: ${blueTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${blueTotal}</td>`; const blueTotalColor = idx % 2 === 0 ? "#8105d8" : "#cf8ffc";
+
+
+    const blueCells = blueTeams.map((team, i) => {
+      const bgColor = idx % 2 === 0 ? "#3EDBF030" : "#5cf0ff30";
+      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
+    }).join('');
+
+    const row = document.createElement('tr');
+    row.innerHTML = statCell + redCells + redTotalCell + blueTotalCell + blueCells;
+    tbody.appendChild(row);
+  });
+}
+
 function createStatsTable(redTeams, blueTeams, teamStats) {
   const table = document.getElementById('matchStatsTable');
   table.innerHTML = '';
 
   const headerRow = document.createElement('tr');
   headerRow.innerHTML = `
-  <th style="background-color: #1C1E21; color: white; text-align: left; padding: 8px; width: 150px;">Stat</th>
+  <th style="background-color: #1C1E21; color: white; text-align: center; padding: 8px; width: 180px; border-bottom: 2px solid #444;">Stat</th>
   ${redTeams.map(team => `
-    <th style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center; min-width: 80px;">
+    <th style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333;">
       ${team}
     </th>
   `).join('')}
+  <th style="background-color: #ffb6e630; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333; font-weight:bold;">
+    Red Total
+  </th>
+  <th style="background-color: #b6a6ff30; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333; font-weight:bold;">
+    Blue Total
+  </th>
   ${blueTeams.map(team => `
-    <th style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center; min-width: 80px;">
+    <th style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center; min-width: 80px; border-bottom: 2px solid #444; border-left: 1px solid #333;">
       ${team}
     </th>
   `).join('')}
@@ -4462,6 +4700,27 @@ function toggleMatchSummaryTable() {
   const isExpanded = container.classList.toggle('expanded');
   arrow.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
 }
+
+function toggleAllianceCompareTable() {
+  const container = document.getElementById('allianceCompareTableContainer');
+  const arrow = document.getElementById('allianceCompareToggleArrow');
+  const isOpen = container.style.display === 'block';
+  if (isOpen) {
+    container.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    container.style.display = 'block';
+    arrow.style.transform = 'rotate(180deg)';
+  }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  const container = document.getElementById('allianceCompareTableContainer');
+  const arrow = document.getElementById('allianceCompareToggleArrow');
+  if (container && arrow) {
+    container.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }
+});
 
 function renderMatchSummaryTable(redTeams, blueTeams) {
   const parsedData = parseCSV().data;
