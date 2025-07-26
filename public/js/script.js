@@ -2454,8 +2454,9 @@ function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row['Auton Algae in Net']) || 0) +
-      (parseInt(row['Auton Algae in Processor']) || 0);
+      (parseInt(row['Auton Algae removed'] || 0)) +
+      (parseInt(row['Auton Algae in Net'] || 0)) +
+      (parseInt(row['Auton Algae in Processor'] || 0));
     if (total > max) max = total;
   });
 
@@ -2672,11 +2673,11 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const algaeRemoved = teamData.map(row => parseInt(row['Auton Algae removed'] || 0));
+  const algaeRemoved = teamData.map(row => parseInt(row['Auton Algae Removed'] || 0));
   const algaeNet = teamData.map(row => parseInt(row['Auton Algae in Net'] || 0));
   const algaeProcessor = teamData.map(row => parseInt(row['Auton Algae in Processor'] || 0));
 
-  const yMax = maxY ?? Math.ceil(Math.max(...algaeNet, ...algaeProcessor) / 1) * 1;
+  const yMax = maxY ?? Math.ceil(Math.max(...algaeRemoved, ...algaeNet, ...algaeProcessor) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
@@ -2702,7 +2703,7 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
         }
       },
       plugins: {
-        legend: { display: false },
+        legend: { display: false }, // This hides the legend
         tooltip: {
           backgroundColor: '#1C1E21',
           titleColor: '#fff',
@@ -2711,13 +2712,23 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
           borderWidth: 1,
           titleFont: { family: 'Lato', size: 14 },
           bodyFont: { family: 'Lato', size: 14 },
-          padding: 10
+          padding: 10,
+          callbacks: {
+            afterBody: function(context) {
+              const dataIndex = context[0].dataIndex;
+              const row = teamData[dataIndex];
+              const total =
+                (parseInt(row['Auton Algae Removed'] || 0))+
+                (parseInt(row['Auton Algae in Net'] || 0))+
+                (parseInt(row['Auton Algae in Processor'] || 0));
+              return `Total Algae: ${total}`;
+            }
+          }
         }
       }
     }
   });
 }
-
 
 function syncAlgaeDropdownsAndFilter(value) {
   document.querySelectorAll('#algaeTypeFilter1, #algaeTypeFilter2').forEach(dropdown => {
