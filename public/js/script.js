@@ -2454,7 +2454,7 @@ function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row['Auton Algae removed'] || 0)) +
+      (parseInt(row['Auton Algae Removed'] || 0)) +
       (parseInt(row['Auton Algae in Net'] || 0)) +
       (parseInt(row['Auton Algae in Processor'] || 0));
     if (total > max) max = total;
