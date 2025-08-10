@@ -913,7 +913,6 @@
             </div>
             <div id="statusSchedule"></div>
           </div>
-
           <div style="flex: 0 0 300px; background-color: #1C1E21; border-radius: 12px; padding: 15px;">
             <h3 style="color: white; margin-top: 0;">TBA Event Verification</h3>
 
@@ -942,8 +941,18 @@
                 Update Climbs
               </button>
             </div>
+
+            <!-- New "Update Auto Leave" Button -->
+            <div style="position: relative; margin-top: 10px;">
+              <button id="updateAutoLeaveBtn"
+                style="width: 100%; background-color: #ff1e1e; border: none; font-size:16px; padding: 8px 0;">
+                Update Auto Leave
+              </button>
+            </div>
+
             <div id="downloadStatus" style="margin-top: 5px; color: #aaa; font-size: 14px;"></div>
           </div>
+
 
         </div>
       </form>
@@ -954,6 +963,7 @@
             <option value="all">All</option>
             <option value="climb">Climb</option>
             <option value="coral">Coral</option>
+            <option value = "autoLeave">Auto Leave</option>
             <option value="others">Other</option>
           </select>
         </div>

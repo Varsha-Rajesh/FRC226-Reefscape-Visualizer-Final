@@ -1,23 +1,29 @@
-function getGradientColor(value, min, mid, max) {
-  if (isNaN(value)) return 'transparent';
+function getGradientColor(value, distribution) {
+  if (isNaN(value)) return 'black';
 
   const redDark = [110, 40, 60];    
   const white = [44, 46, 49];       
-  const greenDark = [60, 120, 80];  
-  if (value <= mid) {
-    const ratio = (value - min) / (mid - min || 1);
-    const r = Math.round(redDark[0] * (1 - ratio) + white[0] * ratio);
-    const g = Math.round(redDark[1] * (1 - ratio) + white[1] * ratio);
-    const b = Math.round(redDark[2] * (1 - ratio) + white[2] * ratio);
-    return `rgb(${r},${g},${b})`;
+  const greenDark = [60, 120, 80];
+
+  const sorted = [...distribution].filter(v => !isNaN(v)).sort((a, b) => a - b);
+  const index = sorted.findIndex(v => value <= v);
+  const percentile = index === -1 ? 1 : index / (sorted.length - 1 || 1);
+
+  let r, g, b;
+  if (percentile <= 0.5) {
+    const ratio = percentile / 0.5;
+    r = Math.round(redDark[0] * (1 - ratio) + white[0] * ratio);
+    g = Math.round(redDark[1] * (1 - ratio) + white[1] * ratio);
+    b = Math.round(redDark[2] * (1 - ratio) + white[2] * ratio);
   } else {
-    const ratio = (value - mid) / (max - mid || 1);
-    const r = Math.round(white[0] * (1 - ratio) + greenDark[0] * ratio);
-    const g = Math.round(white[1] * (1 - ratio) + greenDark[1] * ratio);
-    const b = Math.round(white[2] * (1 - ratio) + greenDark[2] * ratio);
-    return `rgb(${r},${g},${b})`;
+    const ratio = (percentile - 0.5) / 0.5;
+    r = Math.round(white[0] * (1 - ratio) + greenDark[0] * ratio);
+    g = Math.round(white[1] * (1 - ratio) + greenDark[1] * ratio);
+    b = Math.round(white[2] * (1 - ratio) + greenDark[2] * ratio);
   }
+  return `rgb(${r},${g},${b})`;
 }
+
 
 function renderRankingTable() {
   if (typeof Papa === 'undefined' || typeof csvText === 'undefined') return;
@@ -128,8 +134,7 @@ function renderRankingTable() {
     let html = `<td>${idx + 1}</td><td>${team}</td>`;
     metricValues.forEach((val, i) => {
       const numVal = parseFloat(val);
-      const { min, mid, max } = metricStats[i];
-      const bg = getGradientColor(numVal, min, mid, max);
+      const bg = getGradientColor(numVal, metricStats[i].vals);
       html += `<td style="background:${bg};">${val}</td>`;
     });
     row.innerHTML = html;
@@ -544,7 +549,6 @@ function getChartOptions(stacked = false, stepSize = 1) {
 
 /*-----EVENT LISTENERS----*/
 
-// Tab Navigation
 function showTab(event, tabId) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(button => {
@@ -653,6 +657,7 @@ document.getElementById('submitPit').addEventListener('click', function (e) {
 // TBA Verification
 document.getElementById('verifyWithTBABtn').addEventListener('click', getTBAData);
 document.getElementById('updateClimbsBtn').addEventListener('click', updateClimbs);
+document.getElementById('updateAutoLeaveBtn').addEventListener('click', updateAutoLeave);
 
 // Rescout Table
 document.getElementById('rescoutFilter').addEventListener('change', filterRescoutTable);
@@ -1001,44 +1006,29 @@ async function getTBAData() {
     return;
   }
 
-  if (!csvText || csvText.trim() === "") {
-    document.getElementById('tbaStatus').textContent = 'Please upload match data CSV first';
-    return;
-  }
-
   document.getElementById('tbaStatus').textContent = 'Fetching and comparing data...';
 
   try {
     const response = await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/matches`, {
       headers: {
-        'X-TBA-Auth-Key': 'dkHdbc90y6rrKoG7w15O2YsLW3bWKySKjDItw93b8benEh0ZtNDTK4hYRseZnsT3'
+        'X-TBA-Auth-Key': 'dkHdbc90y6rrKoG7w15O2YsLW3bWKySKjDItw93b8benEh0ZtNDTK4hYRseZnsT3	'
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`TBA API error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`TBA API error: ${response.status}`);
 
     const matches = await response.json();
-    const parsedCsv = parseCSV();
-
+    
     tbaClimbData = processTbaClimbData(matches);
-    coralMismatchData = verifyCoralCounts(matches, parsedCsv.data);
+    tbaAutoLeaveData = processTbaAutoLeaveData(matches);
+    coralMismatchData = verifyCoralCounts(matches, parseCSV().data);
 
-    if (coralMismatchData.length > 0) {
-      document.getElementById('tbaStatus').textContent =
-        `Found ${coralMismatchData.length} coral mismatch(es)`;
-    } else {
-      document.getElementById('tbaStatus').textContent = 'No coral mismatches found';
-    }
-
-    renderRescoutTable(parsedCsv.data);
     document.getElementById('tbaStatus').textContent = 'Verification complete!';
+    renderRescoutTable(parseCSV().data);
   } catch (error) {
     document.getElementById('tbaStatus').textContent = `Error: ${error.message}`;
   }
 }
-
 function matchKeyToTeams(matchKey, data, alliance) {
   const matchNum = matchKey.split('_qm')[1];
   return data
@@ -1137,19 +1127,23 @@ function verifyCoralCounts(matches, csvData) {
 const rescoutFilter = document.getElementById('rescoutFilter');
 const hideCoralCheckbox = document.getElementById('hideCoralMismatch');
 
-rescoutFilter.addEventListener('change', function () {
+rescoutFilter.addEventListener('change', function() {
   const selectedFilter = this.value;
 
-  if (selectedFilter === 'climb' || selectedFilter === 'others') {
+  if (selectedFilter === 'climb' || selectedFilter === 'autoLeave' || selectedFilter === 'others') {
     hideCoralCheckbox.checked = false;
+    hideCoralCheckbox.disabled = true;
+  } else {
+    hideCoralCheckbox.disabled = false;
   }
-  filterCoralData();
+
+  filterRescoutTable();
 });
 
-hideCoralCheckbox.addEventListener('change', function () {
+hideCoralCheckbox.addEventListener('change', function() {
   const currentFilter = rescoutFilter.value;
   if (currentFilter === 'all' || currentFilter === 'coral') {
-    filterCoralData();
+    filterRescoutTable();
   }
 });
 
@@ -1316,6 +1310,133 @@ async function updateClimbs() {
   };
 }
 
+async function updateAutoLeave() {
+  if (!csvText || !tbaAutoLeaveData || Object.keys(tbaAutoLeaveData).length === 0) {
+    alert('Please verify auto leave with TBA first and ensure data is loaded');
+    return;
+  }
+
+  const parsed = Papa.parse(csvText, { header: true });
+  const data = parsed.data;
+
+  let changesMade = false;
+  let updatedRows = 0;
+  const changeLog = [];
+
+  const teamAllianceMap = {};
+  data.forEach(row => {
+    const match = row['Match']?.toString();
+    const team = row['Team No.']?.toString();
+    const color = (row['Robot Color'] || '').toLowerCase();
+    
+    if (match && team) {
+      if (!teamAllianceMap[match]) teamAllianceMap[match] = {};
+      teamAllianceMap[match][team] = color.startsWith('red') ? 'red' : 
+                                    color.startsWith('blue') ? 'blue' : null;
+    }
+  });
+
+  data.forEach(row => {
+    const match = row['Match']?.toString();
+    const team = row['Team No.']?.toString();
+    
+    if (!match || !team || !tbaAutoLeaveData[match] || !teamAllianceMap[match] || !teamAllianceMap[match][team]) {
+      return;
+    }
+
+    const alliance = teamAllianceMap[match][team];
+    const tbaLeave = tbaAutoLeaveData[match][alliance][team];
+    if (tbaLeave === undefined) return;
+
+    const scoutLeave = parseInt(row['Auton Leave starting line'] || 0);
+
+    if (scoutLeave !== tbaLeave) {
+      changesMade = true;
+      updatedRows++;
+
+      const oldTotal = parseFloat(row['Total Score'] || 0);
+      const newTotal = scoutLeave === 1 && tbaLeave === 0
+        ? oldTotal - 3
+        : scoutLeave === 0 && tbaLeave === 1
+        ? oldTotal + 3
+        : oldTotal;
+
+      changeLog.push({
+        'Match': match,
+        'Team': team,
+        'Alliance': alliance,
+        'Scouter Input': scoutLeave,
+        'TBA': tbaLeave,
+        'Final': tbaLeave,
+        'Points Adjustment': newTotal - oldTotal
+      });
+
+      row['Auton Leave starting line'] = tbaLeave.toString();
+      row['Total Score'] = Math.round(newTotal).toString();
+    }
+  });
+
+  if (!changesMade) {
+    alert('No Auto Leave discrepancies found - no changes needed');
+    return;
+  }
+
+  const updatedCsv = Papa.unparse(data);
+  const blob = new Blob([updatedCsv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'updated_scouting_data_auto_leave.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  if (changeLog.length > 0) {
+    const changeLogCsv = Papa.unparse(changeLog);
+    const logBlob = new Blob([changeLogCsv], { type: 'text/csv;charset=utf-8;' });
+    const logUrl = URL.createObjectURL(logBlob);
+    const logLink = document.createElement('a');
+    logLink.setAttribute('href', logUrl);
+    logLink.setAttribute('download', 'auto_leave_changes_log.csv');
+    document.body.appendChild(logLink);
+    logLink.click();
+    document.body.removeChild(logLink);
+  }
+
+  document.getElementById('downloadStatus').textContent = 
+    `Updated ${updatedRows} rows with corrected auto leave data`;
+}
+
+function processTbaAutoLeaveData(matches) {
+  const autoLeaveData = {};
+  
+  const qualMatches = matches.filter(match => match.comp_level === 'qm');
+  
+  qualMatches.forEach(match => {
+    const matchNumber = match.match_number.toString();
+    autoLeaveData[matchNumber] = { red: {}, blue: {} };
+
+    if (match.alliances?.red?.team_keys && match.score_breakdown?.red) {
+      match.alliances.red.team_keys.forEach((teamKey, index) => {
+        const teamNumber = teamKey.replace('frc', '');
+        const leaveStatus = match.score_breakdown.red[`autoLineRobot${index + 1}`] || "No";
+        autoLeaveData[matchNumber].red[teamNumber] = leaveStatus === "Yes" ? 1 : 0;
+      });
+    }
+
+    if (match.alliances?.blue?.team_keys && match.score_breakdown?.blue) {
+      match.alliances.blue.team_keys.forEach((teamKey, index) => {
+        const teamNumber = teamKey.replace('frc', '');
+        const leaveStatus = match.score_breakdown.blue[`autoLineRobot${index + 1}`] || "No";
+        autoLeaveData[matchNumber].blue[teamNumber] = leaveStatus === "Yes" ? 1 : 0;
+      });
+    }
+  });
+  
+  return autoLeaveData;
+}
+
+
 /*-----TBA TEAM DATA FETCHING-----*/
 
 async function fetchTeamData(teamNumber) {
@@ -1354,49 +1475,46 @@ function displayTeamNickname(teamNumber, elementId) {
 /*-----RESCOUT TABLE----*/
 
 function filterRescoutTable() {
-  const tableBody = document.getElementById('rescoutBody');
-  const filterType = document.getElementById('rescoutFilter').value;
-  const hideSmallMismatches = document.getElementById('hideCoralMismatch').checked;
+    const tableBody = document.getElementById('rescoutBody');
+    const filterType = document.getElementById('rescoutFilter').value;
+    const hideSmallMismatches = document.getElementById('hideCoralMismatch').checked;
 
-  let filteredRows = window.rescoutData || [];
+    let filteredRows = window.rescoutData || [];
 
-  if (filterType !== 'all') {
-    filteredRows = filteredRows.filter(row => row.type === filterType);
-  }
-
-  if (filterType === 'all' || filterType === 'coral') {
-    if (hideSmallMismatches) {
-      filteredRows = filteredRows.filter(row =>
-        row.type !== 'coral' || (row.type === 'coral' && row.difference >= 3)
-      );
+    if (filterType !== 'all') {
+        filteredRows = filteredRows.filter(row => row.type === filterType);
     }
-  }
 
-  tableBody.innerHTML = '';
+    if ((filterType === 'all' || filterType === 'coral') && hideSmallMismatches) {
+        filteredRows = filteredRows.filter(row =>
+            row.type !== 'coral' || (row.type === 'coral' && row.difference >= 3)
+        );
+    }
 
-  if (filteredRows.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="3" style="text-align: center; padding: 12px; color: #888; font-style: italic;">
-          No Matches to Rescout
-        </td>
-      </tr>
-    `;
-    return;
-  }
+    tableBody.innerHTML = '';
 
-  filteredRows.sort((a, b) => parseInt(a.match, 10) - parseInt(b.match, 10))
-    .forEach(({ match, team, reason }) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td style="padding: 8px;">Q${match}</td>
-        <td style="padding: 8px;">${team}</td>
-        <td style="padding: 8px;">${reason}</td>
-      `;
-      tableBody.appendChild(row);
-    });
+    if (filteredRows.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 12px; color: #888; font-style: italic;">
+                    No Matches to Rescout
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filteredRows.sort((a, b) => parseInt(a.match, 10) - parseInt(b.match, 10))
+        .forEach(({ match, team, reason }) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="padding: 8px;">Q${match}</td>
+                <td style="padding: 8px;">${team}</td>
+                <td style="padding: 8px;">${reason}</td>
+            `;
+            tableBody.appendChild(row);
+        });
 }
-
 function renderRescoutTable(data) {
   const rescoutSection = document.getElementById('rescoutSection');
   const seenRows = new Set();
@@ -1500,6 +1618,28 @@ function renderRescoutTable(data) {
       });
     }
   });
+
+  data.forEach(row => {
+    const match = row['Match']?.toString().replace(/^Q/i, '');
+    const team = row['Team No.']?.toString();
+    const robotColor = (row['Robot Color'] || '').toLowerCase();
+    const alliance = robotColor.startsWith('red') ? 'red' : 
+                   robotColor.startsWith('blue') ? 'blue' : null;
+
+    if (match && team && alliance && tbaAutoLeaveData[match]?.[alliance]?.[team] !== undefined) {
+        const scoutLeave = parseInt(row['Auton Leave starting line'] || 0);
+        const tbaLeave = tbaAutoLeaveData[match][alliance][team];
+        
+        if (scoutLeave !== tbaLeave) {
+            rescoutRows.push({
+                match,
+                team,
+                reason: `Auto Leave: Scouted ${scoutLeave ? "Yes" : "No"}, TBA shows ${tbaLeave ? "Yes" : "No"}`,
+                type: 'autoLeave'
+            });
+        }
+    }
+});
 
   window.rescoutData = rescoutRows;
 
@@ -2703,7 +2843,7 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
         }
       },
       plugins: {
-        legend: { display: false }, // This hides the legend
+        legend: { display: false }, 
         tooltip: {
           backgroundColor: '#1C1E21',
           titleColor: '#fff',
