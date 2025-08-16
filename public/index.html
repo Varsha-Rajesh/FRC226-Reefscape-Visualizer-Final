@@ -92,42 +92,180 @@
       <div class="ranking-header">
         <h1>Rankings</h1>
       </div>
-      <div class="ranking-table-container">
-        <table id="rankingTable" style="width:100%;border-collapse:collapse; color:white;">
-          <thead>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Team</th>
-                <th>AVG<br>Total Score</th>
-                <th>AVG<br>Auto Score</th>
-                <th>AVG<br>Tele Score</th>
-                <th>AVG<br>Climb Score</th>
-                <th>AVG<br>Auto L4</th>
-                <th>AVG<br>Auto Leave<br>Start</th>
-                <th>AVG<br>Tele L4</th>
-                <th>AVG<br>Tele L3</th>
-                <th>AVG<br>Tele L2</th>
-                <th>AVG<br>Tele L1</th>
-                <th>AVG<br>Tele Coral</th>
-                <th>AVG<br>Algae Removed</th>
-                <th>AVG<br>Algae Processed</th>
-                <th>AVG<br>Algae Barge</th>
-                <th>AVG<br>Tele Algae</th>
-                <th>Climb<br>Attempts</th>
-                <th>Climb<br>Success</th>
-                <th>Driver<br>Skill</th>
-                <th>Count<br>Defense Rating</th>
-                <th>MAX<br>Defense Rating</th>
-                <th>Died<br>Rate</th>
-                <th>MAX<br>Algae Net</th>
-                <th>MAX<br>Tele Coral</th>
-              </tr>
-            </thead>
-          </thead>
-          <tbody id="rankingTableBody">
-          </tbody>
-        </table>
+      <div class="ranking-filter-panel" style="margin-top: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="toggleFilterContent()">
+          <img id="filterContentToggleArrow" src="images/down_arrow.png" alt="Toggle"
+            style="width: 18px; height: 18px; transition: transform 0.3s ease; position: relative; top: 2px;">
+          <h2 style="color: white; font-size: 1.3rem; margin: 0; line-height: 1;">Filter Statistics</h2>
+        </div>
+
+        <div id="filterContent" style="display: none; margin-top: 18px;">
+
+          <form id="rankingFilterForm" style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 18px;">
+
+
+            <div class="filter-group-inline">
+              <h3>Auto</h3>
+              <label class="checkbox-label"><input type="checkbox" value="avgAutoScore" checked> AVG Auto Score</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgAutoL4" checked> AVG Auto L4</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgAutoLeaveStart" checked> AVG Auto Leave
+                Start</label>
+            </div>
+
+            <div class="filter-group-inline">
+              <h3>Tele</h3>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleScore" checked> AVG Tele Score</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleL4" checked> AVG Tele L4</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleL3" checked> AVG Tele L3</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleL2" checked> AVG Tele L2</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleL1" checked> AVG Tele L1</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleCoral" checked> AVG Tele Coral</label>
+              <label class="checkbox-label"><input type="checkbox" value="maxTeleCoral" checked> MAX Tele Coral</label>
+            </div>
+
+            <div class="filter-group-inline">
+              <h3>Algae</h3>
+              <label class="checkbox-label"><input type="checkbox" value="avgAlgaeRemoved" checked> AVG Algae
+                Removed</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgAlgaeProcessed" checked> AVG Algae
+                Processed</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgAlgaeBarge" checked> AVG Algae
+                Barge</label>
+              <label class="checkbox-label"><input type="checkbox" value="avgTeleAlgae" checked> AVG Tele Algae</label>
+              <label class="checkbox-label"><input type="checkbox" value="maxAlgaeNet" checked> MAX Algae Net</label>
+            </div>
+
+            <div class="filter-group-inline">
+              <h3>Climb</h3>
+              <label class="checkbox-label"><input type="checkbox" value="avgClimbScore" checked> AVG Climb
+                Score</label>
+              <label class="checkbox-label"><input type="checkbox" value="climbAttempts" checked> Climb Attempts</label>
+              <label class="checkbox-label"><input type="checkbox" value="climbSuccess" checked> Climb Success</label>
+            </div>
+
+            <div class="filter-group-inline">
+              <h3>Other</h3>
+              <label class="checkbox-label"><input type="checkbox" value="driverSkill" checked> Driver Skill</label>
+              <label class="checkbox-label"><input type="checkbox" value="countDefenseRating" checked> Count Defense
+                Rating</label>
+              <label class="checkbox-label"><input type="checkbox" value="maxDefenseRating" checked> MAX Defense
+                Rating</label>
+              <label class="checkbox-label"><input type="checkbox" value="diedRate" checked> Died Rate</label>
+            </div>
+
+          </form>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: -20px;">
+            <button id="resetFilters"
+              style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #ff1e1e; color: white; border: none; border-radius: 6px;">
+              Reset All
+            </button>
+            <button id="uncheckAll"
+              style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #1e90ff; color: white; border: none; border-radius: 6px;">
+              Uncheck All
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 32px; margin-bottom: 20px;">
+        <div id="hideTeamBoxRanking" style="margin-top: 20px; width:50%">
+          <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="toggleHideTeamContent()">
+            <img id="hideTeamToggleArrow" src="images/down_arrow.png" alt="Toggle"
+              style="width: 18px; height: 18px; transition: transform 0.3s ease; position: relative; top: 2px;">
+            <h2 style="color: white; font-size: 1.3rem; margin: 0; line-height: 1;">Hide Team</h2>
+          </div>
+
+          <div id="hideTeamContent" style="display: none; margin-top: 18px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <input type="text" id="hideTeamInputRanking" placeholder="Team #"
+                style="flex: 1; padding: 8px; border-radius: 4px; background-color: #2a2d31; color: white; border: 1px solid #888888; font-family: 'Lato'; font-size: medium;">
+              <button id="addHideTeamButtonRanking"
+                style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #1e90ff; color: white; border: none; border-radius: 6px;">Add</button>
+            </div>
+            <div id="hideTeamListContainerRanking"
+              style="max-height: 300px; overflow-y: auto; transition: max-height 0.3s ease;">
+              <ul id="hideTeamListRanking"
+                style="list-style: none; padding: 0; margin: 0; color: white; font-family: 'Lato'; font-size: medium;">
+              </ul>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+              <button id="resetHideTeamButtonRanking"
+                style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #ff1e1e; color: white; border: none; border-radius: 6px;">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div id="isolateTeamBoxRanking" style="width:50%">
+          <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;"
+            onclick="toggleIsolateTeamContent()">
+            <img id="isolateTeamToggleArrow" src="images/down_arrow.png" alt="Toggle"
+              style="width: 18px; height: 18px; transition: transform 0.3s ease; position: relative; top: 2px;">
+            <h2 style="color: white; font-size: 1.3rem; margin: 0; line-height: 1;">Isolate Teams</h2>
+          </div>
+          <div id="isolateTeamContent" style="display: none; margin-top: 18px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <input type="text" id="isolateTeamInputRanking" placeholder="Team #"
+                style="flex: 1; padding: 8px; border-radius: 4px; background-color: #2a2d31; color: white; border: 1px solid #888888; font-family: 'Lato'; font-size: medium;">
+              <button id="addIsolateTeamButtonRanking"
+                style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #1e90ff; color: white; border: none; border-radius: 6px;">Add</button>
+            </div>
+            <div id="isolateTeamListContainerRanking"
+              style="max-height: 300px; overflow-y: auto; transition: max-height 0.3s ease;">
+              <ul id="isolateTeamListRanking"
+                style="list-style: none; padding: 0; margin: 0; color: white; font-family: 'Lato'; font-size: medium;">
+              </ul>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+              <button id="revertIsolateTeamButtonRanking"
+                style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #ff1e1e; color: white; border: none; border-radius: 6px;">Revert</button>
+              <button id="isolateTeamBoxRankingIsolate"
+                style="padding: 10px 18px; font-size: 16px; cursor: pointer; background-color: #1e90ff; color: white; border: none; border-radius: 6px; margin-left: 10px;">
+                Isolate
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="flex: 1;">
+        <div class="ranking-table-container">
+          <table id="rankingTable">
+            <table id="rankingTable" style="width:100%;border-collapse:collapse; color:white;">
+              <thead>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Team</th>
+                    <th>AVG<br>Total Score</th>
+                    <th>AVG<br>Auto Score</th>
+                    <th>AVG<br>Tele Score</th>
+                    <th>AVG<br>Climb Score</th>
+                    <th>AVG<br>Auto L4</th>
+                    <th>AVG<br>Auto Leave<br>Start</th>
+                    <th>AVG<br>Tele L4</th>
+                    <th>AVG<br>Tele L3</th>
+                    <th>AVG<br>Tele L2</th>
+                    <th>AVG<br>Tele L1</th>
+                    <th>AVG<br>Tele Coral</th>
+                    <th>AVG<br>Algae Removed</th>
+                    <th>AVG<br>Algae Processed</th>
+                    <th>AVG<br>Algae Barge</th>
+                    <th>AVG<br>Tele Algae</th>
+                    <th>Climb<br>Attempts</th>
+                    <th>Climb<br>Success</th>
+                    <th>Driver<br>Skill</th>
+                    <th>Count<br>Defense Rating</th>
+                    <th>MAX<br>Defense Rating</th>
+                    <th>Died<br>Rate</th>
+                    <th>MAX<br>Algae Net</th>
+                    <th>MAX<br>Tele Coral</th>
+                  </tr>
+                </thead>
+              </thead>
+              <tbody id="rankingTableBody">
+              </tbody>
+            </table>
+        </div>
       </div>
     </div>
 
@@ -693,7 +831,8 @@
                 <div class="filter-group-inline">
                   <h3>Robot</h3>
                   <label class="checkbox-label"><input type="checkbox" value="groundBarge">Ground Barge</label>
-                  <label class="checkbox-label"><input type="checkbox" value="groundProcessor">Ground Processor</label>
+                  <label class="checkbox-label"><input type="checkbox" value="groundProcessor">Ground
+                    Processor</label>
                   <label class="checkbox-label"><input type="checkbox" value="swerve">Swerve</label>
                 </div>
 
@@ -941,8 +1080,6 @@
                 Update Climbs
               </button>
             </div>
-
-            <!-- New "Update Auto Leave" Button -->
             <div style="position: relative; margin-top: 10px;">
               <button id="updateAutoLeaveBtn"
                 style="width: 100%; background-color: #ff1e1e; border: none; font-size:16px; padding: 8px 0;">
@@ -963,7 +1100,7 @@
             <option value="all">All</option>
             <option value="climb">Climb</option>
             <option value="coral">Coral</option>
-            <option value = "autoLeave">Auto Leave</option>
+            <option value="autoLeave">Auto Leave</option>
             <option value="others">Other</option>
           </select>
         </div>
@@ -996,15 +1133,18 @@
     <div id="updateClimbInfo" class="tab-content" style="font-family: 'Lato', sans-serif; font-size:16px">
       <h1>Update Climbs</h1>
       <div style="background-color: #1C1E21; padding: 20px; border-radius: 8px;">
-        <p style="color: white;">This feature downloads updated climb data from <strong>The Blue Alliance (TBA)</strong>
+        <p style="color: white;">This feature downloads updated climb data from <strong>The Blue Alliance
+            (TBA)</strong>
           and applies it to your local match records. Turn on permissions to download multiple files at once.</p>
 
         <p style="color: white;">When you click <strong>Update Climbs</strong>, the system will:</p>
         <ul style="color: white;">
           <li>Download two files:
             <ul>
-              <li style="margin-top:5px; font-size:14px;"><strong>Change Log:</strong> A summary of what changed</li>
-              <li style="margin-top:5px; font-size:14px;"><strong>New Match Data CSV:</strong> Updated with new climb
+              <li style="margin-top:5px; font-size:14px;"><strong>Change Log:</strong> A summary of what changed
+              </li>
+              <li style="margin-top:5px; font-size:14px;"><strong>New Match Data CSV:</strong> Updated with new
+                climb
                 scores and total scores</li>
             </ul>
           </li>
@@ -1014,7 +1154,8 @@
         <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
           <thead>
             <tr>
-              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Scouter</th>
+              <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Scouter
+              </th>
               <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">TBA</th>
               <th style="color: white; border-bottom: 2px solid #1e90ff; text-align: left; padding: 8px;">Final</th>
             </tr>
@@ -1146,7 +1287,47 @@
     });
 
     document.getElementById('currentQualMatch').addEventListener('input', updateScoutingSchedule);
+    function toggleFilterContent() {
+      const arrow = document.getElementById('filterContentToggleArrow');
+      const filterContent = document.getElementById('filterContent');
 
+      if (filterContent.style.display === 'none' || filterContent.style.display === '') {
+        filterContent.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        filterContent.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('filterContent').style.display = 'none';
+    });
+
+    function toggleHideTeamContent() {
+      const arrow = document.getElementById('hideTeamToggleArrow');
+      const hideTeamContent = document.getElementById('hideTeamContent');
+
+      if (hideTeamContent.style.display === 'none' || hideTeamContent.style.display === '') {
+        hideTeamContent.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        hideTeamContent.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function toggleIsolateTeamContent() {
+      const arrow = document.getElementById('isolateTeamToggleArrow');
+      const isolateTeamContent = document.getElementById('isolateTeamContent');
+      if (isolateTeamContent.style.display === 'none' || isolateTeamContent.style.display === '') {
+        isolateTeamContent.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        isolateTeamContent.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
   </script>
 </body>
 

@@ -1,8 +1,8 @@
 function getGradientColor(value, distribution) {
   if (isNaN(value)) return 'black';
 
-  const redDark = [110, 40, 60];    
-  const white = [44, 46, 49];       
+  const redDark = [110, 40, 60];
+  const white = [44, 46, 49];
   const greenDark = [60, 120, 80];
 
   const sorted = [...distribution].filter(v => !isNaN(v)).sort((a, b) => a - b);
@@ -24,6 +24,60 @@ function getGradientColor(value, distribution) {
   return `rgb(${r},${g},${b})`;
 }
 
+function updateRankingTableColumns() {
+  const alwaysShow = [0, 1, 2];
+  const statMap = {
+    avgTotalScore: 2,
+    avgAutoScore: 3,
+    avgTeleScore: 4,
+    avgClimbScore: 5,
+    avgAutoL4: 6,
+    avgAutoLeaveStart: 7,
+    avgTeleL4: 8,
+    avgTeleL3: 9,
+    avgTeleL2: 10,
+    avgTeleL1: 11,
+    avgTeleCoral: 12,
+    avgAlgaeRemoved: 13,
+    avgAlgaeProcessed: 14,
+    avgAlgaeBarge: 15,
+    avgTeleAlgae: 16,
+    climbAttempts: 17,
+    climbSuccess: 18,
+    driverSkill: 19,
+    countDefenseRating: 20,
+    maxDefenseRating: 21,
+    diedRate: 22,
+    maxAlgaeNet: 23,
+    maxTeleCoral: 24
+  };
+  const checked = Array.from(document.querySelectorAll('#rankingFilterForm input[type="checkbox"]:checked')).map(cb => cb.value);
+
+  const ths = document.querySelectorAll('#rankingTable thead th');
+  const trs = document.querySelectorAll('#rankingTable tbody tr');
+
+  ths.forEach((th, idx) => {
+    if (alwaysShow.includes(idx) || checked.some(key => statMap[key] === idx)) {
+      th.style.display = '';
+    } else {
+      th.style.display = 'none';
+    }
+  });
+  trs.forEach(tr => {
+    Array.from(tr.children).forEach((td, idx) => {
+      if (alwaysShow.includes(idx) || checked.some(key => statMap[key] === idx)) {
+        td.style.display = '';
+      } else {
+        td.style.display = 'none';
+      }
+    });
+  });
+}
+
+document.getElementById('rankingFilterForm').addEventListener('change', updateRankingTableColumns);
+document.addEventListener('DOMContentLoaded', () => {
+  updateRankingTableColumns();
+});
 
 function renderRankingTable() {
   if (typeof Papa === 'undefined' || typeof csvText === 'undefined') return;
@@ -31,8 +85,14 @@ function renderRankingTable() {
   const tableBody = document.getElementById('rankingTableBody');
   if (!tableBody) return;
 
+  const visibleTeamsData = parsed.filter(row => {
+    if (isIsolated && isolatedTeams.length > 0) {
+      return isolatedTeams.includes(row['Team No.']);
+    }
+    return !hiddenTeams.includes(row['Team No.']);
+  });
   const teams = {};
-  parsed.forEach(row => {
+  visibleTeamsData.forEach(row => {
     const team = row['Team No.'];
     if (!team) return;
     if (!teams[team]) teams[team] = [];
@@ -159,6 +219,193 @@ function renderRankingTable() {
     return total ? ((count / total) * 100).toFixed(1) : '0.0';
   }
 }
+
+document.getElementById('resetFilters').addEventListener('click', function () {
+  const checkboxes = document.querySelectorAll('#rankingFilterForm input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = true;
+  });
+  updateRankingTableColumns();
+});
+
+document.getElementById('uncheckAll').addEventListener('click', function () {
+  const checkboxes = document.querySelectorAll('#rankingFilterForm input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  updateRankingTableColumns();
+});
+document.getElementById('addIsolateTeamButtonRanking').addEventListener('click', function () {
+  const input = document.getElementById('isolateTeamInputRanking');
+  const teamNumber = input.value.trim();
+  if (!teamNumber) return;
+  
+  if (!isolatedTeams.includes(teamNumber)) {
+    isolatedTeams.push(teamNumber);
+    isolatedTeams.sort((a, b) => parseInt(a) - parseInt(b));
+    renderIsolatedTeamsListRanking();
+    input.value = '';
+  } else {
+    alert(`Team ${teamNumber} is already in the list.`);
+  }
+});
+
+document.getElementById('isolateTeamBoxRankingIsolate').addEventListener('click', function () {
+  isIsolated = true;
+  renderRankingTable();
+  updateRankingTableColumns();
+});
+
+document.getElementById('revertIsolateTeamButtonRanking').addEventListener('click', function () {
+  isIsolated = false;
+  isolatedTeams = []; 
+  renderIsolatedTeamsListRanking();
+  renderRankingTable();
+  updateRankingTableColumns();
+});
+
+function renderIsolatedTeamsListRanking() {
+  const list = document.getElementById('isolateTeamListRanking');
+  const container = document.getElementById('isolateTeamListContainerRanking');
+  list.innerHTML = '';
+
+  isolatedTeams.forEach(team => {
+    const listItem = document.createElement('li');
+    listItem.style.display = 'flex';
+    listItem.style.justifyContent = 'space-between';
+    listItem.style.alignItems = 'center';
+    listItem.style.marginBottom = '8px';
+    listItem.style.padding = '6px 10px';
+    listItem.style.backgroundColor = '#1C1E21';
+    listItem.style.borderRadius = '4px';
+    listItem.style.border = '1px solid #1e90ff';
+
+    const teamText = document.createElement('span');
+    teamText.textContent = `Team ${team}`;
+    teamText.style.color = 'white';
+    listItem.appendChild(teamText);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'X';
+    deleteButton.style.padding = '2px 8px';
+    deleteButton.style.backgroundColor = '#1e90ff';
+    deleteButton.style.color = 'white';
+    deleteButton.style.border = 'none';
+    deleteButton.style.borderRadius = '4px';
+    deleteButton.style.cursor = 'pointer';
+
+    deleteButton.addEventListener('click', () => {
+      isolatedTeams = isolatedTeams.filter(t => t !== team);
+      renderIsolatedTeamsListRanking();
+      renderRankingTable();
+    });
+
+    listItem.appendChild(deleteButton);
+    list.appendChild(listItem);
+  });
+
+  container.style.height = list.children.length > 0 ? `${list.scrollHeight + 10}px` : 'auto';
+}
+
+document.getElementById('isolateTeamInputRanking').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('addIsolateTeamButtonRanking').click();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  renderIsolatedTeamsListRanking();
+});
+function renderHiddenTeamsListRanking() {
+  const list = document.getElementById('hideTeamListRanking');
+  const container = document.getElementById('hideTeamListContainerRanking');
+  list.innerHTML = '';
+
+  hiddenTeams.forEach(team => {
+    const listItem = document.createElement('li');
+    listItem.style.display = 'flex';
+    listItem.style.justifyContent = 'space-between';
+    listItem.style.alignItems = 'center';
+    listItem.style.marginBottom = '8px';
+    listItem.style.padding = '6px 10px';
+    listItem.style.backgroundColor = '#1C1E21';
+    listItem.style.borderRadius = '4px';
+    listItem.style.border = '1px solid red';
+
+    const teamText = document.createElement('span');
+    teamText.textContent = `Team ${team}`;
+    teamText.style.color = 'white';
+    listItem.appendChild(teamText);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'X';
+    deleteButton.style.padding = '2px 8px';
+    deleteButton.style.backgroundColor = '#ff5c5c';
+    deleteButton.style.color = 'white';
+    deleteButton.style.border = 'none';
+    deleteButton.style.borderRadius = '4px';
+    deleteButton.style.cursor = 'pointer';
+
+    deleteButton.addEventListener('click', (e) => {
+      hiddenTeams = hiddenTeams.filter(t => t !== team);
+      renderHiddenTeamsList();
+      renderHiddenTeamsListRanking();
+      applyFilters();
+      updateRankingTableColumns();
+      renderRankingTable();
+    });
+
+    listItem.appendChild(deleteButton);
+    list.appendChild(listItem);
+  });
+
+  container.style.height = list.children.length > 0 ? `${list.scrollHeight + 10}px` : 'auto';
+  applyFilters();
+  updateRankingTableColumns();
+}
+
+document.getElementById('addHideTeamButtonRanking').addEventListener('click', function () {
+  const input = document.getElementById('hideTeamInputRanking');
+  const teamNumber = input.value.trim();
+  if (!teamNumber) return;
+  if (!hiddenTeams.includes(teamNumber)) {
+    hiddenTeams.push(teamNumber);
+    hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+    renderHiddenTeamsList();
+    renderHiddenTeamsListRanking();
+    applyFilters();
+    updateRankingTableColumns();
+    renderRankingTable();
+    input.value = '';
+  } else {
+    alert(`Team ${teamNumber} is already in the list.`);
+  }
+});
+
+document.getElementById('resetHideTeamButtonRanking').addEventListener('click', function () {
+  hiddenTeams = [];
+  renderHiddenTeamsList();
+  renderHiddenTeamsListRanking();
+  applyFilters();
+  updateRankingTableColumns();
+  renderRankingTable();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  renderHiddenTeamsListRanking();
+  renderRankingTable();
+
+});
+
+document.getElementById('hideTeamInputRanking').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('addHideTeamButtonRanking').click();
+  }
+});
+
+
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', function (e) {
     if (tab.textContent.trim().toLowerCase().includes('ranking')) {
@@ -221,6 +468,8 @@ let tbaClimbData = {};
 let coralMismatchData = [];
 let hiddenTeams = [];
 let showHiddenTeamsInFilter = false;
+let isolatedTeams = [];
+let isIsolated = false;
 let highlightedOverviewTeam = null;
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
@@ -1018,7 +1267,7 @@ async function getTBAData() {
     if (!response.ok) throw new Error(`TBA API error: ${response.status}`);
 
     const matches = await response.json();
-    
+
     tbaClimbData = processTbaClimbData(matches);
     tbaAutoLeaveData = processTbaAutoLeaveData(matches);
     coralMismatchData = verifyCoralCounts(matches, parseCSV().data);
@@ -1127,7 +1376,7 @@ function verifyCoralCounts(matches, csvData) {
 const rescoutFilter = document.getElementById('rescoutFilter');
 const hideCoralCheckbox = document.getElementById('hideCoralMismatch');
 
-rescoutFilter.addEventListener('change', function() {
+rescoutFilter.addEventListener('change', function () {
   const selectedFilter = this.value;
 
   if (selectedFilter === 'climb' || selectedFilter === 'autoLeave' || selectedFilter === 'others') {
@@ -1140,7 +1389,7 @@ rescoutFilter.addEventListener('change', function() {
   filterRescoutTable();
 });
 
-hideCoralCheckbox.addEventListener('change', function() {
+hideCoralCheckbox.addEventListener('change', function () {
   const currentFilter = rescoutFilter.value;
   if (currentFilter === 'all' || currentFilter === 'coral') {
     filterRescoutTable();
@@ -1328,18 +1577,18 @@ async function updateAutoLeave() {
     const match = row['Match']?.toString();
     const team = row['Team No.']?.toString();
     const color = (row['Robot Color'] || '').toLowerCase();
-    
+
     if (match && team) {
       if (!teamAllianceMap[match]) teamAllianceMap[match] = {};
-      teamAllianceMap[match][team] = color.startsWith('red') ? 'red' : 
-                                    color.startsWith('blue') ? 'blue' : null;
+      teamAllianceMap[match][team] = color.startsWith('red') ? 'red' :
+        color.startsWith('blue') ? 'blue' : null;
     }
   });
 
   data.forEach(row => {
     const match = row['Match']?.toString();
     const team = row['Team No.']?.toString();
-    
+
     if (!match || !team || !tbaAutoLeaveData[match] || !teamAllianceMap[match] || !teamAllianceMap[match][team]) {
       return;
     }
@@ -1358,8 +1607,8 @@ async function updateAutoLeave() {
       const newTotal = scoutLeave === 1 && tbaLeave === 0
         ? oldTotal - 3
         : scoutLeave === 0 && tbaLeave === 1
-        ? oldTotal + 3
-        : oldTotal;
+          ? oldTotal + 3
+          : oldTotal;
 
       changeLog.push({
         'Match': match,
@@ -1403,15 +1652,15 @@ async function updateAutoLeave() {
     document.body.removeChild(logLink);
   }
 
-  document.getElementById('downloadStatus').textContent = 
+  document.getElementById('downloadStatus').textContent =
     `Updated ${updatedRows} rows with corrected auto leave data`;
 }
 
 function processTbaAutoLeaveData(matches) {
   const autoLeaveData = {};
-  
+
   const qualMatches = matches.filter(match => match.comp_level === 'qm');
-  
+
   qualMatches.forEach(match => {
     const matchNumber = match.match_number.toString();
     autoLeaveData[matchNumber] = { red: {}, blue: {} };
@@ -1432,7 +1681,7 @@ function processTbaAutoLeaveData(matches) {
       });
     }
   });
-  
+
   return autoLeaveData;
 }
 
@@ -1475,45 +1724,45 @@ function displayTeamNickname(teamNumber, elementId) {
 /*-----RESCOUT TABLE----*/
 
 function filterRescoutTable() {
-    const tableBody = document.getElementById('rescoutBody');
-    const filterType = document.getElementById('rescoutFilter').value;
-    const hideSmallMismatches = document.getElementById('hideCoralMismatch').checked;
+  const tableBody = document.getElementById('rescoutBody');
+  const filterType = document.getElementById('rescoutFilter').value;
+  const hideSmallMismatches = document.getElementById('hideCoralMismatch').checked;
 
-    let filteredRows = window.rescoutData || [];
+  let filteredRows = window.rescoutData || [];
 
-    if (filterType !== 'all') {
-        filteredRows = filteredRows.filter(row => row.type === filterType);
-    }
+  if (filterType !== 'all') {
+    filteredRows = filteredRows.filter(row => row.type === filterType);
+  }
 
-    if ((filterType === 'all' || filterType === 'coral') && hideSmallMismatches) {
-        filteredRows = filteredRows.filter(row =>
-            row.type !== 'coral' || (row.type === 'coral' && row.difference >= 3)
-        );
-    }
+  if ((filterType === 'all' || filterType === 'coral') && hideSmallMismatches) {
+    filteredRows = filteredRows.filter(row =>
+      row.type !== 'coral' || (row.type === 'coral' && row.difference >= 3)
+    );
+  }
 
-    tableBody.innerHTML = '';
+  tableBody.innerHTML = '';
 
-    if (filteredRows.length === 0) {
-        tableBody.innerHTML = `
+  if (filteredRows.length === 0) {
+    tableBody.innerHTML = `
             <tr>
                 <td colspan="3" style="text-align: center; padding: 12px; color: #888; font-style: italic;">
                     No Matches to Rescout
                 </td>
             </tr>
         `;
-        return;
-    }
+    return;
+  }
 
-    filteredRows.sort((a, b) => parseInt(a.match, 10) - parseInt(b.match, 10))
-        .forEach(({ match, team, reason }) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+  filteredRows.sort((a, b) => parseInt(a.match, 10) - parseInt(b.match, 10))
+    .forEach(({ match, team, reason }) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
                 <td style="padding: 8px;">Q${match}</td>
                 <td style="padding: 8px;">${team}</td>
                 <td style="padding: 8px;">${reason}</td>
             `;
-            tableBody.appendChild(row);
-        });
+      tableBody.appendChild(row);
+    });
 }
 function renderRescoutTable(data) {
   const rescoutSection = document.getElementById('rescoutSection');
@@ -1623,23 +1872,23 @@ function renderRescoutTable(data) {
     const match = row['Match']?.toString().replace(/^Q/i, '');
     const team = row['Team No.']?.toString();
     const robotColor = (row['Robot Color'] || '').toLowerCase();
-    const alliance = robotColor.startsWith('red') ? 'red' : 
-                   robotColor.startsWith('blue') ? 'blue' : null;
+    const alliance = robotColor.startsWith('red') ? 'red' :
+      robotColor.startsWith('blue') ? 'blue' : null;
 
     if (match && team && alliance && tbaAutoLeaveData[match]?.[alliance]?.[team] !== undefined) {
-        const scoutLeave = parseInt(row['Auton Leave starting line'] || 0);
-        const tbaLeave = tbaAutoLeaveData[match][alliance][team];
-        
-        if (scoutLeave !== tbaLeave) {
-            rescoutRows.push({
-                match,
-                team,
-                reason: `Auto Leave: Scouted ${scoutLeave ? "Yes" : "No"}, TBA shows ${tbaLeave ? "Yes" : "No"}`,
-                type: 'autoLeave'
-            });
-        }
+      const scoutLeave = parseInt(row['Auton Leave starting line'] || 0);
+      const tbaLeave = tbaAutoLeaveData[match][alliance][team];
+
+      if (scoutLeave !== tbaLeave) {
+        rescoutRows.push({
+          match,
+          team,
+          reason: `Auto Leave: Scouted ${scoutLeave ? "Yes" : "No"}, TBA shows ${tbaLeave ? "Yes" : "No"}`,
+          type: 'autoLeave'
+        });
+      }
     }
-});
+  });
 
   window.rescoutData = rescoutRows;
 
@@ -2843,7 +3092,7 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
         }
       },
       plugins: {
-        legend: { display: false }, 
+        legend: { display: false },
         tooltip: {
           backgroundColor: '#1C1E21',
           titleColor: '#fff',
@@ -2854,12 +3103,12 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
           bodyFont: { family: 'Lato', size: 14 },
           padding: 10,
           callbacks: {
-            afterBody: function(context) {
+            afterBody: function (context) {
               const dataIndex = context[0].dataIndex;
               const row = teamData[dataIndex];
               const total =
-                (parseInt(row['Auton Algae Removed'] || 0))+
-                (parseInt(row['Auton Algae in Net'] || 0))+
+                (parseInt(row['Auton Algae Removed'] || 0)) +
+                (parseInt(row['Auton Algae in Net'] || 0)) +
                 (parseInt(row['Auton Algae in Processor'] || 0));
               return `Total Algae: ${total}`;
             }

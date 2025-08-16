@@ -1782,6 +1782,7 @@ input:checked+.slider:before {
     margin: 0 auto;
     width: calc(100% - 60px);
     position: relative;
+    margin-top:20px;
 }
 
 #rankingTable {
@@ -1873,3 +1874,63 @@ input:checked+.slider:before {
 #rankingTable tbody tr.team-226 td:nth-child(2) {
     z-index: 1003 !important;
 }
+.ranking-filter-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #23242a;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px #131416;
+  padding: 18px 24px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+#rankingFilterForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+#rankingFilterForm .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: white;
+  font-family: 'Lato';
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+#rankingFilterForm input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #888;
+  border-radius: 4px;
+  background-color: #1C1E21;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+#rankingFilterForm input[type="checkbox"]:checked {
+  background-color: #1e90ff;
+  border-color: #1e90ff;
+}
+
+#rankingFilterForm input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: -2px;
+  left: 3px;
+  font-weight: bold;
+}
+
+#rankingFilterForm input[type="checkbox"]:hover {
+  border-color: #1e90ff;
+}
+
