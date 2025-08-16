@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sharkscout-cache-v7-MARC';
+const CACHE_NAME = 'sharkscout-cache-v9-MARC';
 const ASSETS = [
   '/',
   '/index.html',
