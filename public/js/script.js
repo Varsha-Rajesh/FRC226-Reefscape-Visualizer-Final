@@ -490,6 +490,8 @@ async function handleDataUpload(e) {
     csvText = evt.target.result;
     localStorage.setItem('csvText', csvText);
     statusEl.textContent = 'Event CSV uploaded!';
+    renderRankingTable();
+    updateRankingTableColumns();
   };
   reader.readAsText(file);
 }
@@ -978,25 +980,20 @@ async function uploadFile(fileInputId, statusId, uploadType) {
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = e => csvText = e.target.result;
-  reader.readAsText(file);
-
-  try {
-    const formData = new FormData();
-    formData.append('dataFile', file);
-    formData.append('uploadType', uploadType);
-
-    const response = await fetch('/uploads', { method: 'POST', body: formData });
-
-    statusEl.textContent = reponse.message
-      ? `File uploaded successfully as "${response.filename}"`
-      : `Error: ${reponse.error || 'Unknown error'}`;
-  } catch (err) {
-    statusEl.textContent = `Successful upload`;
-  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      csvText = e.target.result;
+      localStorage.setItem('csvText', csvText);
+      statusEl.textContent = "Event CSV uploaded!";
+      renderRankingTable();
+      updateRankingTableColumns();
+      resolve();
+    };
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
 }
-
 function getLatestMatchNumber(data) {
   const matches = data.map(row => parseInt(row['Match'])).filter(n => !isNaN(n));
   return matches.length > 0 ? Math.max(...matches) : null;
@@ -1018,12 +1015,8 @@ async function handleDataUpload(e) {
     if (latestMatch) {
       document.getElementById('latestMatchInfoSidebar').textContent = `Data up till Q${latestMatch}`;
     }
-
-    const tableBody = document.getElementById('rankingTableBody');
-    if (tableBody) tableBody.innerHTML = '';
-    renderRankingTable();
   });
-};
+}
 async function handlePitUpload(fileInputId, statusId) {
   const fileInput = document.getElementById(fileInputId);
   const statusEl = document.getElementById(statusId);
