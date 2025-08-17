@@ -74,16 +74,50 @@ function updateRankingTableColumns() {
   });
 }
 
-document.getElementById('rankingFilterForm').addEventListener('change', updateRankingTableColumns);
-document.addEventListener('DOMContentLoaded', () => {
+document.getElementById('rankingFilterForm').addEventListener('change', function () {
+  renderRankingTable();
   updateRankingTableColumns();
+}); document.addEventListener('DOMContentLoaded', () => {
+  updateRankingTableColumns();
+
 });
 
 function renderRankingTable() {
+
   if (typeof Papa === 'undefined' || typeof csvText === 'undefined') return;
   const parsed = Papa.parse(csvText, { header: true }).data;
   const tableBody = document.getElementById('rankingTableBody');
   if (!tableBody) return;
+
+  // Get current visibility state
+  const checked = Array.from(document.querySelectorAll('#rankingFilterForm input[type="checkbox"]:checked')).map(cb => cb.value);
+  const statMap = {
+    avgTotalScore: 2,
+    avgAutoScore: 3,
+    avgTeleScore: 4,
+    avgClimbScore: 5,
+    avgAutoL4: 6,
+    avgAutoLeaveStart: 7,
+    avgTeleL4: 8,
+    avgTeleL3: 9,
+    avgTeleL2: 10,
+    avgTeleL1: 11,
+    avgTeleCoral: 12,
+    avgAlgaeRemoved: 13,
+    avgAlgaeProcessed: 14,
+    avgAlgaeBarge: 15,
+    avgTeleAlgae: 16,
+    climbAttempts: 17,
+    climbSuccess: 18,
+    driverSkill: 19,
+    countDefenseRating: 20,
+    maxDefenseRating: 21,
+    diedRate: 22,
+    maxAlgaeNet: 23,
+    maxTeleCoral: 24
+  };
+  const visibleColumns = new Set([0, 1, 2]); // Always show first 3 columns
+  checked.forEach(key => visibleColumns.add(statMap[key]));
 
   const visibleTeamsData = parsed.filter(row => {
     if (isIsolated && isolatedTeams.length > 0) {
@@ -192,15 +226,20 @@ function renderRankingTable() {
     const row = document.createElement('tr');
     if (team === "226") row.classList.add('team-226');
     let html = `<td>${idx + 1}</td><td>${team}</td>`;
+
     metricValues.forEach((val, i) => {
+      // Always render the cell, but hide it if not in visibleColumns
+      const colIdx = i + 2; // +2 for rank and team columns
       const numVal = parseFloat(val);
       const bg = getGradientColor(numVal, metricStats[i].vals);
-      html += `<td style="background:${bg};">${val}</td>`;
+      const displayStyle = visibleColumns.has(colIdx) ? '' : 'display:none;';
+      html += `<td style="background:${bg};${displayStyle}">${val}</td>`;
     });
+
+
     row.innerHTML = html;
     tableBody.appendChild(row);
   });
-
   function avg(arr, key) {
     const vals = arr.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
     return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
@@ -239,7 +278,7 @@ document.getElementById('addIsolateTeamButtonRanking').addEventListener('click',
   const input = document.getElementById('isolateTeamInputRanking');
   const teamNumber = input.value.trim();
   if (!teamNumber) return;
-  
+
   if (!isolatedTeams.includes(teamNumber)) {
     isolatedTeams.push(teamNumber);
     isolatedTeams.sort((a, b) => parseInt(a) - parseInt(b));
@@ -258,7 +297,7 @@ document.getElementById('isolateTeamBoxRankingIsolate').addEventListener('click'
 
 document.getElementById('revertIsolateTeamButtonRanking').addEventListener('click', function () {
   isIsolated = false;
-  isolatedTeams = []; 
+  isolatedTeams = [];
   renderIsolatedTeamsListRanking();
   renderRankingTable();
   updateRankingTableColumns();
