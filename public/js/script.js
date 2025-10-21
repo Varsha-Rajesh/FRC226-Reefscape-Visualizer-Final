@@ -24,6 +24,37 @@ function getGradientColor(value, distribution) {
   return `rgb(${r},${g},${b})`;
 }
 
+let numpadBuffer = '';
+
+document.addEventListener('keydown', function (e) {
+  if (e.location === 3 && e.key >= '0' && e.key <= '9') {
+    numpadBuffer += e.key;
+    e.preventDefault();
+  }
+
+  if (e.key === 'Enter' && e.location === 3){
+    const teamNumber = numpadBuffer.trim();
+
+    if (teamNumber && !hiddenTeams.includes(teamNumber)) {
+      hiddenTeams.push(teamNumber);
+      hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+      renderHiddenTeamsList();
+      renderHiddenTeamsListRanking();
+      applyFilters();
+      updateRankingTableColumns();
+      renderRankingTable();
+    }
+
+    numpadBuffer = '';
+    e.preventDefault();
+  }
+
+  if (e.key === 'Escape' || e.key === 'Backspace') {
+    numpadBuffer = '';
+  }
+});
+
+
 function updateRankingTableColumns() {
   const alwaysShow = [0, 1, 2];
   const statMap = {
@@ -89,7 +120,6 @@ function renderRankingTable() {
   const tableBody = document.getElementById('rankingTableBody');
   if (!tableBody) return;
 
-  // Get current visibility state
   const checked = Array.from(document.querySelectorAll('#rankingFilterForm input[type="checkbox"]:checked')).map(cb => cb.value);
   const statMap = {
     avgTotalScore: 2,
@@ -116,7 +146,7 @@ function renderRankingTable() {
     maxAlgaeNet: 23,
     maxTeleCoral: 24
   };
-  const visibleColumns = new Set([0, 1, 2]); // Always show first 3 columns
+  const visibleColumns = new Set([0, 1, 2]); 
   checked.forEach(key => visibleColumns.add(statMap[key]));
 
   const visibleTeamsData = parsed.filter(row => {
@@ -228,8 +258,7 @@ function renderRankingTable() {
     let html = `<td>${idx + 1}</td><td>${team}</td>`;
 
     metricValues.forEach((val, i) => {
-      // Always render the cell, but hide it if not in visibleColumns
-      const colIdx = i + 2; // +2 for rank and team columns
+      const colIdx = i + 2; 
       const numVal = parseFloat(val);
       const bg = getGradientColor(numVal, metricStats[i].vals);
       const displayStyle = visibleColumns.has(colIdx) ? '' : 'display:none;';
@@ -4229,17 +4258,29 @@ function renderHiddenTeamsList() {
       hiddenTeams = hiddenTeams.filter(t => t !== team);
       renderHiddenTeamsList();
       applyFilters();
-      adjustContainerHeight(container);
     });
 
     listItem.appendChild(deleteButton);
     list.appendChild(listItem);
   });
 
-  adjustContainerHeight(container);
-  applyFilters();
+  const maxVisibleItems = 5;
+  const itemHeight = 42; 
+  const visibleItems = Math.min(hiddenTeams.length, maxVisibleItems);
+  container.style.maxHeight = `${itemHeight * visibleItems}px`;
+  container.style.overflowY = hiddenTeams.length > maxVisibleItems ? 'auto' : 'hidden';
 
+  container.style.scrollbarWidth = 'thin'; 
+  container.style.scrollbarColor = '#ff5c5c #1C1E21';
+  container.style.cssText += `
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background-color: #ff5c5c; border-radius: 3px; }
+    &::-webkit-scrollbar-track { background: #1C1E21; }
+  `;
+
+  applyFilters();
 }
+
 
 async function resetHiddenTeams(e) {
   e.preventDefault();
