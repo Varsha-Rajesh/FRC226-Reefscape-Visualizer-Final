@@ -1,0 +1,282 @@
+Timestamp,Scouter,Event,Team No.,Comp Level,Match,Robot Color,Auton Starting Position,Auton Leave starting line,Auton L4,Auton L3,Auton L2,Auton L1,Auton Algae in Net,Auton Algae in Processor,Auton Algae Removed,L4,L3,L2,L1,Algae in Net,Algae in Processor,Algae removed,Defense was played on robot,Climb Score,Driver skill,Defense Rating,Died or Immobilized,Tippy,Comments,Auton Score,Teleop Score,Total Score,Tele Coral Cycles,Tele Algae Cycles,,Key
+8/16/2025 9:41:46,Meera ,MARC,226,Quals match,1,Blue-2,p,1,1,0,0,0,0,0,0,4,2,0,0,1,0,2,0,2.1,2,,,0,,10,34,44,6,3,,226◆1
+8/16/2025 9:41:53,Elijah,MARC,226,Quals match,1,Blue-3,o,1,0,0,0,0,0,0,0,5,1,0,0,0,0,0,0,2,2,,,0,,3,31,34,6,0,,226◆1
+8/16/2025 9:42:07,Amogh Kshirsagar ,MARC,2834,Quals match,1,Red-1,o,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,,1,0,Got stuck,6,2,8,0,0,,2834◆1
+8/16/2025 9:43:04,Annika,MARC,4381,Quals match,1,Red-2,c,1,0,0,0,1,1,0,2,6,2,0,1,0,0,0,0,0,2,,,0,very slow driving and aligning with the human player and coral,10,40,50,9,0,,4381◆1
+8/16/2025 9:43:32,Ayaan Amin,MARC,4422,Quals match,1,Blue-1,c,1,0,0,0,0,0,0,1,2,0,0,0,3,0,1,0,12,,,,0,,3,34,37,2,4,,4422◆1
+8/16/2025 9:44:11,Varsha ,MARC,6120,Quals match,1,Red-3,p,1,0,0,0,0,0,0,1,7,1,0,0,0,0,0,0,2.1,,,,0,,3,41,44,8,0,,6120◆1
+8/16/2025 9:52:38,Elijah,MARC,3538,Quals match,2,Blue-3,p,1,3,0,0,0,0,0,0,5,3,2,0,1,0,0,1,2,4,,,0,,24,49,73,10,1,,3538◆2
+8/16/2025 9:52:48,Amogh Kshirsagar ,MARC,4395,Quals match,2,Red-1,p,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,2,0,,1,0,Broke end effector ,3,8,11,0,1,,4395◆2
+8/16/2025 9:52:57,Ayaan Amin,MARC,9993,Quals match,2,Blue-1,c,1,0,0,0,1,0,0,0,0,0,0,0,0,2,0,1,0,0,,,0,,6,12,18,0,0,,9993◆2
+8/16/2025 9:53:01,Meera ,MARC,9996,Quals match,2,Blue-2,o,1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1,2,0,0,,0,Could only score L1 and barely able to hold coral without dropping ,3,8,11,3,0,,9996◆2
+8/16/2025 9:53:33,varsha,MARC,862,Quals match,2,Red-3,o,1,0,0,0,0,0,0,1,6,0,0,0,0,0,0,0,12,2,,,0,,3,42,45,6,0,,862◆2
+8/16/2025 9:54:23,Annika,MARC,240,Quals match,2,Red-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,"being so fr right now, they were playing defense but i dont know what they were defending. apparently they were supposed to defend the processor, but the other team was still able to score in processor. take that as you will",3,0,3,0,0,,240◆2
+8/16/2025 10:04:07,Elijah,MARC,9992,Quals match,3,Blue-3,p,1,0,0,0,2,0,0,0,5,2,0,0,0,0,0,0,12,2,,,1,,9,45,54,7,0,,9992◆3
+8/16/2025 10:04:19,Meera,MARC,8280,Quals match,3,Blue-2,o,1,0,0,0,0,0,0,0,5,3,0,0,0,0,0,0,2.1,2,,,0,,3,39,42,8,0,,8280◆3
+8/16/2025 10:04:24,Ayaan Amin,MARC,6081,Quals match,3,Blue-1,c,1,0,0,0,0,0,0,1,0,0,0,0,6,2,5,0,12,2,,,0,"Pretty good with algae mainly, auton did fail a bit though",3,48,51,0,11,,6081◆3
+8/16/2025 10:04:34,Annika,MARC,9245,Quals match,3,Red-2,p,1,0,2,2,0,0,0,1,0,10,9,0,0,0,0,0,12,4,,,0,they were very fast and efficient in lining up with reef,23,79,102,19,0,,9245◆3
+8/16/2025 10:04:36,Amogh Kshirsagar ,MARC,6861,Quals match,3,Red-1,c,1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,12,2,,,0,,3,47,50,7,0,,6861◆3
+8/16/2025 10:05:17,varsha,MARC,8373,Quals match,3,Red-3,o,1,1,0,0,0,0,0,0,1,0,1,0,0,2,4,0,2,2,,,0,,10,22,32,2,4,,8373◆3
+8/16/2025 10:18:42,Elijah,MARC,4422,Quals match,4,Blue-3,c,1,0,0,0,0,1,0,1,1,0,0,0,0,2,0,0,2.1,2,,,0,,7,19,26,1,0,,4422◆4
+8/16/2025 10:18:43,Meera ,MARC,2834,Quals match,4,Blue-2,p,1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,12,2,,,0,,3,52,55,8,0,,2834◆4
+8/16/2025 10:19:25,Ayaan Amin,MARC,6570,Quals match,4,Blue-1,o,1,0,0,2,0,0,0,0,0,4,0,0,0,0,2,0,12,2,,,0,,11,28,39,4,2,,6570◆4
+8/16/2025 10:19:48,Annika,MARC,7196,Quals match,4,Red-2,c,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2.1,0,,,0,"it looked like they were playing defense on themselves. i dont think they knew what was happening, that or something went wrong with their robot.",6,2,8,0,0,,7196◆4
+8/16/2025 10:21:00,varsha,MARC,3538,Quals match,4,Red-3,p,1,0,0,0,0,0,0,0,7,2,1,0,0,0,1,0,2,2,,,0,Coral stuck in robot ,3,48,51,10,1,,3538◆4
+8/16/2025 10:23:52,Amogh Kshirsagar ,MARC,2832,Quals match,4,Red-1,o,1,3,0,0,0,0,0,0,1,0,0,0,0,2,4,0,2,0,,,0,,24,19,43,1,4,,2832◆4
+8/16/2025 10:31:31,Elijah,MARC,6081,Semifinals,5,Blue-3,c,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,,,1,1,Tipped over,3,4,7,0,1,,6081◆5
+8/16/2025 10:31:44,Meera,MARC,9996,Quals match,5,Blue-2,p,1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,2,0,,1,0,,3,8,11,3,0,,9996◆5
+8/16/2025 10:31:54,Amogh Kshirsagar ,MARC,5144,Quals match,5,Red-1,p,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,,,0,Idk if the robot broke or the driver just paused,0,7,7,1,0,,5144◆5
+8/16/2025 10:31:56,Ayaan Amin,MARC,226,Quals match,5,Blue-1,o,1,2,0,0,0,0,0,0,5,4,0,1,1,0,1,1,2.1,4,,,0,Our robot ,17,49,66,10,2,,226◆5
+8/16/2025 10:32:55,Annika,MARC,4395,Quals match,5,Red-2,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,,0,i cant tell if they were defending because they were just hanging around on the other side,3,6,9,0,0,,4395◆5
+8/16/2025 10:33:39,Varsha ,MARC,4381,Quals match,5,Red-3,o,1,1,0,0,0,1,0,2,5,4,0,0,0,0,3,0,12,2,,,0,,14,53,67,9,3,,4381◆5
+8/16/2025 10:41:10,Ayaan Amin,MARC,9993,Quals match,6,Blue-1,c,1,0,0,0,1,0,0,0,0,0,0,2,0,2,0,0,2.1,2,,,0,Only L1 and processor,6,18,24,2,0,,9993◆6
+8/16/2025 10:41:12,Annika,MARC,9245,Quals match,6,Red-2,p,0,0,0,0,0,0,0,0,0,8,8,0,0,0,3,0,12,2,,,0,,0,68,68,16,3,,9245◆6
+8/16/2025 10:41:14,Elijah,MARC,6120,Quals match,6,Blue-3,p,1,1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,12,2,,,0,,10,47,57,7,0,,6120◆6
+8/16/2025 10:41:22,Amogh Kshirsagar ,MARC,9992,Quals match,6,Red-1,o,1,0,0,0,3,0,0,0,1,0,0,4,0,0,2,0,2,4,,,0,,12,15,27,5,2,,9992◆6
+8/16/2025 10:41:58,varsha,MARC,7196,Quals match,6,Red-3,c,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,,,0,Coral constantly kept getting stuck in robot ,3,0,3,0,0,,7196◆6
+8/16/2025 10:41:58,Meera,MARC,240,Quals match,6,Blue-2,o,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,1,0,"Probably the worst one here it moved a bit and stoped and that was all, wasn’t tippy but top was kinda shaky like it would break if it hits another robot ",3,0,3,0,0,,240◆6
+8/16/2025 10:49:43,Ayaan Amin,MARC,8280,Quals match,7,Blue-1,o,1,1,0,0,0,0,0,0,0,5,3,0,0,0,0,0,2.1,4,,,0,Pretty good cycles,10,31,41,8,0,,8280◆7
+8/16/2025 10:49:48,Amogh Kshirsagar ,MARC,8373,Quals match,7,Red-1,c,1,0,0,0,1,0,0,0,4,0,0,2,0,0,3,0,2,2,,,0,,6,26,32,6,3,,8373◆7
+8/16/2025 10:49:59,Elijah,MARC,2832,Quals match,7,Blue-3,p,1,2,0,0,0,0,0,0,2,1,1,0,0,0,1,0,2.1,,,,0,Knock over own partner trying to save them from algae,17,19,36,4,1,,2832◆7
+8/16/2025 10:50:07,Annika,MARC,862,Quals match,7,Red-2,p,1,2,0,0,0,0,0,0,3,4,0,0,0,1,1,0,2.1,2,,,0,,17,39,56,7,1,,862◆7
+8/16/2025 10:50:16,Meera,MARC,6861,Quals match,7,Blue-2,c,1,0,0,0,0,0,0,1,3,1,1,0,0,0,0,0,0,2,,1,0,Got stuck on algae and when another robot tried to free it by moving the algae out the robot just tipped over ,3,22,25,5,0,,6861◆7
+8/16/2025 10:51:44,Varsha,MARC,6570,Quals match,7,Red-3,o,1,0,0,2,0,0,0,0,0,2,0,1,0,0,0,0,12,,,,0,,11,22,33,3,0,,6570◆7
+8/16/2025 11:05:19,Elijah,MARC,6081,Quals match,8,Blue-3,o,1,0,0,0,0,0,0,0,1,0,1,0,3,0,5,0,12,2,,,0,,3,32,35,2,8,,6081◆8
+8/16/2025 11:05:27,varsha,MARC,2834,Quals match,8,Red-3,p,1,0,0,0,0,0,0,0,5,0,0,0,0,0,3,0,2,,,,0,,3,27,30,5,3,,2834◆8
+8/16/2025 11:05:29,Amogh Kshirsagar ,MARC,226,Quals match,8,Red-1,o,1,2,0,0,1,0,0,0,4,5,0,0,2,0,2,0,12,4,,,0,,20,60,80,9,4,,226◆8
+8/16/2025 11:05:55,Meera,MARC,240,Quals match,8,Blue-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,1,0,Moved off the starting line into the park area during auton and didn’t move for the rest of the match,3,2,5,0,0,,240◆8
+8/16/2025 11:05:59,Ayaan Amin,MARC,9992,Quals match,8,Blue-1,p,1,3,0,0,0,0,0,0,6,0,0,0,0,0,1,0,2.1,4,,,1,862 B team,24,32,56,6,1,,9992◆8
+8/16/2025 11:07:41,Annika,MARC,4395,Quals match,8,Red-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,,0,i dont know if they were defending or just spectating. i think they were on defense spiritually. maybe,3,2,5,0,0,,4395◆8
+8/16/2025 11:16:44,Meera,MARC,9993,Quals match,9,Blue-2,c,1,0,0,0,1,0,0,0,0,0,0,0,0,4,0,0,12,0,,,0,,6,36,42,0,0,,9993◆9
+8/16/2025 11:16:47,varsha,MARC,3538,Quals match,9,Red-3,o,1,3,0,0,0,0,0,0,9,3,0,0,1,0,2,0,2,4,,,0,,24,63,87,12,3,,3538◆9
+8/16/2025 11:16:54,Elijah,MARC,862,Quals match,9,Blue-3,p,1,2,0,0,0,0,0,0,6,0,1,1,1,0,1,0,2.1,4,,,0,,17,41,58,8,2,,862◆9
+8/16/2025 11:17:01,UD,MARC,9245,Quals match,9,Red-1,p,1,0,2,0,0,0,0,0,0,4,4,0,0,2,5,0,12,2,,,0,,15,52,67,8,5,,9245◆9
+8/16/2025 11:17:01,Patrick ,MARC,6570,Quals match,9,Red-2,o,1,0,0,0,0,0,0,0,0,1,2,0,0,0,1,0,12,0,,,0,,3,22,25,3,1,,6570◆9
+8/16/2025 11:17:21,Ayaan Amin,MARC,6120,Quals match,9,Blue-1,o,1,0,0,0,0,0,0,0,3,2,0,0,0,0,0,0,2.1,2,,,0,,3,25,28,5,0,,6120◆9
+8/16/2025 11:25:03,Meera,MARC,9996,Quals match,10,Blue-2,p,1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,2,0,,,0,,3,8,11,3,0,,9996◆10
+8/16/2025 11:25:05,Elijah ,MARC,7196,Quals match,10,Blue-3,c,1,0,0,0,1,0,0,0,3,0,0,0,0,0,0,0,2,,,,0,,6,17,23,3,0,,7196◆10
+8/16/2025 11:25:12,Patrick,MARC,4381,Quals match,10,Red-2,o,1,2,0,0,0,0,0,0,0,4,0,2,0,0,1,0,12,0,,,0,,17,32,49,6,1,,4381◆10
+8/16/2025 11:25:41,Ayaan Amin,MARC,5144,Quals match,10,Blue-1,o,1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,2,,,0,"Pretty decent tele op, just needs to work on auton and endgame",3,35,38,7,0,,5144◆10
+8/16/2025 11:26:12,varsja,MARC,8280,Quals match,10,Red-3,p,1,0,0,0,1,0,0,0,0,0,2,2,0,0,0,0,2,0,,,0,,6,12,18,4,0,,8280◆10
+8/16/2025 11:26:46,Ud,MARC,6861,Quals match,10,Red-1,c,1,0,0,0,0,0,0,0,3,1,2,0,0,0,2,0,2.1,0,,,0,,3,27,30,6,2,,6861◆10
+8/16/2025 11:34:22,Ud,MARC,8373,Quals match,11,Red-1,p,1,0,0,0,0,0,0,0,3,2,1,1,0,1,3,0,0,2,,,0,,3,34,37,7,3,,8373◆11
+8/16/2025 11:34:26,Patrick,MARC,9992,Quals match,11,Red-2,p,1,1,0,0,0,0,0,0,3,2,1,1,0,0,0,0,12,2,,,0,,10,40,50,7,0,,9992◆11
+8/16/2025 11:34:44,Ayaan Amin,MARC,2832,Quals match,11,Blue-1,o,1,2,0,0,0,0,0,0,1,4,5,0,2,0,2,0,2.1,4,,,0,Decent algae and coral (L3 and L2 speed) and some L4,17,46,63,10,4,,2832◆11
+8/16/2025 11:34:59,Meera,MARC,4422,Quals match,11,Blue-2,c,1,1,0,0,0,0,0,1,2,1,0,0,1,0,1,0,12,2,,,1,VERY tippy and wobbly and could’ve easily done better if not so wobbly,10,30,40,3,2,,4422◆11
+8/16/2025 11:35:26,varsha,MARC,226,Quals match,11,Red-3,p,1,1,0,0,0,0,0,0,3,3,1,0,1,1,1,0,12,2,,,0,,10,52,62,7,2,,226◆11
+8/16/2025 11:44:13,Meera ,MARC,3538,Quals match,12,Blue-2,c,1,3,0,0,0,0,0,0,8,0,0,0,2,0,2,0,0,4,,,0,,24,48,72,8,4,,3538◆12
+8/16/2025 11:44:14,Elijah,MARC,6120,Quals match,12,Blue-3,o,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,0,,3,0,3,0,0,,6120◆12
+8/16/2025 11:44:20,Patrick,MARC,6861,Quals match,12,Red-2,c,1,0,0,0,0,0,0,0,6,0,1,0,0,0,0,0,2,0,,,0,,3,35,38,7,0,,6861◆12
+8/16/2025 11:44:32,Ud,MARC,8280,Quals match,12,Red-1,p,1,1,0,0,1,0,0,0,0,2,3,4,0,0,0,0,2.1,0,,,0,,13,27,40,9,0,,8280◆12
+8/16/2025 11:44:32,Ayaan Amin,MARC,240,Quals match,12,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,1,0,"Didn’t score, and mostly sat in the parking area",3,2,5,0,0,,240◆12
+8/16/2025 11:46:30,varsha,MARC,6570,Quals match,12,Red-3,p,1,0,0,2,0,0,0,0,0,1,0,0,0,0,2,0,12,,,,0,Kept dropping coral,11,16,27,1,2,,6570◆12
+8/16/2025 11:55:12,Meera,MARC,9996,Quals match,13,Blue-2,r,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,0,Robot wasn’t here ,0,0,0,0,0,,9996◆13
+8/16/2025 11:56:26,Patrick,MARC,2834,Quals match,13,Red-2,o,1,1,0,0,0,0,0,0,5,4,1,0,0,0,0,0,2.1,2,,,0,,10,46,56,10,0,,2834◆13
+8/16/2025 11:56:45,Ud,MARC,8373,Quals match,13,Red-1,p,1,0,0,0,1,0,0,1,3,2,4,0,0,2,3,0,0,2,,,0,,6,47,53,9,3,,8373◆13
+8/16/2025 11:56:59,Elijah,MARC,5144,Quals match,13,Blue-3,o,1,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,2,4,4,,0,,3,19,22,4,0,,5144◆13
+8/16/2025 11:57:29,Ayaan Amin,MARC,9245,Quals match,13,Blue-1,p,1,0,2,1,1,0,0,0,0,8,7,0,0,1,4,0,2.1,4,,,0,Super fast L3 and L2 cycles,22,61,83,15,4,,9245◆13
+8/16/2025 11:58:05,varsha,MARC,4422,Quals match,13,Red-3,c,1,0,0,0,0,0,0,0,0,0,0,0,3,1,2,0,12,,,,1,,3,30,33,0,5,,4422◆13
+8/16/2025 12:05:21,Patrick,MARC,7196,Quals match,14,Red-2,c,1,0,0,0,0,0,1,0,0,0,0,2,0,0,0,1,0,0,,,0,,9,4,13,2,0,,7196◆14
+8/16/2025 12:05:24,Ayaan Amin,MARC,2832,Quals match,14,Blue-1,o,1,1,0,0,0,0,0,0,2,2,5,1,2,0,2,0,2.1,2,,,0,,10,45,55,10,4,,2832◆14
+8/16/2025 12:05:24,Meera,MARC,6081,Quals match,14,Blue-2,c,1,1,0,0,0,0,0,1,1,2,0,0,1,2,2,0,12,2,,,0,Kind of a slow poke ,10,41,51,3,3,,6081◆14
+8/16/2025 12:05:27,Ud,MARC,862,Quals match,14,Red-1,o,1,2,0,0,0,0,0,0,4,1,0,0,0,0,2,0,2,2,,,0,,17,26,43,5,2,,862◆14
+8/16/2025 12:05:26,Elijah ,MARC,4395,Quals match,14,Blue-3,c,1,0,0,0,0,0,0,1,0,2,0,0,0,0,0,0,2.1,,,,0,,3,10,13,2,0,,4395◆14
+8/16/2025 12:06:41,varsha,MARC,4381,Quals match,14,Red-3,p,1,2,0,0,0,0,0,0,4,3,1,0,0,0,1,0,12,2,,,0,,17,47,64,8,1,,4381◆14
+8/16/2025 12:15:13,Meera,MARC,9996,Quals match,15,Blue-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,,0,,3,2,5,0,0,,9996◆15
+8/16/2025 12:15:26,Elijah,MARC,240,Quals match,15,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,,0,,3,2,5,0,0,,240◆15
+8/16/2025 12:15:34,amogh,MARC,8280,Quals match,15,Red-1,c,1,1,0,0,0,0,0,0,1,1,3,1,0,0,1,0,2,2,,,0,,10,22,32,6,1,,8280◆15
+8/16/2025 12:15:47,Patrick,MARC,226,Quals match,15,Red-2,o,1,0,0,0,0,0,0,0,1,3,1,0,0,2,0,1,2,2,,,0,,3,34,37,5,0,,226◆15
+8/16/2025 12:15:51,Ayaan Amin,MARC,240,Quals match,15,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,,0,,3,2,5,0,0,,240◆15
+8/16/2025 12:16:58,varsha,MARC,3538,Quals match,15,Red-3,p,1,3,0,0,0,0,0,0,3,3,1,0,2,0,2,0,0,2,,,0,,24,38,62,7,4,,3538◆15
+8/16/2025 12:23:40,Elijah,MARC,9993,Quals match,15,Blue-3,p,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,1,0,,0,0,0,0,0,,9993◆15
+8/16/2025 12:23:59,Ayaan Amin,MARC,2832,Quals match,16,Blue-1,p,1,3,0,0,0,0,0,0,3,2,0,0,3,0,3,1,2.1,4,,,0,,24,37,61,5,6,,2832◆16
+8/16/2025 12:24:07,Meera ,MARC,4381,Quals match,16,Blue-2,o,1,1,0,0,0,0,0,0,2,2,0,0,0,0,0,1,12,2,,,0,Kinda got shaky and trembling and that affected scoring,10,30,40,4,0,,4381◆16
+8/16/2025 12:24:18,Patrick,MARC,7196,Quals match,16,Red-2,c,1,0,0,0,0,0,0,0,3,0,0,0,0,0,2,0,2.1,0,,,0,,3,17,20,3,2,,7196◆16
+8/16/2025 12:24:18,varsha,MARC,5144,Quals match,16,Red-3,o,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,2,2,2,,0,They can score on all 4 levels,6,7,13,1,0,,5144◆16
+8/16/2025 12:24:21,amogh,MARC,9992,Quals match,16,Red-1,p,1,1,0,0,1,0,0,0,3,0,0,1,1,0,1,0,12,2,0,,0,,13,33,46,4,2,,9992◆16
+8/16/2025 12:35:10,Elijah,MARC,6570,Quals match,17,Blue-3,o,1,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,12,2,,,0,,11,20,31,2,0,,6570◆17
+8/16/2025 12:35:22,Ayaan Amin,MARC,6120,Quals match,17,Blue-1,p,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,2.1,0,,,0,Auton went crazy and knocked off an algae from bumping into the reef,3,7,10,1,0,,6120◆17
+8/16/2025 12:35:26,Patrick,MARC,4422,Quals match,17,Red-2,c,1,0,0,0,0,0,0,0,0,0,3,0,0,1,2,0,2.1,0,,,0,,3,17,20,3,2,,4422◆17
+8/16/2025 12:35:32,varsha,MARC,862,Quals match,17,Red-3,p,1,3,0,0,0,0,0,0,2,3,2,1,0,0,2,0,2.1,4,,,0,,24,32,56,8,2,,862◆17
+8/16/2025 12:35:41,Meera,MARC,6081,Quals match,17,Blue-2,c,1,0,0,0,0,0,0,0,0,0,0,0,9,0,4,0,2.1,4,,,1,Robot moved around the field a bit slowly but scored a ton of algae,3,38,41,0,13,,6081◆17
+8/16/2025 12:35:45,amogh,MARC,8373,Quals match,17,Red-1,o,1,0,0,0,0,0,0,0,2,3,3,0,0,1,1,0,2,2,,,0,,3,39,42,8,1,,8373◆17
+8/16/2025 12:45:20,Meera,MARC,3538,Quals match,18,Blue-2,o,1,3,0,0,0,0,0,0,9,4,0,0,0,1,0,0,2,4,,,0,,24,69,93,13,0,,3538◆18
+8/16/2025 12:45:26,Elijah,MARC,9245,Quals match,18,Blue-3,p,1,0,0,1,0,0,0,2,1,5,4,0,0,0,3,0,12,2,,,0,,7,49,56,10,3,,9245◆18
+8/16/2025 12:45:32,Ayaan Amin,MARC,4395,Quals match,18,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,,0,Almost got penalties multiple times,3,6,9,0,0,,4395◆18
+8/16/2025 12:45:38,Patrick,MARC,2834,Quals match,18,Red-2,o,1,0,0,0,1,0,0,0,5,0,0,0,0,0,1,1,2.1,2,,,0,,6,27,33,5,1,,2834◆18
+8/16/2025 12:45:57,amogh,MARC,6861,Quals match,18,Red-1,p,1,0,0,0,0,0,0,0,1,4,1,0,0,0,0,1,2,2,,,0,,3,26,29,6,0,,6861◆18
+8/16/2025 12:46:37,varsha,MARC,7196,Quals match,18,Red-3,c,0,0,0,0,0,0,0,0,1,0,0,3,0,0,0,0,0,,,,0,,0,11,11,4,0,,7196◆18
+8/16/2025 12:55:58,Patrick,MARC,6120,Quals match,19,Red-2,c,1,1,0,0,0,0,0,0,3,2,0,0,0,0,1,0,2.1,2,,1,0,,10,25,35,5,1,,6120◆19
+8/16/2025 12:56:06,Meera,MARC,8280,Quals match,19,Blue-2,p,1,1,0,0,0,0,0,0,3,2,3,1,0,0,0,0,12,2,,,0,,10,46,56,9,0,,8280◆19
+8/16/2025 12:56:08,Elijah,MARC,9996,Quals match,19,Blue-3,o,1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,2,2,,,0,,3,8,11,3,0,,9996◆19
+8/16/2025 12:56:33,Amogh ,MARC,4381,Quals match,19,Red-1,o,1,1,0,0,0,0,0,0,3,4,2,1,0,0,1,0,12,4,,,1,,10,51,61,10,1,,4381◆19
+8/16/2025 12:56:55,Ayaan Amin,MARC,8373,Quals match,19,Blue-1,o,1,1,0,0,0,0,0,0,3,3,2,1,0,2,2,0,2,2,,,0,Game sense could use some work,10,49,59,9,2,,8373◆19
+8/16/2025 12:58:09,Varsha,MARC,9992,Quals match,19,Red-3,o,1,2,0,0,0,0,0,0,4,1,0,0,1,0,1,0,12,2,,,0,,17,40,57,5,2,,9992◆19
+8/16/2025 13:04:01,Ayaan Amin,MARC,4422,Quals match,20,Blue-1,c,1,1,0,0,0,0,0,1,0,0,0,0,2,0,1,0,2,2,,,0,,10,10,20,0,3,,4422◆20
+8/16/2025 13:04:02,Elijah,MARC,240,Quals match,20,Blue-3,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,,0,,3,2,5,0,0,,240◆20
+8/16/2025 13:04:13,Patrick,MARC,4395,Quals match,20,Red-2,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2.1,0,0,,0,,3,2,5,0,0,,4395◆20
+8/16/2025 13:04:40,Amogh ,MARC,6081,Quals match,20,Red-1,c,1,0,0,0,0,0,0,2,0,0,0,0,7,0,4,0,2.1,2,,,0,,3,30,33,0,11,,6081◆20
+8/16/2025 13:04:52,Meera,MARC,6570,Quals match,20,Blue-2,o,1,0,0,1,0,0,0,0,0,2,0,0,0,0,2,1,12,0,,,0,Scoring end effector was very shaky/wobbly and greatly affected picking up coral from the human player and scoring,7,20,27,2,2,,6570◆20
+8/16/2025 13:04:59,varsha,MARC,5144,Quals match,20,Red-3,c,1,0,0,1,0,0,0,0,6,0,0,0,0,0,0,0,2,2,,,0,,7,32,39,6,0,,5144◆20
+8/16/2025 13:17:17,Meera ,MARC,9993,Quals match,21,Blue-2,p,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,12,0,,,0,,3,24,27,0,0,,9993◆21
+8/16/2025 13:17:46,Amogh ,MARC,2834,Quals match,21,Red-1,o,1,0,0,0,0,0,0,0,3,2,0,0,0,0,0,0,12,2,,,0,,3,35,38,5,0,,2834◆21
+8/16/2025 13:18:38,Ayaan Amin,MARC,862,Quals match,21,Blue-1,o,1,1,0,0,0,0,0,1,4,3,0,1,0,0,1,0,2.1,4,,,0,Pretty decent L4’s,10,36,46,8,1,,862◆21
+8/16/2025 13:18:45,Annika,MARC,6861,Quals match,21,Blue-3,c,1,0,0,0,1,0,0,0,0,2,1,1,0,0,1,0,12,0,,,0,missed half their coral on L3. i strongly dislike their lights on their robot. they take time to align to human player thing and the reef.,6,25,31,4,1,,6861◆21
+8/16/2025 13:18:47,Aditi ,MARC,2832,Quals match,21,Red-3,p,1,2,0,0,0,0,0,0,2,5,1,1,1,2,2,0,2.1,4,,,0,,17,53,70,9,3,,2832◆21
+8/16/2025 13:20:57,varsha,MARC,226,Quals match,21,Red-2,c,1,1,0,0,0,0,0,1,4,1,3,0,1,0,1,0,2.1,2,,,0,,10,39,49,8,2,,226◆21
+8/16/2025 13:25:49,Aditi ,MARC,9996,Quals match,22,Red-3,c,1,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,2,,,0,,3,10,13,5,0,,9996◆22
+8/16/2025 13:26:08,Meera,MARC,8373,Quals match,22,Blue-2,o,1,0,0,0,0,0,0,0,6,3,1,0,0,0,2,0,0,2,,,0,,3,45,48,10,2,,8373◆22
+8/16/2025 13:26:22,Ayaan Amin,MARC,7196,Quals match,22,Blue-1,c,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,12,0,,1,0,Stops often,10,17,27,2,0,,7196◆22
+8/16/2025 13:26:27,Annika,MARC,5144,Quals match,22,Blue-3,p,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2,2,,,0,wasnt consistent with L4,3,27,30,5,0,,5144◆22
+8/16/2025 13:26:34,Amogh ,MARC,6570,Quals match,22,Red-1,o,1,0,0,2,0,0,0,0,0,4,0,1,0,0,3,0,12,2,,,0,,11,30,41,5,3,,6570◆22
+8/16/2025 13:27:06,varsha,MARC,9992,Quals match,22,Red-2,o,1,1,0,0,0,0,0,0,7,0,0,0,0,0,1,0,2.1,2,,,0,,10,37,47,7,1,,9992◆22
+8/16/2025 13:35:10,Ayaan Amin,MARC,240,Quals match,23,Blue-1,o,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,1,0,Stayed in park the entire game,0,2,2,0,0,,240◆23
+8/16/2025 13:35:11,Meera ,MARC,6861,Quals match,23,Blue-2,c,1,1,0,0,0,0,0,0,2,4,2,0,0,0,2,0,2.1,2,,,0,Kinda slow to score ,10,34,44,8,2,,6861◆23
+8/16/2025 13:35:14,amogh,MARC,2834,Quals match,23,Red-1,o,1,1,0,0,0,0,0,0,5,3,0,1,0,0,0,0,2.1,2,,,0,,10,41,51,9,0,,2834◆23
+8/16/2025 13:35:21,Aditi ,MARC,6081,Quals match,23,Red-3,c,1,0,0,0,0,0,1,2,0,0,0,0,0,3,3,0,2.1,2,2,,0,,9,20,29,0,3,,6081◆23
+8/16/2025 13:36:15,Annika,MARC,226,Quals match,23,Blue-3,p,1,2,0,0,0,0,0,0,4,4,1,0,2,0,3,1,12,2,,,0,im gonna be harsh - we looked good with attacking a robot that was trying to defend against us. we were a little bit slow with putting the coral in L4 and it wasnt consistent,17,59,76,9,5,,226◆23
+8/16/2025 13:36:17,varsha,MARC,862,Quals match,23,Red-2,o,1,3,0,0,0,0,0,0,2,4,2,0,0,0,2,0,0,2,,,0,,24,32,56,8,2,,862◆23
+8/16/2025 13:49:11,Meera ,MARC,9245,Quals match,24,Blue-2,p,1,0,1,2,0,0,0,1,0,8,2,0,0,0,4,1,12,4,,,0,,17,50,67,10,4,,9245◆24
+8/16/2025 13:49:12,Ayaan Amin,MARC,9993,Quals match,24,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,2,0,,,0,,3,20,23,0,0,,9993◆24
+8/16/2025 13:49:22,Amogh ,MARC,4422,Quals match,24,Red-1,c,1,1,0,0,0,1,0,1,4,0,0,0,0,1,2,0,2.1,2,,,0,,14,28,42,4,2,,4422◆24
+8/16/2025 13:49:26,Aditi,MARC,4395,Quals match,24,Red-3,o,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,1,0,,3,2,5,0,0,,4395◆24
+8/16/2025 13:49:51,Annika,MARC,8280,Quals match,24,Blue-3,o,1,1,1,0,1,0,0,0,5,0,0,1,0,0,0,0,12,2,,,0,they looked as lost as i do when writing my college essays. they missed some of their L4,19,39,58,6,0,,8280◆24
+8/16/2025 13:57:52,Meera ,MARC,240,Quals match,25,Blue-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,,0,,3,2,5,0,0,,240◆25
+8/16/2025 13:57:58,aditi ,MARC,8373,Quals match,25,Red-3,o,1,1,0,0,0,0,0,0,4,1,0,2,0,0,0,0,0,2,,,0,,10,28,38,7,0,,8373◆25
+8/16/2025 13:58:00,Elijah,MARC,6120,Quals match,25,Red-2,c,1,1,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2.1,2,,,0,,10,27,37,5,0,,6120◆25
+8/16/2025 13:58:24,Amogh ,MARC,2832,Quals match,25,Red-1,p,1,1,0,0,0,0,0,0,0,0,0,0,0,2,5,0,2,2,,,1,,10,14,24,0,5,,2832◆25
+8/16/2025 13:58:39,Ayaan Amin,MARC,4381,Quals match,25,Blue-1,o,1,1,0,0,0,0,0,0,4,2,0,0,0,0,1,0,12,4,,,0,Often misses L3’s. ,10,40,50,6,1,,4381◆25
+8/16/2025 13:59:19,Annika,MARC,226,Quals match,25,Blue-3,p,1,2,0,0,1,0,0,0,4,4,1,0,1,0,2,0,12,2,,,0,we were better with consistency this time. cycle time (is that the word for how long it takes to get a coral from human to reef) has to be faster,20,55,75,9,3,,226◆25
+8/16/2025 14:07:40,Meera,MARC,5144,Quals match,26,Blue-2,p,1,0,0,1,0,0,0,0,6,1,0,0,0,0,0,0,0,2,,,0,,7,34,41,7,0,,5144◆26
+8/16/2025 14:07:46,Amogh ,MARC,3538,Quals match,26,Red-1,o,1,3,0,0,0,0,0,0,3,4,4,0,2,0,2,0,2,4,,,0,,24,53,77,11,4,,3538◆26
+8/16/2025 14:07:55,Elijah,MARC,862,Quals match,26,Red-2,p,1,0,0,0,0,0,0,0,3,4,0,0,0,0,0,0,0,2,,,0,,3,31,34,7,0,,862◆26
+8/16/2025 14:08:21,aditi ,MARC,9992,Quals match,26,Red-3,c,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,1,0,So that robot had issues at the start,0,0,0,0,0,,9992◆26
+8/16/2025 14:08:29,Annika,MARC,6861,Quals match,26,Blue-3,o,1,0,0,0,0,0,0,0,6,2,0,0,0,0,0,0,2.1,2,,,0,"dont like their lights. other than that, they were slow between getting coral to L4, but they were consistent",3,40,43,8,0,,6861◆26
+8/16/2025 14:08:53,Ayaan Amin,MARC,6081,Quals match,26,Blue-1,c,1,0,0,0,0,0,0,1,0,0,0,0,8,0,4,0,12,4,,,0,Super fast algae cycles,3,44,47,0,12,,6081◆26
+8/16/2025 14:16:55,Ayaan Amin,MARC,4381,Quals match,27,Blue-1,o,1,1,0,0,0,0,0,0,4,2,0,0,0,0,1,0,12,2,,,0,,10,40,50,6,1,,4381◆27
+8/16/2025 14:16:59,aditi,MARC,6570,Quals match,27,Red-3,o,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,,,1,0,They had issues with their arm as soon as teleop started,11,2,13,0,0,,6570◆27
+8/16/2025 14:17:05,Meera,MARC,8280,Quals match,27,Blue-2,c,1,1,0,0,0,0,0,0,0,3,1,0,0,0,1,1,12,2,,,0,,10,27,37,4,1,,8280◆27
+8/16/2025 14:17:15,Amogh ,MARC,4395,Quals match,27,Red-1,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,,0,,3,0,3,0,0,,4395◆27
+8/16/2025 14:17:16,Elijah,MARC,9993,Quals match,27,Red-2,c,1,0,0,0,1,0,0,0,0,0,0,1,0,3,0,0,2,2,,,0,,6,22,28,1,0,,9993◆27
+8/16/2025 14:18:12,Annika,MARC,2834,Quals match,27,Blue-3,p,1,0,0,0,0,0,0,0,2,1,1,0,1,0,1,0,2.1,2,,1,1,i got scared so many times that they would fall and then they got stuck. but they were pretty consisitent,3,23,26,4,2,,2834◆27
+8/16/2025 14:26:28,Elijah,MARC,2832,Quals match,28,Red-2,c,1,1,0,0,0,0,0,1,0,0,3,0,2,0,3,0,12,2,,,0,,10,29,39,3,5,,2832◆28
+8/16/2025 14:26:35,Amogh ,MARC,4422,Quals match,28,Red-1,c,1,1,0,0,0,0,0,1,1,0,0,0,2,0,1,0,12,2,,,0,,10,25,35,1,3,,4422◆28
+8/16/2025 14:26:56,aditi,MARC,9245,Quals match,28,Red-3,p,1,0,2,2,0,0,0,1,0,10,8,1,0,0,1,0,12,4,,,0,spectacular ,23,78,101,19,1,,9245◆28
+8/16/2025 14:27:12,Ayaan Amin,MARC,6120,Quals match,28,Blue-1,p,1,0,0,0,0,0,0,0,1,0,0,4,0,0,0,0,2.1,0,,,1,Only did L1 for most of the match (unknown reason),3,15,18,5,0,,6120◆28
+8/16/2025 14:27:37,Rameen Ali,MARC,7196,Quals match,28,Blue-2,c,1,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,2.1,0,,,0,They scored 2 L4s but meeras phone won’t let me put that :(,3,9,12,2,0,,7196◆28
+8/16/2025 14:28:17,Annika,MARC,9996,Quals match,28,Blue-3,o,1,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,2,0,,,0,"i dont know how this can happen, but this robot played defense against its own team. only can score L1 and has manic episodes rocking back and forth to make sure that the coral that they get fit their mechanism properly",3,12,15,5,0,,9996◆28
+8/16/2025 14:36:47,Rameen Ali,MARC,8373,Quals match,29,Blue-2,o,1,1,0,0,0,0,0,0,6,1,0,0,0,0,2,0,2,2,,,0,,10,36,46,7,2,,8373◆29
+8/16/2025 14:36:48,aditi,MARC,6861,Quals match,29,Red-3,c,1,0,0,0,1,0,0,0,6,1,0,0,0,0,1,0,2.1,2,,,0,slow to score ,6,36,42,7,1,,6861◆29
+8/16/2025 14:36:54,Amogh ,MARC,3538,Quals match,29,Red-1,o,1,3,0,0,0,0,0,0,2,5,2,0,3,0,3,0,2,4,,,0,,24,50,74,9,6,,3538◆29
+8/16/2025 14:37:08,Elijah,MARC,5144,Quals match,29,Red-2,p,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,,,1,0,,10,5,15,1,0,,5144◆29
+8/16/2025 14:37:11,Ayaan Amin,MARC,9993,Quals match,29,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,12,0,,,0,Only processor points ,3,30,33,0,0,,9993◆29
+8/16/2025 14:38:26,Annika,MARC,4381,Quals match,29,Blue-3,p,1,2,0,0,1,0,0,0,1,2,1,0,0,0,1,0,12,2,,,1,my heart would race every time their elevator would go up because of how close they were of tipping over. they pmo cuz half the time they would drop the coral when trrying to get from human and they bumped into their teammates too many times.,20,28,48,4,1,,4381◆29
+8/16/2025 14:46:01,Amogh ,MARC,240,Quals match,30,Red-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,1,0,,3,0,3,0,0,,240◆30
+8/16/2025 14:46:01,aditi,MARC,2834,Quals match,30,Red-3,p,1,0,0,0,1,0,0,0,7,0,0,0,1,0,1,0,2.1,2,,,0,,6,41,47,7,2,,2834◆30
+8/16/2025 14:46:02,Rameen,MARC,4422,Quals match,30,Blue-2,p,1,1,0,0,0,0,0,0,5,0,0,0,0,0,1,0,12,2,,,1,,10,37,47,5,1,,4422◆30
+8/16/2025 14:46:19,Ayaan Amin,MARC,6081,Quals match,30,Blue-1,c,1,0,0,0,1,1,0,2,0,0,0,0,9,0,3,0,12,4,,,0,Very impressive algae barge placement and deep climb,10,48,58,0,12,,6081◆30
+8/16/2025 14:47:20,Annika,MARC,8280,Quals match,30,Blue-3,o,1,1,0,0,1,0,0,0,3,0,0,2,0,0,0,0,2,2,,,0,i got excited watching their auton. i was disappointed when i watched their teleop. they would miss half their coral on L4,13,21,34,5,0,,8280◆30
+8/17/2025 6:19:56,Varsha,MARC,6570,Quals match,31,Red-2,o,1,0,0,1,0,0,0,0,0,3,0,0,0,0,2,0,12,0,,,0,Dropped a lot of coral ,7,24,31,3,2,,6570◆31
+8/17/2025 6:20:06,Meera,MARC,9992,Quals match,31,Blue-2,o,1,2,0,0,0,0,0,0,8,1,0,0,0,0,0,0,2.1,2,,,1,,17,46,63,9,0,,9992◆31
+8/17/2025 6:20:40,Elijah,MARC,9245,Quals match,31,Blue-3,p,1,0,1,0,0,0,0,1,0,6,6,0,0,0,0,1,12,4,,,0,Great scorer and fast cycle time good alliance partner choice,9,54,63,12,0,,9245◆31
+8/17/2025 6:20:43,Annika,MARC,7196,Quals match,31,Red-3,c,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,,,0,they got a coral stuck in them so they couldnt do anything. looked like they were playing defense against themselves. i acc dont even know what tehy were doing,3,2,5,0,0,,7196◆31
+8/17/2025 6:21:32,aditi,MARC,226,Quals match,31,Blue-1,c,1,1,0,0,0,1,0,1,3,2,0,0,2,2,3,1,12,4,,,0,,14,55,69,5,5,,226◆31
+8/17/2025 6:37:22,Meera,MARC,5144,Quals match,32,Blue-2,p,1,0,0,0,0,0,0,1,6,0,0,0,0,1,2,0,0,2,,,0,,3,36,39,6,2,,5144◆32
+8/17/2025 6:37:25,Elijah,MARC,240,Quals match,32,Blue-3,o,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,,0,,3,2,5,0,0,,240◆32
+8/17/2025 6:37:27,aditi,MARC,6120,Quals match,32,Blue-1,c,1,1,0,0,0,0,0,0,4,0,0,0,0,0,2,0,12,2,,,0,,10,32,42,4,2,,6120◆32
+8/17/2025 6:38:14,Annika,MARC,2832,Quals match,32,Red-3,p,1,2,0,0,0,0,0,0,3,1,0,1,3,0,4,1,2,2,,,1,"a little tippy when extending elevator, got defended but went right thru them. they missed like 3 L4 in a row but they were pretty consistent",17,35,52,5,7,,2832◆32
+8/17/2025 6:38:38,Varsha,MARC,862,Quals match,32,Red-2,o,1,3,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,,1,0,Dropped a lot of coral,24,7,31,2,1,,862◆32
+8/17/2025 6:46:16,Meera,MARC,9993,Quals match,33,Blue-2,o,1,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,12,0,,,0,,3,36,39,0,0,,9993◆33
+8/17/2025 6:46:18,Varsha,MARC,8373,Quals match,33,Red-2,p,1,0,0,0,0,0,0,0,2,1,4,0,0,0,0,0,2,2,,,0,,3,28,31,7,0,,8373◆33
+8/17/2025 6:46:19,Elijah,MARC,226,Quals match,33,Blue-3,p,1,1,0,0,0,0,0,0,6,4,0,0,0,0,3,0,12,4,,,0,,10,58,68,10,3,,226◆33
+8/17/2025 6:46:39,aditi ,MARC,7196,Quals match,33,Blue-1,c,1,0,0,0,1,0,0,1,3,2,0,0,0,0,2,0,12,2,,,0,,6,35,41,5,2,,7196◆33
+8/17/2025 6:47:13,Annika,MARC,3538,Quals match,33,Red-3,o,1,3,0,0,0,0,0,0,7,6,1,0,1,0,0,0,2,4,,,0,they were so fast that i kept on losing them while watching. they were able to score coral without taking forever to align,24,68,92,14,1,,3538◆33
+8/17/2025 6:55:55,aditi,MARC,8280,Quals match,34,Blue-1,p,1,1,0,0,1,0,0,0,4,1,0,0,0,0,1,0,2.1,2,,,0,,13,26,39,5,1,,8280◆34
+8/17/2025 6:55:54,Varsha,MARC,4422,Quals match,34,Red-2,p,1,0,0,0,0,0,0,0,1,0,0,0,0,3,2,0,12,0,,,0,Penalty for shoving their arm into another robot ,3,35,38,1,2,,4422◆34
+8/17/2025 6:56:03,Elijah,MARC,4395,Quals match,34,Blue-3,p,1,1,0,0,1,0,0,0,4,1,0,1,0,0,1,0,2.1,2,,,0,,13,28,41,6,1,,4395◆34
+8/17/2025 6:56:21,Meera,MARC,9992,Quals match,34,Blue-2,o,1,0,0,0,1,0,0,0,4,0,0,0,0,0,4,0,2,2,,,1,,6,22,28,4,4,,9992◆34
+8/17/2025 6:56:56,Annika,MARC,6120,Quals match,34,Red-3,c,1,1,0,0,0,0,0,0,0,0,3,0,0,0,0,0,2,2,,,1,tippy even when their elevator is down. their intake is built weird soit was hard for the loading station to feed them and they can only score L2 (at least i think so),10,11,21,3,0,,6120◆34
+8/17/2025 7:04:29,aditi,MARC,9996,Quals match,35,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,2,2,,,0,,3,20,23,9,0,,9996◆35
+8/17/2025 7:04:37,Varsha,MARC,4381,Quals match,35,Red-2,p,1,0,0,0,0,0,0,0,6,4,0,0,0,0,2,0,12,2,,,0,,3,58,61,10,2,,4381◆35
+8/17/2025 7:04:37,Meera,MARC,2834,Quals match,35,Blue-2,o,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2.1,2,,,1,,3,27,30,5,0,,2834◆35
+8/17/2025 7:04:39,Elijah,MARC,9245,Quals match,35,Blue-3,p,1,0,2,2,0,0,0,0,0,9,8,0,0,0,4,0,12,4,,,0,Good selection for alliance partner,23,72,95,17,4,,9245◆35
+8/17/2025 7:05:04,Annika,MARC,862,Quals match,35,Red-3,o,1,1,0,0,1,0,0,0,5,1,0,1,0,0,0,0,2.1,2,,,0,took time with aligning to the reef ,13,33,46,7,0,,862◆35
+8/17/2025 7:14:29,Elijah,MARC,240,Quals match,36,Blue-3,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,,,0,,3,2,5,0,0,,240◆36
+8/17/2025 7:14:37,Varsha,MARC,7196,Quals match,36,Red-2,c,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,6,0,,,0,,3,16,19,2,0,,7196◆36
+8/17/2025 7:14:51,Meera,MARC,8373,Quals match,36,Blue-2,o,1,0,0,0,0,0,0,0,3,0,0,0,0,0,1,0,2.1,2,,,0,,3,17,20,3,1,,8373◆36
+8/17/2025 7:14:52,aditi,MARC,4395,Quals match,36,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,,0,,3,2,5,0,0,,4395◆36
+8/17/2025 7:15:18,Annika,MARC,6861,Quals match,36,Red-3,o,1,0,0,0,0,0,0,0,3,0,0,0,0,0,0,1,12,2,,,0,,3,27,30,3,0,,6861◆36
+8/17/2025 7:23:03,Varsha,MARC,3538,Quals match,37,Red-2,o,1,3,0,0,0,0,0,0,6,4,0,0,2,0,2,0,2,2,,,0,,24,56,80,10,4,,3538◆37
+8/17/2025 7:23:17,Elijah,MARC,9992,Quals match,37,Blue-3,p,1,3,0,0,0,0,0,0,6,0,0,0,0,0,1,0,2.1,2,,,0,,24,32,56,6,1,,9992◆37
+8/17/2025 7:23:20,Meera,MARC,2832,Quals match,37,Blue-2,o,1,2,0,0,0,0,0,0,1,4,1,0,3,0,3,0,2.1,2,,,1,,17,38,55,6,6,,2832◆37
+8/17/2025 7:23:23,aditi,MARC,9996,Quals match,37,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,2,,,0,,3,20,23,10,0,,9996◆37
+8/17/2025 7:23:57,Annika,MARC,6081,Quals match,37,Red-3,c,1,0,0,0,0,1,0,1,0,0,0,0,4,2,3,0,2.1,2,,,1,"they would have sudden stop that would make them tippy, have ground intake for algae and focused only on algae",7,30,37,0,7,,6081◆37
+8/17/2025 7:30:59,Meera,MARC,9993,Quals match,38,Blue-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,12,0,,,0,,3,30,33,0,0,,9993◆38
+8/17/2025 7:31:25,Elijah,MARC,2834,Quals match,38,Blue-3,p,1,0,0,0,0,0,0,0,2,1,0,1,0,0,1,0,0,2,,1,0,,3,16,19,4,1,,2834◆38
+8/17/2025 7:31:32,aditi,MARC,5144,Quals match,38,Blue-1,o,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2,2,,,0,,3,27,30,5,0,,5144◆38
+8/17/2025 7:31:49,Varsha ,MARC,6120,Quals match,38,Red-2,c,1,1,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,,,1,0,,10,9,19,3,0,,6120◆38
+8/17/2025 7:32:33,Annika,MARC,8280,Quals match,38,Red-3,p,1,0,0,0,3,0,0,0,0,3,1,2,0,0,0,0,2.1,2,,,0,"not consisent with their coral, takes so long to get coral in their intake because of design so they litter the floor with missed coral that didnt make it into their intake",12,21,33,6,0,,8280◆38
+8/17/2025 7:42:59,Varsha,MARC,9245,Quals match,39,Red-2,p,1,0,2,2,0,0,0,1,0,9,8,0,0,0,4,0,2.1,4,,,0,,23,62,85,17,4,,9245◆39
+8/17/2025 7:43:02,Elijah,MARC,4422,Quals match,39,Blue-3,c,1,1,0,0,0,1,0,1,0,0,0,0,4,0,5,0,2.1,2,,,0,,14,18,32,0,9,,4422◆39
+8/17/2025 7:43:09,aditi,MARC,240,Quals match,39,Red-3,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,,,1,0,,3,2,5,0,0,,240◆39
+8/17/2025 7:43:13,Meera,MARC,9992,Quals match,39,Blue-2,p,1,3,0,0,0,0,0,0,1,4,1,0,0,0,0,0,2.1,4,,,1,,24,26,50,6,0,,9992◆39
+8/17/2025 7:43:23,Amogh,MARC,4381,Quals match,39,Blue-1,o,1,1,0,0,0,0,0,0,4,3,0,2,0,0,0,0,12,2,,,0,,10,48,58,9,0,,4381◆39
+8/17/2025 7:51:04,Elijah ,MARC,9993,Quals match,40,Blue-3,p,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2.1,0,,1,0,,3,8,11,0,0,,9993◆40
+8/17/2025 7:51:06,aditi,MARC,4395,Quals match,40,Red-3,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,2,0,,0,,3,12,15,0,0,,4395◆40
+8/17/2025 7:51:10,Varsha,MARC,6861,Quals match,40,Red-2,o,1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,12,2,,,0,,3,47,50,7,0,,6861◆40
+8/17/2025 7:51:18,Meera,MARC,6120,Quals match,40,Blue-2,c,1,1,0,0,0,0,0,0,4,0,0,1,0,0,2,1,12,2,,,0,,10,34,44,5,2,,6120◆40
+8/17/2025 7:51:28,Amogh ,MARC,2834,Quals match,40,Blue-1,o,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1,0,2,,,0,,3,25,28,5,0,,2834◆40
+8/17/2025 7:59:35,Meera,MARC,6081,Quals match,41,Blue-2,c,1,0,0,0,0,1,0,1,0,0,0,0,1,0,1,0,0,2,,1,0,Got stuck on algae then tipped when another bot tried to bump the algae out at the very beginning of tele op,7,4,11,0,2,,6081◆41
+8/17/2025 7:59:51,Elijah,MARC,4381,Quals match,41,Blue-3,o,1,1,0,0,0,0,0,0,8,0,0,0,0,0,0,0,12,2,,,0,,10,52,62,8,0,,4381◆41
+8/17/2025 8:00:02,Amogh ,MARC,9245,Quals match,41,Blue-1,o,1,0,2,0,0,0,0,0,0,10,7,0,1,0,2,0,12,4,,,0,,15,77,92,17,3,,9245◆41
+8/17/2025 8:00:10,aditi ,MARC,2832,Quals match,41,Red-3,p,1,2,0,0,0,0,0,0,2,2,2,0,3,0,4,0,2.1,2,,,0,,17,38,55,6,7,,2832◆41
+8/17/2025 8:08:51,Elijah,MARC,8280,Quals match,42,Blue-3,p,1,1,0,0,1,0,0,0,3,2,0,0,0,0,1,0,12,2,,,0,,13,35,48,5,1,,8280◆42
+8/17/2025 8:09:19,Amogh,MARC,862,Quals match,42,Blue-1,o,1,2,0,0,1,0,0,0,2,3,0,0,1,0,2,0,2.1,2,,,0,,20,28,48,5,3,,862◆42
+8/17/2025 8:09:26,Meera,MARC,5144,Quals match,42,Blue-2,c,1,1,0,0,0,0,0,0,3,2,0,1,0,0,0,0,2,0,,,0,,10,27,37,6,0,,5144◆42
+8/17/2025 8:09:39,aditi,MARC,226,Quals match,42,Red-3,p,1,3,0,0,0,0,0,0,3,4,0,0,1,0,2,0,12,4,,,0,spectacular,24,47,71,7,3,,226◆42
+8/17/2025 8:20:20,Elijah,MARC,9992,Quals match,43,Blue-3,p,1,3,0,0,0,0,0,0,1,5,0,0,0,0,0,1,2,2,,,0,,24,27,51,6,0,,9992◆43
+8/17/2025 8:20:25,aditi,MARC,6120,Quals match,43,Red-3,c,1,1,0,0,0,0,0,0,0,7,0,0,0,0,1,0,12,2,,,0,,10,40,50,7,1,,6120◆43
+8/17/2025 8:20:54,Amogh,MARC,2834,Quals match,43,Blue-1,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,2,2,,0,Did nothing for a while,3,12,15,0,0,,2834◆43
+8/17/2025 8:21:23,Meera,MARC,2832,Quals match,43,Blue-2,o,1,1,0,0,0,0,0,0,1,3,3,0,2,1,4,0,2.1,2,,,0,,10,42,52,7,6,,2832◆43
+8/17/2025 8:29:45,Amogh,MARC,4381,Quals match,44,Blue-1,o,1,1,0,0,0,0,0,0,3,3,0,2,0,0,2,0,12,2,,,0,,10,43,53,8,2,,4381◆44
+8/17/2025 8:29:45,aditi ,MARC,6861,Quals match,44,Red-3,c,1,0,0,0,0,0,0,0,2,5,0,0,0,0,0,0,12,2,,,0,,3,42,45,7,0,,6861◆44
+8/17/2025 8:29:47,Elijah,MARC,9996,Quals match,44,Blue-3,p,1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,2,2,,,0,Very good at saving bots stuck on algae,3,37,40,7,0,,9996◆44
+8/17/2025 8:30:24,Meera,MARC,4422,Quals match,44,Blue-2,c,1,1,0,0,0,0,0,1,0,2,0,0,0,2,2,0,12,0,,,0,Almost got stuck on algae and took extremely long time to get coral from station they did not know what they were doing this time ,10,32,42,2,2,,4422◆44
+8/17/2025 8:39:34,Meera,MARC,862,Quals match,45,Blue-2,o,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2.1,2,,,0,,0,27,27,5,0,,862◆45
+8/17/2025 8:39:45,Elijah,MARC,6081,Quals match,45,Blue-3,c,1,0,0,0,1,1,0,2,0,0,0,0,9,0,4,0,2.1,2,,,1,Good alliance partner,10,38,48,0,13,,6081◆45
+8/17/2025 8:39:51,Amogh,MARC,9993,Quals match,45,Blue-1,p,1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,2,0,,,0,,3,8,11,3,0,,9993◆45
+8/17/2025 8:40:01,aditi,MARC,8373,Quals match,45,Red-3,o,1,1,0,0,0,0,0,0,5,0,2,1,0,0,2,0,0,2,,,0,,10,33,43,8,2,,8373◆45
+8/17/2025 8:48:19,aditi,MARC,4395,Quals match,46,Red-3,o,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,,0,,3,2,5,0,0,,4395◆46
+8/17/2025 8:48:22,Elijah,MARC,2832,Quals match,46,Blue-3,p,1,2,0,0,0,0,0,0,2,0,0,0,4,0,4,0,2,2,,,0,Got a coral stuck in their elevator,17,28,45,2,8,,2832◆46
+8/17/2025 8:48:30,Amogh,MARC,5144,Quals match,46,Blue-1,c,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2,2,,,0,,3,27,30,5,0,,5144◆46
+8/17/2025 8:49:11,Meera,MARC,6570,Quals match,46,Blue-2,o,1,0,0,1,0,0,0,0,0,3,0,0,0,0,2,0,12,0,,,0,,7,24,31,3,2,,6570◆46
+8/17/2025 8:56:08,Elijah,MARC,4422,Quals match,47,Blue-3,o,1,2,0,0,0,0,0,0,3,0,0,0,1,0,1,1,12,2,,,0,,17,31,48,3,2,,4422◆47
+8/17/2025 8:56:27,Amogh,MARC,9996,Quals match,47,Blue-1,p,1,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,2,2,,,0,,3,16,19,7,0,,9996◆47
+8/17/2025 8:56:45,Meera,MARC,6081,Quals match,47,Blue-2,c,1,0,0,0,0,1,0,2,1,0,0,1,7,0,3,0,12,2,,,0,Good with algae scored a ton,7,47,54,2,10,,6081◆47
+8/17/2025 8:57:51,aditi,MARC,9993,Quals match,47,Red-3,c,1,0,0,0,0,0,0,0,0,0,0,1,0,2,0,0,2,2,,,0,,3,16,19,1,0,,9993◆47
+8/17/2025 9:05:39,Elijah,MARC,862,Quals match,48,Blue-3,o,1,1,0,0,1,0,0,1,5,0,0,0,0,0,0,0,12,2,,,0,,13,37,50,5,0,,862◆48
+8/17/2025 9:05:39,Meera,MARC,226,Quals match,48,Blue-2,p,1,1,0,0,0,0,0,0,0,6,1,1,2,0,2,0,12,2,,,0,Yippee we didn’t die!!,10,49,59,8,4,,226◆48
+8/17/2025 9:05:51,Amogh,MARC,5144,Quals match,48,Blue-1,c,1,1,0,0,0,0,0,0,3,0,3,2,0,0,0,0,2,2,,,0,,10,30,40,8,0,,5144◆48
+8/17/2025 9:05:58,aditi,MARC,8373,Quals match,48,Red-3,o,1,1,0,0,0,0,0,0,3,2,0,0,3,0,3,0,2,2,,,0,,10,37,47,5,6,,8373◆48
+8/17/2025 9:13:52,Elijah,MARC,4381,Quals match,49,Blue-3,c,1,0,0,0,0,1,0,1,0,3,0,0,0,0,0,0,2,2,,,0,Broke,7,14,21,3,0,,4381◆49
+8/17/2025 9:14:16,Amogh,MARC,3538,Quals match,49,Blue-1,o,1,1,0,0,0,0,0,0,5,4,1,1,0,2,2,0,0,2,,,0,,10,58,68,11,2,,3538◆49
+8/17/2025 9:14:30,Meera,MARC,2834,Quals match,49,Blue-2,p,1,0,0,0,0,0,0,0,6,2,0,0,0,0,1,0,2.1,2,,,0,Slippy slidy unscored a coraly ,3,40,43,8,1,,2834◆49
+8/17/2025 9:20:37,Ayaan Amin,MARC,4395,Quals match,31,Red-1,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,,0,,3,2,5,0,0,,4395◆31
+8/17/2025 9:37:33,Ayaan Amin,MARC,9996,Quals match,32,Red-1,c,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,2,,,,0,,3,10,13,4,0,,9996◆32
+8/17/2025 9:46:50,Ayaan Amin,MARC,6081,Quals match,33,Red-1,c,0,0,0,0,0,1,0,2,0,3,1,0,3,2,3,0,12,2,,,0,Descored a piece,4,51,55,4,6,,6081◆33
+8/17/2025 9:56:12,Ayaan Amin,MARC,6861,Quals match,34,Red-1,o,1,0,0,0,0,0,0,0,3,1,0,0,0,0,0,1,2,2,,,0,,3,21,24,4,0,,6861◆34
+8/17/2025 10:04:51,Ayaan Amin,MARC,6570,Quals match,35,Red-1,c,1,0,0,0,0,0,0,1,0,4,0,0,0,0,1,0,12,2,,,0,,3,28,31,4,1,,6570◆35
+8/17/2025 10:14:45,Ayaan Amin,MARC,4422,Quals match,36,Red-1,p,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,1,1,Robot tipped over in auton,3,0,3,0,0,,4422◆36
+8/17/2025 10:23:23,Ayaan Amin,MARC,6570,Quals match,37,Red-1,p,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,12,2,,,0,,0,28,28,4,0,,6570◆37
+8/17/2025 10:32:17,Ayaan Amin,MARC,226,Quals match,38,Red-1,o,1,2,0,0,0,0,0,0,2,1,2,0,0,3,3,0,2.1,2,,,0,Our robot,17,40,57,5,3,,226◆38
+8/17/2025 10:23:23,Ayaan Amin,MARC,6570,Quals match,37,Red-1,p,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,12,2,,,0,,0,28,28,4,0,,6570◆37
+8/17/2025 10:32:17,Ayaan Amin,MARC,226,Quals match,38,Red-1,o,1,2,0,0,0,0,0,0,2,1,2,0,0,3,3,0,2.1,2,,,0,Our robot,17,40,57,5,3,,226◆38
+8/17/2025 10:44:04,Ayaan Amin,MARC,862,Quals match,39,Red-1,o,1,1,0,0,0,0,0,0,5,0,0,0,0,0,0,0,2.1,0,,,0,Took a while to align their last L4 (~15 seconds),10,27,37,5,0,,862◆39
+8/17/2025 10:51:57,Ayaan Amin,MARC,9996,Quals match,40,Red-1,c,1,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,2,2,,,0,,3,14,17,6,0,,9996◆40
+8/17/2025 11:00:36,Agastya,MARC,8373,Quals match,41,Red-2,c,1,0,0,0,0,0,0,0,3,4,4,0,0,0,0,0,2,4,,,0,,3,45,48,11,0,,8373◆41
+8/17/2025 11:02:46,Ayaan Amin,MARC,3538,Quals match,41,Red-1,o,1,1,0,0,0,0,0,0,2,2,1,0,0,2,2,0,2,0,,,0,Wasted a lot of time trying to score L3 on a blocked reef (algae was still on it),10,35,45,5,2,,3538◆41
+8/17/2025 11:10:06,Ayaan Amin,MARC,7196,Quals match,42,Red-1,c,1,0,0,0,0,0,0,0,4,2,0,0,0,0,0,0,2.1,4,,,0,6570 slowed down this robot’s cycles by a lot (alliance not opponent so it’s not defense),3,30,33,6,0,,7196◆42
+8/17/2025 11:10:44,Agastya,MARC,6570,Quals match,42,Red-2,o,1,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,2,2,,,0,,3,22,25,5,3,,6570◆42
+8/17/2025 11:20:33,Agasya,MARC,4395,Quals match,43,Red-2,c,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,,0,,3,2,5,0,0,,4395◆43
+8/17/2025 11:21:19,Ayaan Amin,MARC,4395,Quals match,43,Red-1,p,1,3,0,0,0,0,0,0,7,1,1,0,2,0,2,1,2,4,,,0,Super fast algae and coral cycles even with defense being played on them,24,52,76,9,4,,4395◆43
+8/17/2025 11:29:58,Ayaan Amin,MARC,6570,Quals match,44,Red-1,o,1,0,0,1,0,0,0,0,0,0,4,0,0,0,2,0,12,2,,,0,,7,24,31,4,2,,6570◆44
