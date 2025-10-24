@@ -38,6 +38,7 @@ document.addEventListener('keydown', function (e) {
     if (teamNumber && !hiddenTeams.includes(teamNumber)) {
       hiddenTeams.push(teamNumber);
       hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+      saveHiddenTeams();
       renderHiddenTeamsList();
       renderHiddenTeamsListRanking();
       applyFilters();
@@ -54,6 +55,47 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
+function updatePersistentNumpadBox(text = '') {
+  const el = document.getElementById('numpadBufferBox');
+  if (!el) return;
+  if (!text) {
+    el.textContent = 'numpad:';
+    el.classList.add('empty');
+    el.classList.remove('small');
+    return;
+  }
+  el.classList.remove('empty');
+  el.textContent = text;
+  if (text.length > 8) el.classList.add('small'); else el.classList.remove('small');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updatePersistentNumpadBox('');
+});
+
+(function () {
+  let tick = null;
+  document.addEventListener('keydown', (e) => {
+    const code = e.code || '';
+    const isNumpadDigit = code.startsWith('Numpad') && /Numpad[0-9]/.test(code);
+    const isNumpadEnter = code === 'NumpadEnter' || (e.key === 'Enter' && e.location === 3);
+    const isNumpadRelated = isNumpadDigit || isNumpadEnter || e.key === 'Escape' || e.key === 'Backspace' || (e.location === 3 && /^[0-9]$/.test(e.key));
+
+    if (!isNumpadRelated) return;
+
+    if (tick) clearTimeout(tick);
+    tick = setTimeout(() => {
+      try {
+        const buf = typeof numpadBuffer !== 'undefined' ? String(numpadBuffer || '') : '';
+        updatePersistentNumpadBox(buf);
+      } catch (err) {
+        updatePersistentNumpadBox('');
+      }
+    }, 0);
+  });
+
+  window._updateNumpadBufferBox = updatePersistentNumpadBox;
+})();
 
 function updateRankingTableColumns() {
   const alwaysShow = [0, 1, 2];
@@ -388,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function renderHiddenTeamsListRanking() {
   const list = document.getElementById('hideTeamListRanking');
   const container = document.getElementById('hideTeamListContainerRanking');
+  if (!list || !container) return;
   list.innerHTML = '';
 
   hiddenTeams.forEach(team => {
@@ -417,6 +460,7 @@ function renderHiddenTeamsListRanking() {
 
     deleteButton.addEventListener('click', (e) => {
       hiddenTeams = hiddenTeams.filter(t => t !== team);
+      saveHiddenTeams();
       renderHiddenTeamsList();
       renderHiddenTeamsListRanking();
       applyFilters();
@@ -428,7 +472,24 @@ function renderHiddenTeamsListRanking() {
     list.appendChild(listItem);
   });
 
-  container.style.height = list.children.length > 0 ? `${list.scrollHeight + 10}px` : 'auto';
+  const itemHeight = 42;
+  const maxVisibleItems = 8;
+  container.style.transition = 'max-height 0.20s ease, height 0.20s ease';
+  if (hiddenTeams.length === 0) {
+    container.style.maxHeight = '0px';
+    container.style.overflowY = 'hidden';
+  } else if (hiddenTeams.length <= maxVisibleItems) {
+    container.style.maxHeight = `${hiddenTeams.length * itemHeight}px`;
+    container.style.overflowY = 'hidden';
+  } else {
+    container.style.maxHeight = `${maxVisibleItems * itemHeight}px`;
+    container.style.overflowY = 'auto';
+  }
+
+  setTimeout(() => {
+    container.scrollTop = container.scrollHeight;
+  }, 40);
+
   applyFilters();
   updateRankingTableColumns();
 }
@@ -440,6 +501,7 @@ document.getElementById('addHideTeamButtonRanking').addEventListener('click', fu
   if (!hiddenTeams.includes(teamNumber)) {
     hiddenTeams.push(teamNumber);
     hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+    saveHiddenTeams();
     renderHiddenTeamsList();
     renderHiddenTeamsListRanking();
     applyFilters();
@@ -461,9 +523,13 @@ document.getElementById('resetHideTeamButtonRanking').addEventListener('click', 
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  loadHiddenTeams();
+  renderHiddenTeamsList();
   renderHiddenTeamsListRanking();
+  applyFilters();
   renderRankingTable();
-
+  updateRankingTableColumns();
+  renderIsolatedTeamsListRanking();
 });
 
 document.getElementById('hideTeamInputRanking').addEventListener('keydown', function (e) {
@@ -534,7 +600,7 @@ const reliabilityMetrics = [
 let pitScoutingData = [];
 let tbaClimbData = {};
 let coralMismatchData = [];
-let hiddenTeams = [];
+let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 let showHiddenTeamsInFilter = false;
 let isolatedTeams = [];
 let isIsolated = false;
@@ -542,6 +608,15 @@ let highlightedOverviewTeam = null;
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
 let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
+
+function saveHiddenTeams() {
+  localStorage.setItem('hiddenTeams', JSON.stringify(hiddenTeams));
+}
+
+function loadHiddenTeams() {
+  hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
+}
+
 let isBoxPlot = true;
 
 async function handleDataUpload(e) {
@@ -892,6 +967,18 @@ function showTab(event, tabId) {
       title.textContent = "Strategist's View";
       btn.textContent = "Switch to Targeted Scouting";
     }
+  }
+
+    try {
+    if (typeof renderHiddenTeamsList === 'function') renderHiddenTeamsList();
+  } catch (err) {}
+  try {
+    if (typeof renderHiddenTeamsListRanking === 'function') renderHiddenTeamsListRanking();
+  } catch (err) {}
+
+  if (tabId === 'ranking') {
+    try { renderRankingTable(); } catch (e) {}
+    try { updateRankingTableColumns(); } catch (e) {}
   }
 }
 
@@ -4215,16 +4302,17 @@ async function addHiddenTeam(e) {
   if (!hiddenTeams.includes(teamNumber)) {
     hiddenTeams.push(teamNumber);
     hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+    saveHiddenTeams();
     renderHiddenTeamsList();
     input.value = '';
   } else {
     alert(`Team ${teamNumber} is already in the list.`);
   }
 }
-
 function renderHiddenTeamsList() {
   const list = document.getElementById('hideTeamList');
   const container = document.getElementById('hideTeamListContainer');
+  if (!list || !container) return;
   list.innerHTML = '';
 
   hiddenTeams.forEach(team => {
@@ -4253,30 +4341,36 @@ function renderHiddenTeamsList() {
     deleteButton.style.cursor = 'pointer';
 
     deleteButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
       hiddenTeams = hiddenTeams.filter(t => t !== team);
+      saveHiddenTeams();
       renderHiddenTeamsList();
+      renderHiddenTeamsListRanking();
       applyFilters();
+      updateRankingTableColumns();
+      renderRankingTable();
     });
 
     listItem.appendChild(deleteButton);
     list.appendChild(listItem);
   });
 
-  const maxVisibleItems = 5;
   const itemHeight = 42; 
-  const visibleItems = Math.min(hiddenTeams.length, maxVisibleItems);
-  container.style.maxHeight = `${itemHeight * visibleItems}px`;
-  container.style.overflowY = hiddenTeams.length > maxVisibleItems ? 'auto' : 'hidden';
+  const maxVisibleItems = 8; 
+  container.style.transition = 'max-height 0.20s ease, height 0.20s ease';
+  if (hiddenTeams.length === 0) {
+    container.style.maxHeight = '0px';
+    container.style.overflowY = 'hidden';
+  } else if (hiddenTeams.length <= maxVisibleItems) {
+    container.style.maxHeight = `${hiddenTeams.length * itemHeight}px`;
+    container.style.overflowY = 'hidden';
+  } else {
+    container.style.maxHeight = `${maxVisibleItems * itemHeight}px`;
+    container.style.overflowY = 'auto';
+  }
 
-  container.style.scrollbarWidth = 'thin'; 
-  container.style.scrollbarColor = '#ff5c5c #1C1E21';
-  container.style.cssText += `
-    &::-webkit-scrollbar { width: 6px; }
-    &::-webkit-scrollbar-thumb { background-color: #ff5c5c; border-radius: 3px; }
-    &::-webkit-scrollbar-track { background: #1C1E21; }
-  `;
+  setTimeout(() => {
+    container.scrollTop = container.scrollHeight;
+  }, 40);
 
   applyFilters();
 }
@@ -4286,6 +4380,7 @@ async function resetHiddenTeams(e) {
   e.preventDefault();
   e.stopPropagation();
   hiddenTeams = [];
+  saveHiddenTeams();
   renderHiddenTeamsList();
   applyFilters();
 };
