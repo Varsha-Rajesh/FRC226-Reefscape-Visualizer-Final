@@ -1,3 +1,91 @@
+/*-----VARIABLES----*/
+
+// Charts
+const charts = {
+  autoCoral: null,
+  autoAlgae: null,
+  teleCoral: null,
+  teleAlgae: null,
+  endGame: null,
+  overviewStackedChart: null,
+  coralCyclesChart: null,
+  algaeCyclesChart: null,
+  reliabilityChartsArea: null,
+};
+
+let pitScoutingData = [];
+let tbaClimbData = {};
+let coralMismatchData = [];
+let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
+let showHiddenTeamsInFilter = false;
+let isolatedTeams = [];
+let isIsolated = false;
+let highlightedOverviewTeam = null;
+let csvText = localStorage.getItem('csvText') || "";
+let pitCsvText = localStorage.getItem('pitCsvText') || "";
+let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
+
+let isBoxPlot = true;
+
+/*-----RELIABILITY CHARTS-----*/
+
+if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
+  Chart.register(window.ChartBoxplot);
+} else {
+  console.error('Chart.js or Boxplot plugin not loaded');
+}
+
+Chart.register({
+  id: 'boxplot',
+  beforeDraw: function (chart) {
+  }
+});
+
+const reliabilityMetrics = [
+  { id: 'reliabilityTotalPoints', label: 'Total Points', color: '#3ED098', getValue: row => parseFloat(row['Total Score'] || 0) },
+  { id: 'reliabilityAutoPoints', label: 'Auto Points', color: '#51E7CF', getValue: row => parseFloat(row['Auton Score'] || 0) },
+  { id: 'reliabilityTelePoints', label: 'Tele Points', color: '#3ecdd0', getValue: row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)) },
+  {
+    id: 'reliabilityTotalCycles', label: 'Total Cycles', color: '#cf8ffc', getValue: row =>
+    (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
+      parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  },
+  {
+    id: 'reliabilityTotalCoralCycles', label: 'Total Coral Cycles', color: '#ff83fa', getValue: row =>
+      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
+  },
+  { id: 'reliabilityL4Cycles', label: 'L4 Cycles', color: '#ff8bfc', getValue: row => parseInt(row['L4'] || 0) },
+  { id: 'reliabilityL3Cycles', label: 'L3 Cycles', color: '#ed0cef', getValue: row => parseInt(row['L3'] || 0) },
+  { id: 'reliabilityL2Cycles', label: 'L2 Cycles', color: '#BF02ff', getValue: row => parseInt(row['L2'] || 0) },
+  { id: 'reliabilityL1Cycles', label: 'L1 Cycles', color: '#8105d8', getValue: row => parseInt(row['L1'] || 0) },
+  {
+    id: 'reliabilityTotalAlgaeCycles', label: 'Total Algae Cycles', color: '#006fff', getValue: row =>
+      (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  },
+  { id: 'reliabilityBargeCycles', label: 'Barge Cycles', color: '#3498db', getValue: row => parseInt(row['Algae in Net'] || 0) },
+  { id: 'reliabilityProcessorCycles', label: 'Processor Cycles', color: '#14c7de', getValue: row => parseInt(row['Algae in Processor'] || 0) }
+];
+
+function toggleEPAAvg(containerId, show) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const charts = container.querySelectorAll('canvas');
+
+  charts.forEach(canvas => {
+    const chart = Chart.getChart(canvas);
+    if (chart) {
+      chart.data.datasets.forEach((dataset, i) => {
+        if (dataset.label === 'Average') {
+          chart.setDatasetVisibility(i, show);
+        }
+      });
+      chart.update('none');
+    }
+  });
+}
+
+/*-----RANKINGS-----*/
 function getGradientColor(value, distribution) {
   if (isNaN(value)) return 'black';
 
@@ -23,79 +111,6 @@ function getGradientColor(value, distribution) {
   }
   return `rgb(${r},${g},${b})`;
 }
-
-let numpadBuffer = '';
-
-document.addEventListener('keydown', function (e) {
-  if (e.location === 3 && e.key >= '0' && e.key <= '9') {
-    numpadBuffer += e.key;
-    e.preventDefault();
-  }
-
-  if (e.key === 'Enter' && e.location === 3){
-    const teamNumber = numpadBuffer.trim();
-
-    if (teamNumber && !hiddenTeams.includes(teamNumber)) {
-      hiddenTeams.push(teamNumber);
-      hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
-      saveHiddenTeams();
-      renderHiddenTeamsList();
-      renderHiddenTeamsListRanking();
-      applyFilters();
-      updateRankingTableColumns();
-      renderRankingTable();
-    }
-
-    numpadBuffer = '';
-    e.preventDefault();
-  }
-
-  if (e.key === 'Escape' || e.key === 'Backspace') {
-    numpadBuffer = '';
-  }
-});
-
-function updatePersistentNumpadBox(text = '') {
-  const el = document.getElementById('numpadBufferBox');
-  if (!el) return;
-  if (!text) {
-    el.textContent = 'numpad:';
-    el.classList.add('empty');
-    el.classList.remove('small');
-    return;
-  }
-  el.classList.remove('empty');
-  el.textContent = text;
-  if (text.length > 8) el.classList.add('small'); else el.classList.remove('small');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  updatePersistentNumpadBox('');
-});
-
-(function () {
-  let tick = null;
-  document.addEventListener('keydown', (e) => {
-    const code = e.code || '';
-    const isNumpadDigit = code.startsWith('Numpad') && /Numpad[0-9]/.test(code);
-    const isNumpadEnter = code === 'NumpadEnter' || (e.key === 'Enter' && e.location === 3);
-    const isNumpadRelated = isNumpadDigit || isNumpadEnter || e.key === 'Escape' || e.key === 'Backspace' || (e.location === 3 && /^[0-9]$/.test(e.key));
-
-    if (!isNumpadRelated) return;
-
-    if (tick) clearTimeout(tick);
-    tick = setTimeout(() => {
-      try {
-        const buf = typeof numpadBuffer !== 'undefined' ? String(numpadBuffer || '') : '';
-        updatePersistentNumpadBox(buf);
-      } catch (err) {
-        updatePersistentNumpadBox('');
-      }
-    }, 0);
-  });
-
-  window._updateNumpadBufferBox = updatePersistentNumpadBox;
-})();
 
 function updateRankingTableColumns() {
   const alwaysShow = [0, 1, 2];
@@ -546,68 +561,6 @@ document.querySelectorAll('.tab').forEach(tab => {
     }
   });
 });
-if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
-  Chart.register(window.ChartBoxplot);
-} else {
-  console.error('Chart.js or Boxplot plugin not loaded');
-}
-
-/*-----VARIABLES----*/
-
-const charts = {
-  autoCoral: null,
-  autoAlgae: null,
-  teleCoral: null,
-  teleAlgae: null,
-  endGame: null,
-  overviewStackedChart: null,
-  coralCyclesChart: null,
-  algaeCyclesChart: null,
-  reliabilityChartsArea: null,
-};
-
-Chart.register({
-  id: 'boxplot',
-  beforeDraw: function (chart) {
-  }
-});
-
-const reliabilityMetrics = [
-  { id: 'reliabilityTotalPoints', label: 'Total Points', color: '#3ED098', getValue: row => parseFloat(row['Total Score'] || 0) },
-  { id: 'reliabilityAutoPoints', label: 'Auto Points', color: '#51E7CF', getValue: row => parseFloat(row['Auton Score'] || 0) },
-  { id: 'reliabilityTelePoints', label: 'Tele Points', color: '#3ecdd0', getValue: row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)) },
-  {
-    id: 'reliabilityTotalCycles', label: 'Total Cycles', color: '#cf8ffc', getValue: row =>
-    (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
-      parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
-  },
-  {
-    id: 'reliabilityTotalCoralCycles', label: 'Total Coral Cycles', color: '#ff83fa', getValue: row =>
-      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
-  },
-  { id: 'reliabilityL4Cycles', label: 'L4 Cycles', color: '#ff8bfc', getValue: row => parseInt(row['L4'] || 0) },
-  { id: 'reliabilityL3Cycles', label: 'L3 Cycles', color: '#ed0cef', getValue: row => parseInt(row['L3'] || 0) },
-  { id: 'reliabilityL2Cycles', label: 'L2 Cycles', color: '#BF02ff', getValue: row => parseInt(row['L2'] || 0) },
-  { id: 'reliabilityL1Cycles', label: 'L1 Cycles', color: '#8105d8', getValue: row => parseInt(row['L1'] || 0) },
-  {
-    id: 'reliabilityTotalAlgaeCycles', label: 'Total Algae Cycles', color: '#006fff', getValue: row =>
-      (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
-  },
-  { id: 'reliabilityBargeCycles', label: 'Barge Cycles', color: '#3498db', getValue: row => parseInt(row['Algae in Net'] || 0) },
-  { id: 'reliabilityProcessorCycles', label: 'Processor Cycles', color: '#14c7de', getValue: row => parseInt(row['Algae in Processor'] || 0) }
-];
-
-let pitScoutingData = [];
-let tbaClimbData = {};
-let coralMismatchData = [];
-let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
-let showHiddenTeamsInFilter = false;
-let isolatedTeams = [];
-let isIsolated = false;
-let highlightedOverviewTeam = null;
-let csvText = localStorage.getItem('csvText') || "";
-let pitCsvText = localStorage.getItem('pitCsvText') || "";
-let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
 
 function saveHiddenTeams() {
   localStorage.setItem('hiddenTeams', JSON.stringify(hiddenTeams));
@@ -617,7 +570,87 @@ function loadHiddenTeams() {
   hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 }
 
-let isBoxPlot = true;
+/*-----NUMPAD-----*/
+
+let numpadBuffer = '';
+
+document.addEventListener('keydown', function (e) {
+  if (e.location === 3 && e.key >= '0' && e.key <= '9') {
+    numpadBuffer += e.key;
+    e.preventDefault();
+  }
+
+  if (e.key === 'Enter' && e.location === 3){
+    const teamNumber = numpadBuffer.trim();
+
+    if (teamNumber && !hiddenTeams.includes(teamNumber)) {
+      hiddenTeams.push(teamNumber);
+      hiddenTeams.sort((a, b) => parseInt(a) - parseInt(b));
+      saveHiddenTeams();
+      renderHiddenTeamsList();
+      renderHiddenTeamsListRanking();
+      applyFilters();
+      updateRankingTableColumns();
+      renderRankingTable();
+    }
+
+    numpadBuffer = '';
+    e.preventDefault();
+  }
+
+  if (e.key === 'Escape' || e.key === 'Backspace') {
+    numpadBuffer = '';
+  }
+});
+
+function updatePersistentNumpadBox(text = '') {
+  const el = document.getElementById('numpadBufferBox');
+  if (!el) return;
+  if (!text) {
+    el.textContent = 'numpad:';
+    el.classList.add('empty');
+    el.classList.remove('small');
+    return;
+  }
+  el.classList.remove('empty');
+  el.textContent = text;
+  if (text.length > 8) el.classList.add('small'); else el.classList.remove('small');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updatePersistentNumpadBox('');
+});
+
+(function () {
+  let tick = null;
+  document.addEventListener('keydown', (e) => {
+    const code = e.code || '';
+    const isNumpadDigit = code.startsWith('Numpad') && /Numpad[0-9]/.test(code);
+    const isNumpadEnter = code === 'NumpadEnter' || (e.key === 'Enter' && e.location === 3);
+    const isNumpadRelated = isNumpadDigit || isNumpadEnter || e.key === 'Escape' || e.key === 'Backspace' || (e.location === 3 && /^[0-9]$/.test(e.key));
+
+    if (!isNumpadRelated) return;
+
+    if (tick) clearTimeout(tick);
+    tick = setTimeout(() => {
+      try {
+        const buf = typeof numpadBuffer !== 'undefined' ? String(numpadBuffer || '') : '';
+        updatePersistentNumpadBox(buf);
+      } catch (err) {
+        updatePersistentNumpadBox('');
+      }
+    }, 0);
+  });
+
+  window._updateNumpadBufferBox = updatePersistentNumpadBox;
+})();
+
+
+/*-----FILE UPLOADS-----*/
+
+function parseCSV() {
+  return Papa.parse(csvText, { header: true });
+}
 
 async function handleDataUpload(e) {
   e.preventDefault();
@@ -712,6 +745,224 @@ function deleteFile(type) {
     document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
   }
 
+}
+
+async function uploadFile(fileInputId, statusId, uploadType) {
+  const fileInput = document.getElementById(fileInputId);
+  const statusEl = document.getElementById(statusId);
+  const file = fileInput.files[0];
+
+  if (!file || !file.name.endsWith(".csv")) {
+    statusEl.textContent = "Please upload a valid .csv file.";
+    return;
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      csvText = e.target.result;
+      localStorage.setItem('csvText', csvText);
+      statusEl.textContent = "Event CSV uploaded!";
+      renderRankingTable();
+      updateRankingTableColumns();
+      resolve();
+    };
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
+}
+function getLatestMatchNumber(data) {
+  const matches = data.map(row => parseInt(row['Match'])).filter(n => !isNaN(n));
+  return matches.length > 0 ? Math.max(...matches) : null;
+}
+async function handleDataUpload(e) {
+  e.preventDefault();
+  uploadFile('dataFile', 'statusData', 'csvData').then(() => {
+    const parsedData = parseCSV();
+    renderOverviewStackedChart(parsedData.data, 'all');
+    renderCoralCyclesChart(parsedData.data);
+    renderAlgaeCyclesChart(parsedData.data);
+    renderRescoutTable(parsedData.data);
+    updateDefenseRankings(parsedData.data);
+    applyFilters();
+
+    document.getElementById('rescoutFilter').value = 'all';
+
+    const latestMatch = getLatestMatchNumber(parsedData.data);
+    if (latestMatch) {
+      document.getElementById('latestMatchInfoSidebar').textContent = `Data up till Q${latestMatch}`;
+    }
+  });
+}
+async function handlePitUpload(fileInputId, statusId) {
+  const fileInput = document.getElementById(fileInputId);
+  const statusEl = document.getElementById(statusId);
+  const file = fileInput.files[0];
+
+  if (!file || !file.name.endsWith(".csv")) {
+    statusEl.textContent = "Please upload a valid .csv file.";
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('dataFile', file);
+    formData.append('uploadType', 'csvPitScouting');
+
+    const text = await file.text();
+    const result = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transform: (value, header) => {
+        const normalizedHeader = header.trim();
+        if (normalizedHeader === 'Ground Barge' || normalizedHeader === 'Ground Processor') {
+          return value === '1';
+        }
+        return value;
+      }
+    });
+
+    pitScoutingData = result.data.filter(row => {
+      return row['Team No.'] &&
+        (row['Ground Barge'] !== undefined) &&
+        (row['Ground Processor'] !== undefined);
+    });
+
+    statusEl.textContent = `Successfully loaded pit data for ${pitScoutingData.length} teams`;
+
+    const currentTeam = document.getElementById('teamSearch').value.trim();
+    if (currentTeam) {
+      const teamData = filterTeamData(currentTeam);
+      if (teamData.length > 0) {
+        renderTeamStatistics(teamData, pitScoutingData);
+      }
+    }
+
+    const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
+    const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
+
+    if (comparisonTeam1) {
+      const team1Data = filterTeamData(comparisonTeam1);
+      if (team1Data.length > 0) {
+        renderComparisonTeamStatistics(team1Data, pitScoutingData, 1);
+      }
+    }
+
+    if (comparisonTeam2) {
+      const team2Data = filterTeamData(comparisonTeam2);
+      if (team2Data.length > 0) {
+        renderComparisonTeamStatistics(team2Data, pitScoutingData, 2);
+      }
+    }
+
+    applyFilters();
+  } catch (error) {
+    statusEl.textContent = "Error: " + error.message;
+    pitScoutingData = [];
+  }
+}
+async function deleteFile(fileType) {
+  let filename, statusId, fileInputId;
+
+  if (fileType === 'dataFile') {
+    filename = 'data.csv';
+    statusId = 'statusData';
+    fileInputId = 'dataFile';
+  } else if (fileType === 'pitFile') {
+    filename = 'pit_scouting.csv';
+    statusId = 'statusPit';
+    fileInputId = 'pitFile';
+  } else if (fileType === 'scheduleFile') {
+    filename = 'schedule.csv';
+    statusId = 'statusSchedule';
+    fileInputId = 'scheduleFile';
+  }
+
+  try {
+    if (filename) {
+      await fetch(`/uploads/${filename}`, {
+        method: 'DELETE'
+      });
+    }
+
+    document.getElementById(fileInputId).value = '';
+    document.getElementById(statusId).textContent = 'File deleted successfully';
+
+    if (fileType === 'dataFile') {
+      clearAllCharts();
+      clearRescoutTable();
+    } else if (fileType === 'pitFile') {
+      pitScoutingData = [];
+
+      const currentTeam = document.getElementById('teamSearch').value.trim();
+      if (currentTeam) {
+        const teamData = filterTeamData(currentTeam);
+        if (teamData.length > 0) {
+          renderTeamStatistics(teamData, []);
+        }
+      }
+
+      const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
+      const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
+
+      if (comparisonTeam1) {
+        const team1Data = filterTeamData(comparisonTeam1);
+        if (team1Data.length > 0) {
+          renderComparisonTeamStatistics(team1Data, [], 1);
+        }
+      }
+
+      if (comparisonTeam2) {
+        const team2Data = filterTeamData(comparisonTeam2);
+        if (team2Data.length > 0) {
+          renderComparisonTeamStatistics(team2Data, [], 2);
+        }
+      }
+    } else if (fileType === 'scheduleFile') {
+      scheduleCsvText = "";
+      localStorage.removeItem('scheduleCsvText');
+      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
+      document.getElementById('scheduleFile').value = "";
+      const strategyContent = document.getElementById('strategyContent');
+      if (strategyContent) strategyContent.innerHTML = '';
+      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
+      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
+    }
+  } catch (error) {
+    document.getElementById(fileInputId).value = '';
+    document.getElementById(statusId).textContent = 'File deleted successfully';
+
+    if (fileType === 'dataFile') {
+      clearAllCharts();
+      clearRescoutTable();
+    } else if (fileType === 'pitFile') {
+      pitScoutingData = [];
+    } else if (fileType === 'scheduleFile') {
+      scheduleCsvText = "";
+      localStorage.removeItem('scheduleCsvText');
+      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
+      document.getElementById('scheduleFile').value = "";
+      const strategyContent = document.getElementById('strategyContent');
+      if (strategyContent) strategyContent.innerHTML = '';
+      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
+      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
+    }
+  }
+}
+
+function parseScheduleCSV() {
+  const scheduleText = localStorage.getItem('scheduleCsvText');
+  if (!scheduleText) return { data: [] };
+  try {
+    return Papa.parse(scheduleText, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    });
+  } catch (e) {
+    console.error('Error parsing schedule CSV:', e);
+    return { data: [] };
+  }
 }
 
 /*-----DEFENSE RANKING FUNCTIONS----*/
@@ -885,11 +1136,7 @@ function renderDefenseRankingTable() {
 }
 
 
-/*-----UTILITY FUNCTIONS----*/
-
-function parseCSV() {
-  return Papa.parse(csvText, { header: true });
-}
+/*-----CHART FUNCTIONS----*/
 
 function destroyChart(chartName) {
   if (charts[chartName]) {
@@ -938,6 +1185,54 @@ function getChartOptions(stacked = false, stepSize = 1) {
       }
     }
   };
+}
+
+function clearAllCharts() {
+  if (charts['overviewStackedChart']) {
+    charts['overviewStackedChart'].destroy();
+    charts['overviewStackedChart'] = null;
+  }
+  if (charts['coralCyclesChart']) {
+    charts['coralCyclesChart'].destroy();
+    charts['coralCyclesChart'] = null;
+  }
+  if (charts['algaeCyclesChart']) {
+    charts['algaeCyclesChart'].destroy();
+    charts['algaeCyclesChart'] = null;
+  }
+  if (charts['reliabilityChartsArea']) {
+    charts['reliabilityChartsArea'].destroy();
+    charts['reliabilityChartsArea'] = null;
+  }
+
+  Object.keys(charts).forEach(chartName => {
+    if (charts[chartName]) {
+      charts[chartName].destroy();
+      charts[chartName] = null;
+    }
+  });
+
+  document.getElementById('teamSearch').value = '';
+  document.getElementById('flaggedMatches').innerHTML = '';
+  document.getElementById('scouterComments').innerHTML = '';
+
+  const statElements = [
+    'climbSuccessRate', 'robotDiedRate', 'groundBarge', 'groundProcessor',
+    'averageEPA', 'averageCoral', 'averageAlgae', 'maxCoral', 'maxCoralMatch',
+    'maxAlgae', 'maxAlgaeMatch'
+  ];
+
+  statElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = id.includes('Rate') || id.includes('average') ? '0.00' :
+        id.includes('max') ? '0' :
+          id.includes('ground') ? '❌' : '';
+    }
+  });
+
+  document.getElementById('comparisonSearch1').value = '';
+  document.getElementById('comparisonSearch2').value = '';
 }
 
 
@@ -1121,278 +1416,6 @@ document.getElementById('overviewSearch').addEventListener('keydown', function (
 document.querySelector('.tab[onclick*="defenseRankingInfo"]').addEventListener('click', function () {
   renderDefenseRankingTable();
 });
-
-
-/*-----FILE UPLOAD-----*/
-
-async function uploadFile(fileInputId, statusId, uploadType) {
-  const fileInput = document.getElementById(fileInputId);
-  const statusEl = document.getElementById(statusId);
-  const file = fileInput.files[0];
-
-  if (!file || !file.name.endsWith(".csv")) {
-    statusEl.textContent = "Please upload a valid .csv file.";
-    return;
-  }
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      csvText = e.target.result;
-      localStorage.setItem('csvText', csvText);
-      statusEl.textContent = "Event CSV uploaded!";
-      renderRankingTable();
-      updateRankingTableColumns();
-      resolve();
-    };
-    reader.onerror = reject;
-    reader.readAsText(file);
-  });
-}
-function getLatestMatchNumber(data) {
-  const matches = data.map(row => parseInt(row['Match'])).filter(n => !isNaN(n));
-  return matches.length > 0 ? Math.max(...matches) : null;
-}
-async function handleDataUpload(e) {
-  e.preventDefault();
-  uploadFile('dataFile', 'statusData', 'csvData').then(() => {
-    const parsedData = parseCSV();
-    renderOverviewStackedChart(parsedData.data, 'all');
-    renderCoralCyclesChart(parsedData.data);
-    renderAlgaeCyclesChart(parsedData.data);
-    renderRescoutTable(parsedData.data);
-    updateDefenseRankings(parsedData.data);
-    applyFilters();
-
-    document.getElementById('rescoutFilter').value = 'all';
-
-    const latestMatch = getLatestMatchNumber(parsedData.data);
-    if (latestMatch) {
-      document.getElementById('latestMatchInfoSidebar').textContent = `Data up till Q${latestMatch}`;
-    }
-  });
-}
-async function handlePitUpload(fileInputId, statusId) {
-  const fileInput = document.getElementById(fileInputId);
-  const statusEl = document.getElementById(statusId);
-  const file = fileInput.files[0];
-
-  if (!file || !file.name.endsWith(".csv")) {
-    statusEl.textContent = "Please upload a valid .csv file.";
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append('dataFile', file);
-    formData.append('uploadType', 'csvPitScouting');
-
-    const text = await file.text();
-    const result = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      transform: (value, header) => {
-        const normalizedHeader = header.trim();
-        if (normalizedHeader === 'Ground Barge' || normalizedHeader === 'Ground Processor') {
-          return value === '1';
-        }
-        return value;
-      }
-    });
-
-    pitScoutingData = result.data.filter(row => {
-      return row['Team No.'] &&
-        (row['Ground Barge'] !== undefined) &&
-        (row['Ground Processor'] !== undefined);
-    });
-
-    statusEl.textContent = `Successfully loaded pit data for ${pitScoutingData.length} teams`;
-
-    const currentTeam = document.getElementById('teamSearch').value.trim();
-    if (currentTeam) {
-      const teamData = filterTeamData(currentTeam);
-      if (teamData.length > 0) {
-        renderTeamStatistics(teamData, pitScoutingData);
-      }
-    }
-
-    const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
-    const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
-
-    if (comparisonTeam1) {
-      const team1Data = filterTeamData(comparisonTeam1);
-      if (team1Data.length > 0) {
-        renderComparisonTeamStatistics(team1Data, pitScoutingData, 1);
-      }
-    }
-
-    if (comparisonTeam2) {
-      const team2Data = filterTeamData(comparisonTeam2);
-      if (team2Data.length > 0) {
-        renderComparisonTeamStatistics(team2Data, pitScoutingData, 2);
-      }
-    }
-
-    applyFilters();
-  } catch (error) {
-    statusEl.textContent = "Error: " + error.message;
-    pitScoutingData = [];
-  }
-}
-
-
-
-async function deleteFile(fileType) {
-  let filename, statusId, fileInputId;
-
-  if (fileType === 'dataFile') {
-    filename = 'data.csv';
-    statusId = 'statusData';
-    fileInputId = 'dataFile';
-  } else if (fileType === 'pitFile') {
-    filename = 'pit_scouting.csv';
-    statusId = 'statusPit';
-    fileInputId = 'pitFile';
-  } else if (fileType === 'scheduleFile') {
-    filename = 'schedule.csv';
-    statusId = 'statusSchedule';
-    fileInputId = 'scheduleFile';
-  }
-
-  try {
-    if (filename) {
-      await fetch(`/uploads/${filename}`, {
-        method: 'DELETE'
-      });
-    }
-
-    document.getElementById(fileInputId).value = '';
-    document.getElementById(statusId).textContent = 'File deleted successfully';
-
-    if (fileType === 'dataFile') {
-      clearAllCharts();
-      clearRescoutTable();
-    } else if (fileType === 'pitFile') {
-      pitScoutingData = [];
-
-      const currentTeam = document.getElementById('teamSearch').value.trim();
-      if (currentTeam) {
-        const teamData = filterTeamData(currentTeam);
-        if (teamData.length > 0) {
-          renderTeamStatistics(teamData, []);
-        }
-      }
-
-      const comparisonTeam1 = document.getElementById('comparisonSearch1').value.trim();
-      const comparisonTeam2 = document.getElementById('comparisonSearch2').value.trim();
-
-      if (comparisonTeam1) {
-        const team1Data = filterTeamData(comparisonTeam1);
-        if (team1Data.length > 0) {
-          renderComparisonTeamStatistics(team1Data, [], 1);
-        }
-      }
-
-      if (comparisonTeam2) {
-        const team2Data = filterTeamData(comparisonTeam2);
-        if (team2Data.length > 0) {
-          renderComparisonTeamStatistics(team2Data, [], 2);
-        }
-      }
-    } else if (fileType === 'scheduleFile') {
-      scheduleCsvText = "";
-      localStorage.removeItem('scheduleCsvText');
-      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
-      document.getElementById('scheduleFile').value = "";
-      const strategyContent = document.getElementById('strategyContent');
-      if (strategyContent) strategyContent.innerHTML = '';
-      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
-      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
-    }
-  } catch (error) {
-    document.getElementById(fileInputId).value = '';
-    document.getElementById(statusId).textContent = 'File deleted successfully';
-
-    if (fileType === 'dataFile') {
-      clearAllCharts();
-      clearRescoutTable();
-    } else if (fileType === 'pitFile') {
-      pitScoutingData = [];
-    } else if (fileType === 'scheduleFile') {
-      scheduleCsvText = "";
-      localStorage.removeItem('scheduleCsvText');
-      document.getElementById('statusSchedule').textContent = "File succsessfully deleted";
-      document.getElementById('scheduleFile').value = "";
-      const strategyContent = document.getElementById('strategyContent');
-      if (strategyContent) strategyContent.innerHTML = '';
-      const targetedScoutingContainer = document.getElementById('targetedScoutingContainer');
-      if (targetedScoutingContainer) targetedScoutingContainer.innerHTML = '';
-    }
-  }
-}
-
-function clearAllCharts() {
-  if (charts['overviewStackedChart']) {
-    charts['overviewStackedChart'].destroy();
-    charts['overviewStackedChart'] = null;
-  }
-  if (charts['coralCyclesChart']) {
-    charts['coralCyclesChart'].destroy();
-    charts['coralCyclesChart'] = null;
-  }
-  if (charts['algaeCyclesChart']) {
-    charts['algaeCyclesChart'].destroy();
-    charts['algaeCyclesChart'] = null;
-  }
-  if (charts['reliabilityChartsArea']) {
-    charts['reliabilityChartsArea'].destroy();
-    charts['reliabilityChartsArea'] = null;
-  }
-
-  Object.keys(charts).forEach(chartName => {
-    if (charts[chartName]) {
-      charts[chartName].destroy();
-      charts[chartName] = null;
-    }
-  });
-
-  document.getElementById('teamSearch').value = '';
-  document.getElementById('flaggedMatches').innerHTML = '';
-  document.getElementById('scouterComments').innerHTML = '';
-
-  const statElements = [
-    'climbSuccessRate', 'robotDiedRate', 'groundBarge', 'groundProcessor',
-    'averageEPA', 'averageCoral', 'averageAlgae', 'maxCoral', 'maxCoralMatch',
-    'maxAlgae', 'maxAlgaeMatch'
-  ];
-
-  statElements.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.textContent = id.includes('Rate') || id.includes('average') ? '0.00' :
-        id.includes('max') ? '0' :
-          id.includes('ground') ? '❌' : '';
-    }
-  });
-
-  document.getElementById('comparisonSearch1').value = '';
-  document.getElementById('comparisonSearch2').value = '';
-}
-
-function parseScheduleCSV() {
-  const scheduleText = localStorage.getItem('scheduleCsvText');
-  if (!scheduleText) return { data: [] };
-  try {
-    return Papa.parse(scheduleText, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true
-    });
-  } catch (e) {
-    console.error('Error parsing schedule CSV:', e);
-    return { data: [] };
-  }
-}
 
 /*-----TBA DATA FETCHING-----*/
 
@@ -1833,9 +1856,7 @@ function processTbaAutoLeaveData(matches) {
   return autoLeaveData;
 }
 
-
-/*-----TBA TEAM DATA FETCHING-----*/
-
+ 
 async function fetchTeamData(teamNumber) {
   try {
     const response = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNumber}`, {
@@ -4619,25 +4640,7 @@ function goToIndividualView(teamNumber) {
   searchTeam();
 }
 
-/*-----TOGGLE EPA FILTER----*/
-function toggleEPAAvg(containerId, show) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
 
-  const charts = container.querySelectorAll('canvas');
-
-  charts.forEach(canvas => {
-    const chart = Chart.getChart(canvas);
-    if (chart) {
-      chart.data.datasets.forEach((dataset, i) => {
-        if (dataset.label === 'Average') {
-          chart.setDatasetVisibility(i, show);
-        }
-      });
-      chart.update('none');
-    }
-  });
-}
 /*-----MATCH PREDICTOR FUNCTIONS----*/
 
 function renderMatchPredictor() {
@@ -5657,7 +5660,6 @@ function calculateTeamStatsForSummary(teamData) {
     defenseRank
   };
 }
-
 
 /*-----ALLIANCE COMPARISON FUNCTIONS-----*/
 
