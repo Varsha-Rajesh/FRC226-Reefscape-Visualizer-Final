@@ -101,6 +101,8 @@ const score = {
   total: 'Total Score',
   auto: 'Auton Score',
 }
+
+const team_number = "Team No.";
 /*-----RELIABILITY CHARTS-----*/
 
 if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
@@ -851,8 +853,8 @@ async function handleDataUpload(e) {
   uploadFile('dataFile', 'statusData', 'csvData').then(() => {
     const parsedData = parseCSV();
     renderOverviewStackedChart(parsedData.data, 'all');
-    renderCoralCyclesChart(parsedData.data);
-    renderAlgaeCyclesChart(parsedData.data);
+    renderMechanism1CyclesChart(parsedData.data);
+    renderMechanism2CyclesChart(parsedData.data);
     renderRescoutTable(parsedData.data);
     updateDefenseRankings(parsedData.data);
     applyFilters();
@@ -1037,6 +1039,7 @@ function parseScheduleCSV() {
 }
 
 /*-----DEFENSE RANKING FUNCTIONS----*/
+
 function calculateDefenseRankings(data) {
   const matches = {};
   const teamMatches = {};
@@ -1263,13 +1266,13 @@ function clearAllCharts() {
     charts['overviewStackedChart'].destroy();
     charts['overviewStackedChart'] = null;
   }
-  if (charts['coralCyclesChart']) {
-    charts['coralCyclesChart'].destroy();
-    charts['coralCyclesChart'] = null;
+  if (charts['mechanism1CyclesChart']) {
+    charts['mechanism1CyclesChart'].destroy();
+    charts['mechanism1CyclesChart'] = null;
   }
-  if (charts['algaeCyclesChart']) {
-    charts['algaeCyclesChart'].destroy();
-    charts['algaeCyclesChart'] = null;
+  if (charts['mechanism2CyclesChart']) {
+    charts['mechanism2CyclesChart'].destroy();
+    charts['mechanism2CyclesChart'] = null;
   }
   if (charts['reliabilityChartsArea']) {
     charts['reliabilityChartsArea'].destroy();
@@ -3957,8 +3960,8 @@ function updateOverviewCharts() {
   const parsedData = parseCSV();
   const filter = document.getElementById('chartFilterDropdown').value;
   (parsedData.data, filter);
-  renderCoralCyclesChart(parsedData.data);
-  renderAlgaeCyclesChart(parsedData.data);
+  renderMechanism1CyclesChart(parsedData.data);
+  renderMechanism2CyclesChart(parsedData.data);
   renderOverviewStackedChart(parsedData.data, filter);
 }
 
@@ -3972,11 +3975,11 @@ function renderOverviewStackedChart(data, filter = 'all') {
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!team) return;
 
-    const autonScore = parseFloat(row['Auton Score'] || 0);
-    const totalScore = parseFloat(row['Total Score'] || 0);
+    const autonScore = parseFloat(row[score.auto] || 0);
+    const totalScore = parseFloat(row[score.total] || 0);
     const teleScore = totalScore - autonScore;
 
     if (!teamScores[team]) {
@@ -4124,59 +4127,59 @@ function renderOverviewStackedChart(data, filter = 'all') {
   });
 }
 
-function renderCoralCyclesChart(data) {
-  const ctx = document.getElementById('coralCyclesChart').getContext('2d');
+function renderMechanism1CyclesChart(data) {
+  const ctx = document.getElementById('mechanism1CyclesChart').getContext('2d');
 
-  if (charts['coralCyclesChart']) {
-    charts['coralCyclesChart'].destroy();
+  if (charts['mechanism1CyclesChart']) {
+    charts['mechanism1CyclesChart'].destroy();
   }
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!team) return;
 
-    const teleL1 = parseInt(row['L1'] || 0);
-    const teleL2 = parseInt(row['L2'] || 0);
-    const teleL3 = parseInt(row['L3'] || 0);
-    const teleL4 = parseInt(row['L4'] || 0);
+    const tele_mechanism1_scoringLocation4 = parseInt(row[tele.mechanism1.scoringLocation4] || 0);
+    const tele_mechanism1_scoringLocation3 = parseInt(row[tele.mechanism1.scoringLocation3] || 0);
+    const tele_mechanism1_scoringLocation2 = parseInt(row[tele.mechanism1.scoringLocation2] || 0);
+    const tele_mechanism1_scoringLocation1 = parseInt(row[tele.mechanism1.scoringLocation1] || 0);
 
-    const totalCoralCycles = teleL1 + teleL2 + teleL3 + teleL4;
+    const totalMechanism1Cycles = tele_mechanism1_scoringLocation4 + tele_mechanism1_scoringLocation3 + tele_mechanism1_scoringLocation2 + tele_mechanism1_scoringLocation1;
 
     if (!teamScores[team]) {
-      teamScores[team] = { coralCycles: 0, matches: 0 };
+      teamScores[team] = { mechanism1Cycles: 0, matches: 0 };
     }
 
-    teamScores[team].coralCycles += totalCoralCycles;
+    teamScores[team].mechanism1Cycles += totalMechanism1Cycles;
     teamScores[team].matches += 1;
   });
 
   const averagedScores = Object.keys(teamScores).map(team => ({
     team,
-    avgCoralCycles: (teamScores[team].coralCycles / teamScores[team].matches)
+    avgMechanism1Cycles: (teamScores[team].mechanism1Cycles / teamScores[team].matches)
   }));
 
-  const sortedScores = averagedScores.sort((a, b) => b.avgCoralCycles - a.avgCoralCycles);
+  const sortedScores = averagedScores.sort((a, b) => b.avgMechanism1Cycles - a.avgMechanism1Cycles);
 
   const labels = sortedScores.map(score => `Team ${score.team}`);
-  const coralCycles = sortedScores.map(score => score.avgCoralCycles);
+  const mechanism1Cycles = sortedScores.map(score => score.avgMechanism1Cycles);
 
-  const coralColors = sortedScores.map(score => {
+  const mechniams1Colors = sortedScores.map(score => {
     if (score.team === '226') return '#FE59D7';
     if (score.team === highlightedOverviewTeam) return '#ffaad3';
     return '#3EDBF0';
   });
 
 
-  charts['coralCyclesChart'] = new Chart(ctx, {
+  charts['mechanism1CyclesChart'] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
           label: 'Cycles',
-          data: coralCycles,
-          backgroundColor: coralColors
+          data: mechanism1Cycles,
+          backgroundColor: mechniams1Colors
         }
       ]
     },
@@ -4236,57 +4239,57 @@ function renderCoralCyclesChart(data) {
     }
   });
 }
-function renderAlgaeCyclesChart(data) {
-  const ctx = document.getElementById('algaeCyclesChart').getContext('2d');
+function renderMechanism2CyclesChart(data) {
+  const ctx = document.getElementById('mechanism2CyclesChart').getContext('2d');
 
-  if (charts['algaeCyclesChart']) {
-    charts['algaeCyclesChart'].destroy();
+  if (charts['mechanism2CyclesChart']) {
+    charts['mechanism2CyclesChart'].destroy();
   }
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!team) return;
 
-    const algaeProcessor = parseInt(row['Algae in Processor'] || 0);
-    const algaeNet = parseInt(row['Algae in Net'] || 0);
+    const tele_mechanism2_scoringLocation2 = parseInt(row[tele.mechanism2.scoringLocation2] || 0)
+    const tele_mechanism2_scoringLocation1 = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
 
-    const totalAlgaeCycles = algaeProcessor + algaeNet;
+    const totalMechanism2Cycles = tele_mechanism2_scoringLocation2 + tele_mechanism2_scoringLocation1;
 
     if (!teamScores[team]) {
-      teamScores[team] = { algaeCycles: 0, matches: 0 };
+      teamScores[team] = { mechanism2Cycles: 0, matches: 0 };
     }
 
-    teamScores[team].algaeCycles += totalAlgaeCycles;
+    teamScores[team].mechanism2Cycles += totalMechanism2Cycles;
     teamScores[team].matches += 1;
   });
 
   const averagedScores = Object.keys(teamScores).map(team => ({
     team,
-    avgAlgaeCycles: teamScores[team].algaeCycles / teamScores[team].matches
+    avgMechanism2Cycles: teamScores[team].mechanism2Cycles / teamScores[team].matches
   }));
 
-  const sortedScores = averagedScores.sort((a, b) => b.avgAlgaeCycles - a.avgAlgaeCycles);
+  const sortedScores = averagedScores.sort((a, b) => b.avgMechanism2Cycles - a.avgMechanism2Cycles);
 
   const labels = sortedScores.map(score => `Team ${score.team}`);
-  const algaeCycles = sortedScores.map(score => score.avgAlgaeCycles);
+  const mechanism2Cycles = sortedScores.map(score => score.avgMechanism2Cycles);
 
-  const algaeColors = sortedScores.map(score => {
+  const mechanism2Colors = sortedScores.map(score => {
     if (score.team === '226') return '#FE59D7';
     if (score.team === highlightedOverviewTeam) return '#ffaad3';
     return '#3EDBF0';
   });
 
 
-  charts['algaeCyclesChart'] = new Chart(ctx, {
+  charts['mechanism2CyclesChart'] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
           label: 'Cycles',
-          data: algaeCycles,
-          backgroundColor: algaeColors
+          data: mechanism2Cycles,
+          backgroundColor: mechanism2Colors
         }
       ]
     },
@@ -4355,8 +4358,8 @@ function handleOverviewSearch() {
   highlightedOverviewTeam = input;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
-  renderCoralCyclesChart(parsedData.data);
-  renderAlgaeCyclesChart(parsedData.data);
+  renderMechanism1CyclesChart(parsedData.data);
+  renderMechanism2CyclesChart(parsedData.data);
   displayTeamNickname(input, 'overviewTeamNicknameDisplay');
 
 }
@@ -4368,8 +4371,8 @@ function clearOverviewSearch() {
   highlightedOverviewTeam = null;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
-  renderCoralCyclesChart(parsedData.data);
-  renderAlgaeCyclesChart(parsedData.data);
+  renderMechanism1CyclesChart(parsedData.data);
+  renderMechanism2CyclesChart(parsedData.data);
 }
 
 
