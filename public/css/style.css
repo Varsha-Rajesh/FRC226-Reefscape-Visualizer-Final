@@ -1418,42 +1418,42 @@ label {
     border-color: #cf8ffc !important;
 }
 
-#reliabilityTotalCoralCycles:checked {
+#reliabilityTotalMechanism1Cycles:checked {
     background-color: #ff83fa !important;
     border-color: #ff83fa !important;
 }
 
-#reliabilityL4Cycles:checked {
+#reliabilityMechanism1ScoringLocation1Cycles:checked {
     background-color: #ff8bfc !important;
     border-color: #ff8bfc !important;
 }
 
-#reliabilityL3Cycles:checked {
+#reliabilityMechanism1ScoringLocation2Cycles:checked {
     background-color: #ed0cef !important;
     border-color: #ed0cef !important;
 }
 
-#reliabilityL2Cycles:checked {
+#reliabilityMechanism1ScoringLocation3Cycles:checked {
     background-color: #BF02ff !important;
     border-color: #BF02ff !important;
 }
 
-#reliabilityL1Cycles:checked {
+#reliabilityMechanism1ScoringLocation4Cycles:checked {
     background-color: #8105d8 !important;
     border-color: #8105d8 !important;
 }
 
-#reliabilityTotalAlgaeCycles:checked {
+#reliabilityTotalMechanism2Cycles:checked {
     background-color: #006fff !important;
     border-color: #006fff !important;
 }
 
-#reliabilityBargeCycles:checked {
+#reliabilityMechanism2ScoringLocation1Cycles:checked {
     background-color: #3498db !important;
     border-color: #3498db !important;
 }
 
-#reliabilityProcessorCycles:checked {
+#reliabilityMechanism2ScoringLocation2Cycles:checked {
     background-color: #14c7de !important;
     border-color: #14c7de !important;
 }

@@ -13,20 +13,94 @@ const charts = {
   reliabilityChartsArea: null,
 };
 
-let pitScoutingData = [];
-let tbaClimbData = {};
-let coralMismatchData = [];
+//Labels 
+const reliability = {
+  points: {
+    total: 'Total Points',
+    auto: 'Auto Points',
+    tele: 'Tele Points'
+  },
+  mechanism1: {
+    scoringLocation1: "L4 Cycles",
+    scoringLocation2: "L3 Cycles",
+    scoringLocation3: "L2 Cycles",
+    scoringLocation4: "L1 Cycles",
+    scoringLocation5: "",
+    total: "Total Coral Cycles"
+  },
+  mechanism2: {
+    scoringLocation1: "Barge Cycles",
+    scoringLocation2: "Processor Cycles",
+    scoringLocation3: "",
+    scoringLocation4: "",
+    scoringLocation5: "",
+    total: "Total Algae Cycles"
+  },
+  cycles: "Total Cycles"
+}
+
+let isBoxPlot = true;
+
+// Teams
 let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 let showHiddenTeamsInFilter = false;
 let isolatedTeams = [];
 let isIsolated = false;
 let highlightedOverviewTeam = null;
+
+// TBA
+let tbaClimbData = {};
+let coralMismatchData = [];
+
+// File Upload Data
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
 let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
+let pitScoutingData = [];
 
-let isBoxPlot = true;
+// CSV Headers
 
+const auto = {
+  mechanism1: {
+    scoringLocation1: 'Auton L4',
+    scoringLocation2: 'Auton L3',
+    scoringLocation3: 'Auton L2',
+    scoringLocation4: 'Auton L1',
+    scoringLocation: '',
+    total: ""
+  },
+  mechanism2: {
+    scoringLocation1: 'Auton Algae in Net',
+    scoringLocation2: 'Auton Algae in Processor',
+    scoringLocation3: 'Auton Algae Removed',
+    scoringLocation4: '',
+    scoringLocation5: '',
+    total: ''
+  }
+}
+
+const tele = {
+  mechanism1: {
+    scoringLocation1: 'L4',
+    scoringLocation2: 'L3',
+    scoringLocation3: 'L2',
+    scoringLocation4: 'L1',
+    scoringLocation5: '',
+    total: ''
+  },
+  mechanism2: {
+    scoringLocation1: 'Algae in Net',
+    scoringLocation2: 'Algae in Processor',
+    scoringLocation3: 'Algae Removed',  
+    scoringLocation4: '',
+    scoringLocation5: '',
+    total: ''
+  }
+}
+const score = {
+  total: 'Total Score',
+  auto: 'Auton Score',
+}
 /*-----RELIABILITY CHARTS-----*/
 
 if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
@@ -42,28 +116,25 @@ Chart.register({
 });
 
 const reliabilityMetrics = [
-  { id: 'reliabilityTotalPoints', label: 'Total Points', color: '#3ED098', getValue: row => parseFloat(row['Total Score'] || 0) },
-  { id: 'reliabilityAutoPoints', label: 'Auto Points', color: '#51E7CF', getValue: row => parseFloat(row['Auton Score'] || 0) },
-  { id: 'reliabilityTelePoints', label: 'Tele Points', color: '#3ecdd0', getValue: row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)) },
-  {
-    id: 'reliabilityTotalCycles', label: 'Total Cycles', color: '#cf8ffc', getValue: row =>
-    (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
-      parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  { id: 'reliabilityTotalPoints', label: reliability.points.total, color: '#3ED098', getValue: row => parseFloat(row[score.total] || 0) },
+  { id: 'reliabilityAutoPoints', label: reliability.points.auto, color: '#51E7CF', getValue: row => parseFloat(row[score.auto] || 0) },
+  { id: 'reliabilityTelePoints', label: reliability.points.tele, color: '#3ecdd0', getValue: row => (parseFloat(row[score.total] || 0) - parseFloat(row[score.auto] || 0)) },
+  { id: 'reliabilityTotalCycles', label: reliability.cycles, color: '#cf8ffc', getValue: row =>
+    (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0) +
+      parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
   },
-  {
-    id: 'reliabilityTotalCoralCycles', label: 'Total Coral Cycles', color: '#ff83fa', getValue: row =>
-      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
+  { id: 'reliabilityTotalMechanism1Cycles', label: reliability.mechanism1.total, color: '#ff83fa', getValue: row =>
+      (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0))
   },
-  { id: 'reliabilityL4Cycles', label: 'L4 Cycles', color: '#ff8bfc', getValue: row => parseInt(row['L4'] || 0) },
-  { id: 'reliabilityL3Cycles', label: 'L3 Cycles', color: '#ed0cef', getValue: row => parseInt(row['L3'] || 0) },
-  { id: 'reliabilityL2Cycles', label: 'L2 Cycles', color: '#BF02ff', getValue: row => parseInt(row['L2'] || 0) },
-  { id: 'reliabilityL1Cycles', label: 'L1 Cycles', color: '#8105d8', getValue: row => parseInt(row['L1'] || 0) },
-  {
-    id: 'reliabilityTotalAlgaeCycles', label: 'Total Algae Cycles', color: '#006fff', getValue: row =>
-      (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+  { id: 'reliabilityMechanism1ScoringLocation1Cycles', label: reliability.mechanism1.scoringLocation1, color: '#ff8bfc', getValue: row => parseInt(row[tele.mechanism1.scoringLocation4] || 0) },
+  { id: 'reliabilityMechanism1ScoringLocation2Cycles', label: reliability.mechanism1.scoringLocation2, color: '#ed0cef', getValue: row => parseInt(row[tele.mechanism1.scoringLocation3] || 0) },
+  { id: 'reliabilityMechanism1ScoringLocation3Cycles', label: reliability.mechanism1.scoringLocation3, color: '#BF02ff', getValue: row => parseInt(row[tele.mechanism1.scoringLocation2] || 0) },
+  { id: 'reliabilityMechanism1ScoringLocation4Cycles', label: reliability.mechanism1.scoringLocation4, color: '#8105d8', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
+  { id: 'reliabilityTotalMechanism2Cycles', label: reliability.mechanism2.total, color: '#006fff', getValue: row =>
+      (parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
   },
-  { id: 'reliabilityBargeCycles', label: 'Barge Cycles', color: '#3498db', getValue: row => parseInt(row['Algae in Net'] || 0) },
-  { id: 'reliabilityProcessorCycles', label: 'Processor Cycles', color: '#14c7de', getValue: row => parseInt(row['Algae in Processor'] || 0) }
+  { id: 'reliabilityMechanism2ScoringLocation1Cycles', label: reliability.mechanism2.scoringLocation1, color: '#3498db', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
+  { id: 'reliabilityMechanism2ScoringLocation2Cycles', label: reliability.mechanism2.scoringLocation2, color: '#14c7de', getValue: row => parseInt(row[tele.mechanism1.scoringLocation2] || 0) },
 ];
 
 function toggleEPAAvg(containerId, show) {
