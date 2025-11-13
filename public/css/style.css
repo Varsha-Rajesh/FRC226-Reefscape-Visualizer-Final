@@ -285,10 +285,10 @@ label {
 #comparisonResultTeleAlgae2,
 #comparisonResultEndGame1,
 #comparisonResultEndGame2,
-#autoCoral,
-#teleCoral,
-#autoAlgae,
-#teleAlgae,
+#autoMechanism1,
+#teleMechanism1,
+#autoMechanism2,
+#teleMechanism2,
 #endGame,
 #scouterComments {
     width: 100% !important;
@@ -341,7 +341,7 @@ label {
 }
 
 #startingPositionFilter,
-#algaeTypeFilter {
+#mechanism2TypeFilter {
     padding: 8px;
     border-radius: 4px;
     background-color: #1C1E21;
@@ -353,7 +353,7 @@ label {
 }
 
 #startingPositionFilter:focus,
-#algaeTypeFilter:focus {
+#mechanism2TypeFilter:focus {
     outline: none;
     border-color: #1e90ff;
     background-color: #2a2d31;

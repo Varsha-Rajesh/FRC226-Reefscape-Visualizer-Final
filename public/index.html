@@ -295,16 +295,16 @@
             <div class="statsText">
               <p><strong>Climb Success:</strong> <span id="climbSuccessRate">0.00</span>%</p>
               <p><strong>Robot Died:</strong> <span id="robotDiedRate">0.00</span>%</p>
-              <p><strong>Ground Barge:</strong> <span id="groundBarge">❌</span></p>
-              <p><strong>Ground Processor:</strong> <span id="groundProcessor">❌</span></p>
+              <p><strong>Ground Barge:</strong> <span id="trait1">❌</span></p>
+              <p><strong>Ground Processor:</strong> <span id="trait2">❌</span></p>
             </div>
           </div>
           <div class="statsContainerText">
             <h3>Averages</h3>
             <div class="statsText">
               <p><strong>Avg EPA:</strong> <span id="averageEPA">0.00</span></p>
-              <p><strong>Avg Coral:</strong> <span id="averageCoral">0.00</span></p>
-              <p><strong>Avg Algae:</strong> <span id="averageAlgae">0.00</span></p>
+              <p><strong>Avg Coral:</strong> <span id="averageMechanism1">0.00</span></p>
+              <p><strong>Avg Algae:</strong> <span id="averageMechanism2">0.00</span></p>
               <p><strong>Defense Rank:</strong> <span id="defenseRank">N/A</span> <a href="#"
                   onclick="showTab(event, 'defenseRankingInfo')">
                   <img src="/images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
@@ -314,10 +314,10 @@
           <div class="statsContainerText">
             <h3>Peak Performance</h3>
             <div class="statsText">
-              <p><strong>Max Coral:</strong> <span id="maxCoral">0</span> </p>
-              <p class="invidualMatchNumbers"></p><strong>Match: </strong><span id="maxCoralMatch">N/A</span></p>
-              <p><strong>Max Barge:</strong> <span id="maxAlgae">0</span></p>
-              <p class="invidualMatchNumbers"><strong>Match: </strong><span id="maxAlgaeMatch">N/A</span></p>
+              <p><strong>Max Coral:</strong> <span id="maxMechanism1">0</span> </p>
+              <p class="invidualMatchNumbers"></p><strong>Match: </strong><span id="maxMechanism1Match">N/A</span></p>
+              <p><strong>Max Barge:</strong> <span id="maxMechanism2">0</span></p>
+              <p class="invidualMatchNumbers"><strong>Match: </strong><span id="maxMechanism2Match">N/A</span></p>
             </div>
           </div>
         </div>
@@ -334,18 +334,18 @@
                 <option value="all">All</option>
                 <option value="side">Side</option>
                 <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
+                <option value="side1">Side - Processor</option>
+                <option value="side2">Side - Barge</option>
               </select>
             </div>
-            <canvas id="autoCoral"></canvas>
+            <canvas id="autoMechanism1"></canvas>
           </div>
 
           <div id="teleCoralContainer">
             <div class="containerStyling">
               <h3 class="chart-title">Tele Coral</h3>
             </div>
-            <canvas id="teleCoral"></canvas>
+            <canvas id="teleMechanism1"></canvas>
           </div>
 
           <div id="endGameContainer">
@@ -365,23 +365,23 @@
                 <option value="all">All</option>
                 <option value="side">Side</option>
                 <option value="center">Center</option>
-                <option value="processor">Side - Processor</option>
-                <option value="barge">Side - Barge</option>
+                <option value="side1">Side - Processor</option>
+                <option value="side2">Side - Barge</option>
               </select>
             </div>
-            <canvas id="autoAlgae"></canvas>
+            <canvas id="autoMechanism2"></canvas>
           </div>
           <div id="teleAlgaeContainer">
             <div class="autoCharts">
               <h3 class="chart-title">Tele Algae</h3>
-              <select id="algaeTypeFilter" class="dropdown">
+              <select id="mechanism2TypeFilter" class="dropdown">
                 <option value="all">All</option>
-                <option value="remove">Remove</option>
-                <option value="process">Process</option>
-                <option value="barge">Barge</option>
+                <option value="scoringLocation3">Remove</option>
+                <option value="scoringLocation2">Process</option>
+                <option value="scoringLocation1">Barge</option>
               </select>
             </div>
-            <canvas id="teleAlgae"></canvas>
+            <canvas id="teleMechanism2"></canvas>
           </div>
           <div id="scouterCommentsContainer">
             <div class="containerStyling">
@@ -426,19 +426,19 @@
               Total Coral Cycles
             </label>
             <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityMechanism1ScoringLocation1Cycles">
+              <input type="checkbox" id="reliabilityMechanism1ScoringLocation4Cycles">
               L4 Cycles
             </label>
             <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityMechanism1ScoringLocation2Cycles">
+              <input type="checkbox" id="reliabilityMechanism1ScoringLocation3Cycles">
               L3 Cycles
             </label>
             <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityMechanism1ScoringLocation3Cycles">
+              <input type="checkbox" id="reliabilityMechanism1ScoringLocation2Cycles">
               L2 Cycles
             </label>
             <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
-              <input type="checkbox" id="reliabilityMechanism1ScoringLocation4Cycles">  
+              <input type="checkbox" id="reliabilityMechanism1ScoringLocation1Cycles">  
               L1 Cycles
             </label>
             <label style="color: #ccc; font-size: 16px; font-family: 'Lato';">
