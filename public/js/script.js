@@ -66,7 +66,24 @@ const individual = {
   endGame: "Climb Score"
 }
 
+const comparision = {
+  mechanism1: {
+    scoringLocation1: "L4",
+    scoringLocation2: "L3",
+    scoringLocation3: "L2",
+    scoringLocation4: "L1",
+    scoringLocation5: "",
+  },
+  mechanism2: {
+    scoringLocation1: "Net",
+    scoringLocation2: "Processor",
+    scoringLocation3: "Remove",
+  },
+  endGame: "Climb Score"
+}
+
 const callback_mechanism1 = "Total Coral";
+const callback_mechanism2 = "Total Algae";
 // Teams
 let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 let showHiddenTeamsInFilter = false;
@@ -124,7 +141,7 @@ const tele = {
   mechanism2: {
     scoringLocation1: 'Algae in Net',
     scoringLocation2: 'Algae in Processor',
-    scoringLocation3: 'Algae removed',  
+    scoringLocation3: 'Algae removed',
     scoringLocation4: '',
     scoringLocation5: '',
     total: ''
@@ -184,18 +201,21 @@ const reliabilityMetrics = [
   { id: 'reliabilityTotalPoints', label: reliability.points.total, color: '#3ED098', getValue: row => parseFloat(row[total_score] || 0) },
   { id: 'reliabilityAutoPoints', label: reliability.points.auto, color: '#51E7CF', getValue: row => parseFloat(row[auto_score] || 0) },
   { id: 'reliabilityTelePoints', label: reliability.points.tele, color: '#3ecdd0', getValue: row => (parseFloat(row[total_score] || 0) - parseFloat(row[auto_score] || 0)) },
-  { id: 'reliabilityTotalCycles', label: reliability.cycles, color: '#cf8ffc', getValue: row =>
+  {
+    id: 'reliabilityTotalCycles', label: reliability.cycles, color: '#cf8ffc', getValue: row =>
     (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0) +
       parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
   },
-  { id: 'reliabilityTotalMechanism1Cycles', label: reliability.mechanism1.total, color: '#ff83fa', getValue: row =>
+  {
+    id: 'reliabilityTotalMechanism1Cycles', label: reliability.mechanism1.total, color: '#ff83fa', getValue: row =>
       (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0))
   },
   { id: 'reliabilityMechanism1ScoringLocation1Cycles', label: reliability.mechanism1.scoringLocation1, color: '#ff8bfc', getValue: row => parseInt(row[tele.mechanism1.scoringLocation4] || 0) },
   { id: 'reliabilityMechanism1ScoringLocation2Cycles', label: reliability.mechanism1.scoringLocation2, color: '#ed0cef', getValue: row => parseInt(row[tele.mechanism1.scoringLocation3] || 0) },
   { id: 'reliabilityMechanism1ScoringLocation3Cycles', label: reliability.mechanism1.scoringLocation3, color: '#BF02ff', getValue: row => parseInt(row[tele.mechanism1.scoringLocation2] || 0) },
   { id: 'reliabilityMechanism1ScoringLocation4Cycles', label: reliability.mechanism1.scoringLocation4, color: '#8105d8', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
-  { id: 'reliabilityTotalMechanism2Cycles', label: reliability.mechanism2.total, color: '#006fff', getValue: row =>
+  {
+    id: 'reliabilityTotalMechanism2Cycles', label: reliability.mechanism2.total, color: '#006fff', getValue: row =>
       (parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
   },
   { id: 'reliabilityMechanism2ScoringLocation1Cycles', label: reliability.mechanism2.scoringLocation1, color: '#3498db', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
@@ -704,7 +724,7 @@ function renderRankingTable() {
     maxAlgaeNet: 23,
     maxTeleCoral: 24
   };
-  const visibleColumns = new Set([0, 1, 2]); 
+  const visibleColumns = new Set([0, 1, 2]);
   checked.forEach(key => visibleColumns.add(statMap[key]));
 
   const visibleTeamsData = parsed.filter(row => {
@@ -816,7 +836,7 @@ function renderRankingTable() {
     let html = `<td>${idx + 1}</td><td>${team}</td>`;
 
     metricValues.forEach((val, i) => {
-      const colIdx = i + 2; 
+      const colIdx = i + 2;
       const numVal = parseFloat(val);
       const bg = getGradientColor(numVal, metricStats[i].vals);
       const displayStyle = visibleColumns.has(colIdx) ? '' : 'display:none;';
@@ -1081,7 +1101,7 @@ document.addEventListener('keydown', function (e) {
     e.preventDefault();
   }
 
-  if (e.key === 'Enter' && e.location === 3){
+  if (e.key === 'Enter' && e.location === 3) {
     const teamNumber = numpadBuffer.trim();
 
     if (teamNumber && !hiddenTeams.includes(teamNumber)) {
@@ -1250,7 +1270,7 @@ function deleteFile(type) {
 
 function restorePitScoutingData() {
   pitCsvText = localStorage.getItem('pitCsvText') || "";
-  
+
   if (!pitCsvText) {
     pitScoutingData = [];
     return;
@@ -1806,16 +1826,16 @@ function showTab(event, tabId) {
     }
   }
 
-    try {
+  try {
     if (typeof renderHiddenTeamsList === 'function') renderHiddenTeamsList();
-  } catch (err) {}
+  } catch (err) { }
   try {
     if (typeof renderHiddenTeamsListRanking === 'function') renderHiddenTeamsListRanking();
-  } catch (err) {}
+  } catch (err) { }
 
   if (tabId === 'ranking') {
-    try { renderRankingTable(); } catch (e) {}
-    try { updateRankingTableColumns(); } catch (e) {}
+    try { renderRankingTable(); } catch (e) { }
+    try { updateRankingTableColumns(); } catch (e) { }
   }
 }
 
@@ -1926,11 +1946,11 @@ document.querySelectorAll('#startingPositionFilter').forEach(dropdown => {
     document.getElementById('mechanism2TypeFilter').value = mechanism2Filter;
   });
 });
-document.getElementById('algaeTypeFilter1').addEventListener('change', function () {
+document.getElementById('mechanism2TypeFilter1').addEventListener('change', function () {
   syncAlgaeDropdownsAndFilter(this.value);
 });
 
-document.getElementById('algaeTypeFilter2').addEventListener('change', function () {
+document.getElementById('mechanism2TypeFilter2').addEventListener('change', function () {
   syncAlgaeDropdownsAndFilter(this.value);
 })
 
@@ -2398,7 +2418,7 @@ function processTbaAutoLeaveData(matches) {
   return autoLeaveData;
 }
 
- 
+
 async function fetchTeamData(teamNumber) {
   try {
     const response = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNumber}`, {
@@ -3099,20 +3119,20 @@ function syncDropdowns(value) {
 
 /*-----COMPARISON VIEW----*/
 
-function getMaxTeleCoral(team1Data, team2Data) {
+function getMaxTeleMechanism1(team1Data, team2Data) {
   const combined = [...team1Data, ...team2Data];
 
   let maxTotal = 0;
 
   combined.forEach(row => {
-    const totalCoral =
-      (parseInt(row['L1']) || 0) +
-      (parseInt(row['L2']) || 0) +
-      (parseInt(row['L3']) || 0) +
-      (parseInt(row['L4']) || 0);
+    const totalMechanism1 =
+      (parseInt(row[tele.mechanism1.scoringLocation4]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0);
 
-    if (totalCoral > maxTotal) {
-      maxTotal = totalCoral;
+    if (totalMechanism1 > maxTotal) {
+      maxTotal = totalMechanism1;
     }
   });
 
@@ -3120,23 +3140,23 @@ function getMaxTeleCoral(team1Data, team2Data) {
 }
 
 
-function getMaxTeleAlgae(team1Data, team2Data, filter = 'all') {
+function getMaxTeleMechanism2(team1Data, team2Data, filter = 'all') {
   const combined = [...team1Data, ...team2Data];
   let max = 0;
 
   combined.forEach(row => {
     let value = 0;
     if (filter === 'scoringLocation3') {
-      value = parseInt(row['Algae removed'] || 0);
+      value = parseInt(row[tele.mechanism2.scoringLocation3] || 0);
     } else if (filter === 'scoringLocation1') {
-      value = parseInt(row['Algae in Net'] || 0);
+      value = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
     } else if (filter === 'scoringLocation2') {
-      value = parseInt(row['Algae in Processor'] || 0);
+      value = parseInt(row[tele.mechanism2.scoringLocation2] || 0);
     } else {
       value =
-        (parseInt(row['Algae removed'] || 0)) +
-        (parseInt(row['Algae in Net'] || 0)) +
-        (parseInt(row['Algae in Processor'] || 0));
+        (parseInt(row[tele.mechanism2.scoringLocation3] || 0)) +
+        (parseInt(row[tele.mechanism2.scoringLocation1] || 0)) +
+        (parseInt(row[tele.mechanism2.scoringLocation2] || 0));
     }
 
     if (value > max) {
@@ -3147,53 +3167,53 @@ function getMaxTeleAlgae(team1Data, team2Data, filter = 'all') {
   return Math.ceil(max / 2) * 2;
 }
 
-function getMaxAutoCoral(team1Data, team2Data, filterValue = 'all') {
+function getMaxAutoMechanism1(team1Data, team2Data, filterValue = 'all') {
   const combined = [...team1Data, ...team2Data];
 
   let filtered = combined;
   if (filterValue === 'side') {
-    filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
+    filtered = filtered.filter(row => [auto.starting.side2, auto.starting.side1].includes(row[auto.starting.position]));
   } else if (filterValue === 'center') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
-  } else if (filterValue === 'processor') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
-  } else if (filterValue === 'scoringLocation3') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.center);
+  } else if (filterValue === 'side1') {
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side1);
+  } else if (filterValue === 'side2') {
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side2);
   }
 
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row['Auton L1']) || 0) +
-      (parseInt(row['Auton L2']) || 0) +
-      (parseInt(row['Auton L3']) || 0) +
-      (parseInt(row['Auton L4']) || 0);
+      (parseInt(row[auto.mechanism1.scoringLocation4]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation3]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation2]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation1]) || 0);
     if (total > max) max = total;
   });
 
   return Math.ceil(max / 1) * 1;
 }
 
-function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
+function getMaxAutoMechanism2(team1Data, team2Data, filterValue = 'all') {
   const combined = [...team1Data, ...team2Data];
 
   let filtered = combined;
   if (filterValue === 'side') {
-    filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
+    filtered = filtered.filter(row => [auto.starting.side2, auto.starting.side1].includes(row[auto.starting.position]));
   } else if (filterValue === 'center') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
-  } else if (filterValue === 'processor') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
-  } else if (filterValue === 'scoringLocation3') {
-    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.center);
+  } else if (filterValue === 'side1') {
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side1);
+  } else if (filterValue === 'side2') {
+    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side2);
   }
 
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row['Auton Algae Removed'] || 0)) +
-      (parseInt(row['Auton Algae in Net'] || 0)) +
-      (parseInt(row['Auton Algae in Processor'] || 0));
+      (parseInt(row[auto.mechanism2.scoringLocation1] || 0)) +
+      (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) +
+      (parseInt(row[auto.mechanism2.scoringLocation3] || 0));
     if (total > max) max = total;
   });
 
@@ -3210,27 +3230,27 @@ function searchComparisonBothTeams() {
   const team1Data = filterTeamData(team1);
   const team2Data = filterTeamData(team2);
 
-  const maxTeleopCoral = getMaxTeleCoral(team1Data, team2Data);
-  const algaeFilter = document.getElementById('algaeTypeFilter1').value || 'all';
-  const maxTeleopAlgae = getMaxTeleAlgae(team1Data, team2Data, algaeFilter);
-  const yMax = Math.ceil(maxTeleopCoral / 2) * 2;
+  const maxTeleopMechanism1 = getMaxTeleMechanism1(team1Data, team2Data);
+  const mechanism2Filter = document.getElementById('mechanism2TypeFilter1').value || 'all';
+  const maxTeleopMechanism2 = getMaxTeleMechanism2(team1Data, team2Data, mechanism2Filter);
+  const yMax = Math.ceil(maxTeleopMechanism1 / 2) * 2;
   const startFilter = document.getElementById('startingPositionFilter1').value || 'all';
-  const maxAutoCoral = getMaxAutoCoral(team1Data, team2Data, startFilter);
-  const maxAutoAlgae = getMaxAutoAlgae(team1Data, team2Data, startFilter);
+  const maxAutoMechanism1 = getMaxAutoMechanism1(team1Data, team2Data, startFilter);
+  const maxAutoMechanism2 = getMaxAutoMechanism2(team1Data, team2Data, startFilter);
 
-  searchComparison(1, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
-  searchComparison(2, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
+  searchComparison(1, yMax, maxTeleopMechanism2, maxAutoMechanism1, maxAutoMechanism2);
+  searchComparison(2, yMax, maxTeleopMechanism2, maxAutoMechanism1, maxAutoMechanism2);
   renderComparisonMetricBoxPlots();
 
 }
-function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = null, maxAutoCoralOverride = null, maxAutoAlgaeOverride = null) {
+function searchComparison(teamNumber, yMaxOverride = null, yMaxMechanism2Override = null, maxAutoMechanism1Override = null, maxAutoMechanism2Override = null) {
 
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
   const otherTeamInputId = teamNumber === 1 ? 'comparisonSearch2' : 'comparisonSearch1';
-  const coralCanvasId = teamNumber === 1 ? 'autoCoralTeam1' : 'autoCoralTeam2';
-  const algaeCanvasId = teamNumber === 1 ? 'autoAlgaeTeam1' : 'autoAlgaeTeam2';
-  const teleCoralCanvasId = teamNumber === 1 ? 'teleCoralTeam1' : 'teleCoralTeam2';
-  const teleAlgaeCanvasId = teamNumber === 1 ? 'teleAlgaeTeam1' : 'teleAlgaeTeam2';
+  const mechanism1CanvasId = teamNumber === 1 ? 'autoMechanism1Team1' : 'autoMechanism1Team2';
+  const mechanism2CanvasId = teamNumber === 1 ? 'autoMechanism2Team1' : 'autoMechanism2Team2';
+  const teleMechanism1CanvasId = teamNumber === 1 ? 'teleMechanism1Team1' : 'teleMechanism1Team2';
+  const teleMechanism2CanvasId = teamNumber === 1 ? 'teleMechanism2Team1' : 'teleMechanism2Team2';
   const endGameCanvasId = teamNumber === 1 ? 'endGameTeam1' : 'endGameTeam2';
   const scouterCommentsId = teamNumber === 1 ? 'scouterComments1' : 'scouterComments2';
   const teamNameDisplayId = teamNumber === 1 ? 'teamNameDisplay1' : 'teamNameDisplay2';
@@ -3243,32 +3263,30 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   document.getElementById(`startingPositionFilter${teamNumber}`).value = 'all';
   document.querySelectorAll('.showEPAAvgComparison').forEach(cb => cb.checked = true);
 
-
   let teamData = filterTeamData(teamNumberInput);
   let otherTeamData = filterTeamData(otherTeamNumberInput);
 
   const yMax = yMaxOverride !== null
     ? yMaxOverride
-    : Math.ceil(getMaxTeleCoral(teamData, otherTeamData) / 2) * 2;
+    : Math.ceil(getMaxTeleMechanism1(teamData, otherTeamData) / 2) * 2;
 
-  const yMaxAlgae = yMaxAlgaeOverride !== null
-    ? yMaxAlgaeOverride
+  const yMaxAlgae = yMaxMechanism2Override !== null
+    ? yMaxMechanism2Override
     : Math.ceil(getTopAlgaeMatchFromTwoTeams(teamData, otherTeamData) / 2) * 2;
 
+  const maxAutoCoral = maxAutoMechanism1Override !== null
+    ? maxAutoMechanism1Override
+    : Math.ceil(getMaxAutoMechanism1(teamData, otherTeamData) / 1) * 1;
 
-  const maxAutoCoral = maxAutoCoralOverride !== null
-    ? maxAutoCoralOverride
-    : Math.ceil(getMaxAutoCoral(teamData, otherTeamData) / 1) * 1;
-
-  const maxAutoAlgae = maxAutoAlgaeOverride !== null
-    ? maxAutoAlgaeOverride
-    : Math.ceil(getMaxAutoAlgae(teamData, otherTeamData) / 1) * 1;
+  const maxAutoAlgae = maxAutoMechanism2Override !== null
+    ? maxAutoMechanism2Override
+    : Math.ceil(getMaxAutoMechanism2(teamData, otherTeamData) / 1) * 1;
 
   if (teamData.length === 0) {
-    renderBlankChart(coralCanvasId);
-    renderBlankChart(algaeCanvasId);
-    renderBlankChart(teleCoralCanvasId);
-    renderBlankChart(teleAlgaeCanvasId);
+    renderBlankChart(mechanism1CanvasId);
+    renderBlankChart(mechanism2CanvasId);
+    renderBlankChart(teleMechanism1CanvasId);
+    renderBlankChart(teleMechanism2CanvasId);
     renderBlankChart(endGameCanvasId);
     document.getElementById(scouterCommentsId).innerHTML = 'No qualitative notes available for this team.';
     return;
@@ -3277,10 +3295,10 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   otherTeamData = otherTeamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
-  renderAutoCoralChartForTeam(teamData, coralCanvasId, maxAutoCoral);
-  renderAutoAlgaeChartForTeam(teamData, algaeCanvasId, maxAutoAlgae);
-  renderTeleCoralChartForTeam(teamData, teleCoralCanvasId, yMax);
-  renderTeleAlgaeChartForTeam(teamData, teleAlgaeCanvasId, yMaxAlgae);
+  renderAutoMechanism1ChartForTeam(teamData, mechanism1CanvasId, maxAutoCoral);
+  renderAutoMechanism2ChartForTeam(teamData, mechanism2CanvasId, maxAutoAlgae);
+  renderTeleMechanism1ChartforTeam(teamData, teleMechanism1CanvasId, yMax);
+  renderTeleMechanism2ChartForTeam(teamData, teleMechanism2CanvasId, yMaxAlgae);
   renderEndGameChartForTeam(teamData, endGameCanvasId);
   renderScouterCommentsForTeam(teamData, scouterCommentsId);
   renderComparisonTeamStatistics(teamData, pitScoutingData, teamNumber);
@@ -3288,10 +3306,10 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = n
   const currentFilterValue = document.getElementById(`startingPositionFilter${teamNumber}`).value;
   syncDropdownsAndFilter(currentFilterValue);
 
-  filterAndRenderAlgaeCharts(1, 'all');
-  filterAndRenderAlgaeCharts(2, 'all');
+  filterAndRenderMechanism2Charts(1, 'all');
+  filterAndRenderMechanism2Charts(2, 'all');
 }
-function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
+function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3299,12 +3317,12 @@ function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const coralL1 = teamData.map(row => parseInt(row['L1'] || 0));
-  const coralL2 = teamData.map(row => parseInt(row['L2'] || 0));
-  const coralL3 = teamData.map(row => parseInt(row['L3'] || 0));
-  const coralL4 = teamData.map(row => parseInt(row['L4'] || 0));
+  const mechanism1_scoringLocation4 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation4] || 0));
+  const mechanism1_scoringLocation3 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation3] || 0));
+  const mechanism1_scoringLocation2 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation2] || 0));
+  const mechanism1_scoringLocation1 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation1] || 0));
 
-  const yMax = maxYValue !== null ? maxYValue : getMaxTeleCoral(teamData, []);
+  const yMax = maxYValue !== null ? maxYValue : getMaxTeleMechanism1(teamData, []);
 
   const stepSize = maxYValue > 16 ? 4 : 2;
   const newMax = Math.ceil(yMax / stepSize) * stepSize;
@@ -3314,10 +3332,10 @@ function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
     data: {
       labels: matchLabels,
       datasets: [
-        { label: 'L1', data: coralL1, backgroundColor: '#3B064D' },
-        { label: 'L2', data: coralL2, backgroundColor: '#8105D8' },
-        { label: 'L3', data: coralL3, backgroundColor: '#ED0CEF' },
-        { label: 'L4', data: coralL4, backgroundColor: '#FF8BFC' }
+        { label: comparision.mechanism1.scoringLocation4, data: mechanism1_scoringLocation4, backgroundColor: '#3B064D' },
+        { label: comparision.mechanism1.scoringLocation3, data: mechanism1_scoringLocation3, backgroundColor: '#8105D8' },
+        { label: comparision.mechanism1.scoringLocation2, data: mechanism1_scoringLocation2, backgroundColor: '#ED0CEF' },
+        { label: comparision.mechanism1.scoringLocation1, data: mechanism1_scoringLocation1, backgroundColor: '#FF8BFC' }
       ]
     },
     options: {
@@ -3342,11 +3360,11 @@ function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
               const dataIndex = context[0].dataIndex;
               const row = teamData[dataIndex];
               const total =
-                (parseInt(row['L1'] || 0)) +
-                (parseInt(row['L2'] || 0)) +
-                (parseInt(row['L3'] || 0)) +
-                (parseInt(row['L4'] || 0));
-              return `Total Coral: ${total}`;
+                (parseInt(row[tele.mechanism1.scoringLocation4] || 0)) +
+                (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
+                (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
+                (parseInt(row[tele.mechanism1.scoringLocation1] || 0));
+              return `${callback_mechanism1}: ${total}`;
             }
           }
         }
@@ -3357,7 +3375,7 @@ function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
   return newMax;
 }
 
-function renderAutoCoralChartForTeam(teamData, canvasId, maxY = null) {
+function renderAutoMechanism1ChartForTeam(teamData, canvasId, maxY = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3365,22 +3383,22 @@ function renderAutoCoralChartForTeam(teamData, canvasId, maxY = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const coralL1 = teamData.map(row => parseInt(row['Auton L1'] || 0));
-  const coralL2 = teamData.map(row => parseInt(row['Auton L2'] || 0));
-  const coralL3 = teamData.map(row => parseInt(row['Auton L3'] || 0));
-  const coralL4 = teamData.map(row => parseInt(row['Auton L4'] || 0));
+  const mechanism1_scoringLocation4 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation4] || 0));
+  const mechanism1_scoringLocation3 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation3] || 0));
+  const mechanism1_scoringLocation2 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation2] || 0));
+  const mechanism1_scoringLocation1 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation1] || 0));
 
-  const yMax = maxY ?? Math.ceil(Math.max(...coralL1, ...coralL2, ...coralL3, ...coralL4) / 1) * 1;
+  const yMax = maxY ?? Math.ceil(Math.max(...mechanism1_scoringLocation4, ...mechanism1_scoringLocation3, ...mechanism1_scoringLocation2, ...mechanism1_scoringLocation1) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: 'L1', data: coralL1, backgroundColor: '#3B064D' },
-        { label: 'L2', data: coralL2, backgroundColor: '#8105D8' },
-        { label: 'L3', data: coralL3, backgroundColor: '#ED0CEF' },
-        { label: 'L4', data: coralL4, backgroundColor: '#FF8BFC' }
+        { label: comparision.mechanism1.scoringLocation4, data: mechanism1_scoringLocation4, backgroundColor: '#3B064D' },
+        { label: comparision.mechanism1.scoringLocation3, data: mechanism1_scoringLocation3, backgroundColor: '#8105D8' },
+        { label: comparision.mechanism1.scoringLocation2, data: mechanism1_scoringLocation2, backgroundColor: '#ED0CEF' },
+        { label: comparision.mechanism1.scoringLocation1, data: mechanism1_scoringLocation1, backgroundColor: '#FF8BFC' }
       ]
     },
     options: {
@@ -3402,7 +3420,7 @@ function renderAutoCoralChartForTeam(teamData, canvasId, maxY = null) {
   return yMax;
 }
 
-function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
+function renderAutoMechanism2ChartForTeam(teamData, canvasId, maxY = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3410,20 +3428,20 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const algaeRemoved = teamData.map(row => parseInt(row['Auton Algae Removed'] || 0));
-  const algaeNet = teamData.map(row => parseInt(row['Auton Algae in Net'] || 0));
-  const algaeProcessor = teamData.map(row => parseInt(row['Auton Algae in Processor'] || 0));
+  const mechanism2_scoringLocation3 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation3] || 0));
+  const mechanism2_scoringLocation1 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation1] || 0));
+  const mechanism2_scoringLocation2 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation2] || 0));
 
-  const yMax = maxY ?? Math.ceil(Math.max(...algaeRemoved, ...algaeNet, ...algaeProcessor) / 1) * 1;
+  const yMax = maxY ?? Math.ceil(Math.max(...mechanism2_scoringLocation3, ...mechanism2_scoringLocation1, ...mechanism2_scoringLocation2) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: 'Removed', data: algaeRemoved, backgroundColor: '#002BFF' },
-        { label: 'Net', data: algaeNet, backgroundColor: '#00D2F3' },
-        { label: 'Processor', data: algaeProcessor, backgroundColor: '#5cffd5' }
+        { label: comparision.mechanism2.scoringLocation3, data: mechanism2_scoringLocation3, backgroundColor: '#002BFF' },
+        { label: comparision.mechanism2.scoringLocation1, data: mechanism2_scoringLocation1, backgroundColor: '#00D2F3' },
+        { label: comparision.mechanism2.scoringLocation2, data: mechanism2_scoringLocation2, backgroundColor: '#5cffd5' }
       ]
     },
     options: {
@@ -3455,10 +3473,10 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
               const dataIndex = context[0].dataIndex;
               const row = teamData[dataIndex];
               const total =
-                (parseInt(row['Auton Algae Removed'] || 0)) +
-                (parseInt(row['Auton Algae in Net'] || 0)) +
-                (parseInt(row['Auton Algae in Processor'] || 0));
-              return `Total Algae: ${total}`;
+                (parseInt(row[auto.mechanism2.scoringLocation3] || 0)) +
+                (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) +
+                (parseInt(row[auto.mechanism2.scoringLocation1] || 0));
+              return `${callback_mechanism2}: ${total}`;
             }
           }
         }
@@ -3468,27 +3486,26 @@ function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
 }
 
 function syncAlgaeDropdownsAndFilter(value) {
-  document.querySelectorAll('#algaeTypeFilter1, #algaeTypeFilter2').forEach(dropdown => {
+  document.querySelectorAll('#mechanism2TypeFilter1, #mechanism2TypeFilter2').forEach(dropdown => {
     dropdown.value = value;
   });
 
-  filterAndRenderAlgaeCharts(1, value);
-  filterAndRenderAlgaeCharts(2, value);
+  filterAndRenderMechanism2Charts(1, value);
+  filterAndRenderMechanism2Charts(2, value);
 }
-
-function filterAndRenderAlgaeCharts(teamNumber, filterValue) {
+function filterAndRenderMechanism2Charts(teamNumber, filterValue) {
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
-  const teleAlgaeCanvasId = teamNumber === 1 ? 'teleAlgaeTeam1' : 'teleAlgaeTeam2';
+  const teleMechanism2CanvasId = teamNumber === 1 ? 'teleMechanism2Team1' : 'teleMechanism2Team2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
   if (!teamNumberInput) {
-    renderBlankChart(teleAlgaeCanvasId);
+    renderBlankChart(teleMechanism2CanvasId);
     return;
   }
 
   let teamData = filterTeamData(teamNumberInput);
   if (teamData.length === 0) {
-    renderBlankChart(teleAlgaeCanvasId);
+    renderBlankChart(teleMechanism2CanvasId);
     return;
   }
 
@@ -3496,23 +3513,23 @@ function filterAndRenderAlgaeCharts(teamNumber, filterValue) {
 
   let filteredData = [...teamData];
   if (filterValue === 'scoringLocation3') {
-    filteredData = filteredData.filter(row => parseInt(row['Algae removed'] || 0) > 0);
-  } else if (filterValue === 'scoringLocation3') {
-    filteredData = filteredData.filter(row => parseInt(row['Algae in Net'] || 0) > 0);
+    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0);
+  } else if (filterValue === 'scoringLocation1') {
+    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0);
   } else if (filterValue === 'scoringLocation2') {
-    filteredData = filteredData.filter(row => parseInt(row['Algae in Processor'] || 0) > 0);
+    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0);
   }
 
   const otherTeamInputId = teamNumber === 1 ? 'comparisonSearch2' : 'comparisonSearch1';
   const otherTeamInput = document.getElementById(otherTeamInputId).value.trim();
   const otherTeamData = filterTeamData(otherTeamInput);
 
-  const maxY = getMaxTeleAlgae(teamData, otherTeamData, filterValue);
+  const maxY = getMaxTeleMechanism2(teamData, otherTeamData, filterValue);
 
-  renderFilteredTeleAlgaeChartForTeam(filteredData, teleAlgaeCanvasId, filterValue, maxY);
+  renderFilteredTeleMechanism2ChartForTeam(filteredData, teleMechanism2CanvasId, filterValue, maxY);
 }
 
-function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yMax = null) {
+function renderFilteredTeleMechanism2ChartForTeam(teamData, canvasId, filterValue, yMax = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3524,24 +3541,24 @@ function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yM
 
   if (filterValue === 'all' || filterValue === 'scoringLocation3') {
     datasets.push({
-      label: 'Removed',
-      data: teamData.map(row => parseInt(row['Algae removed'] || 0)),
+      label: comparision.mechanism2.scoringLocation3,
+      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0)),
       backgroundColor: '#002BFF'
     });
   }
 
-  if (filterValue === 'all' || filterValue === 'scoringLocation3') {
+  if (filterValue === 'all' || filterValue === 'scoringLocation1') {
     datasets.push({
-      label: 'Net',
-      data: teamData.map(row => parseInt(row['Algae in Net'] || 0)),
+      label: comparision.mechanism2.scoringLocation1,
+      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0)),
       backgroundColor: '#00D2F3'
     });
   }
 
   if (filterValue === 'all' || filterValue === 'scoringLocation2') {
     datasets.push({
-      label: 'Processor',
-      data: teamData.map(row => parseInt(row['Algae in Processor'] || 0)),
+      label: comparision.mechanism2.scoringLocation2,
+      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0)),
       backgroundColor: '#5cffd5'
     });
   }
@@ -3587,7 +3604,7 @@ function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yM
   });
 }
 
-function renderTeleAlgaeChartForTeam(teamData, canvasId, yMax) {
+function renderTeleMechanism2ChartForTeam(teamData, canvasId, yMax) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3595,20 +3612,20 @@ function renderTeleAlgaeChartForTeam(teamData, canvasId, yMax) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const algaeRemoved = teamData.map(row => parseInt(row['Algae removed'] || 0));
-  const algaeNet = teamData.map(row => parseInt(row['Algae in Net'] || 0));
-  const algaeProcessed = teamData.map(row => parseInt(row['Algae in Processor'] || 0));
+  const mechanism2_scoringLocation3 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0));
+  const mechanism2_scoringLocation1 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0));
+  const mechanism2_scoringLocation2 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0));
 
-  const maxYValue = yMax ?? Math.ceil(Math.max(...algaeRemoved, ...algaeNet, ...algaeProcessed) / 1) * 1;
+  const maxYValue = yMax ?? Math.ceil(Math.max(...mechanism2_scoringLocation3, ...mechanism2_scoringLocation1, ...mechanism2_scoringLocation2) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: 'Removed', data: algaeRemoved, backgroundColor: '#002BFF' },
-        { label: 'Net', data: algaeNet, backgroundColor: '#00D2F3' },
-        { label: 'Processor', data: algaeProcessed, backgroundColor: '#5cffd5' }
+        { label: comparision.mechanism2.scoringLocation3, data: mechanism2_scoringLocation3, backgroundColor: '#002BFF' },
+        { label: comparision.mechanism2.scoringLocation1, data: mechanism2_scoringLocation1, backgroundColor: '#00D2F3' },
+        { label: comparision.mechanism2.scoringLocation2, data: mechanism2_scoringLocation2, backgroundColor: '#5cffd5' }
       ]
     },
     options: {
@@ -3645,7 +3662,7 @@ function renderEndGameChartForTeam(teamData, canvasId) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const climbScores = teamData.map(row => parseFloat(row['Climb Score'] || 0));
+  const climbScores = teamData.map(row => parseFloat(row[tele.endGame.header] || 0));
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
@@ -3653,10 +3670,10 @@ function renderEndGameChartForTeam(teamData, canvasId) {
       labels: matchLabels,
       datasets: [
         {
-          label: 'Climb Score',
+          label: comparision.endGame.header,
           data: climbScores,
           backgroundColor: climbScores.map(score =>
-            score === 12 || score === 6 || score === 2 ? '#3EDBF0' : '#FF5C5C'
+            score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.park ? '#3EDBF0' : '#FF5C5C'
           )
         }
       ]
@@ -3677,11 +3694,11 @@ function renderEndGameChartForTeam(teamData, canvasId) {
 function renderComparisonTeamStatistics(teamData, pitData, teamNumber) {
   const climbSuccessRateId = `comparisonClimbSuccessRate${teamNumber}`;
   const robotDiedRateId = `comparisonRobotDiedRate${teamNumber}`;
-  const groundBargeId = `comparisonGroundBarge${teamNumber}`;
-  const groundProcessorId = `comparisonGroundProcessor${teamNumber}`;
+  const trait1Id = `comparisonTrait1_${teamNumber}`;
+  const trait2Id = `comparisonTrait2_${teamNumber}`;
   const averageEPAId = `comparisonAverageEPA${teamNumber}`;
-  const averageCoralId = `comparisonAverageCoral${teamNumber}`;
-  const averageAlgaeId = `comparisonAverageAlgae${teamNumber}`;
+  const averageMechanism1Id = `comparisonAverageMechanism1_${teamNumber}`;
+  const averageMechanism2Id = `comparisonAverageMechanism2_${teamNumber}`;
 
   const clearValue = (id, defaultValue = '') => {
     document.getElementById(id).textContent = defaultValue;
@@ -3689,73 +3706,73 @@ function renderComparisonTeamStatistics(teamData, pitData, teamNumber) {
 
   clearValue(climbSuccessRateId, '0.00');
   clearValue(robotDiedRateId, '0.00');
-  clearValue(groundBargeId);
-  clearValue(groundProcessorId);
+  clearValue(trait1Id);
+  clearValue(trait2Id);
   clearValue(averageEPAId, '0.00');
-  clearValue(averageCoralId, '0.00');
-  clearValue(averageAlgaeId, '0.00');
+  clearValue(averageMechanism1Id, '0.00');
+  clearValue(averageMechanism2Id, '0.00');
 
   if (!teamData || teamData.length === 0) return;
 
-  let groundBarge = '';
-  let groundProcessor = '';
+  let trait1 = '';
+  let trait2 = '';
 
   if (pitData && pitData.length > 0) {
     const teamPitData = pitData.find(team => {
-      const pitTeamNumber = team['Team No.']?.toString().trim();
-      return pitTeamNumber === teamData[0]['Team No.'].toString().trim();
+      const pitTeamNumber = team[team_number]?.toString().trim();
+      return pitTeamNumber === teamData[0][team_number].toString().trim();
     });
 
     if (teamPitData) {
-      if (teamPitData['Ground Barge'] !== undefined) {
-        groundBarge = teamPitData['Ground Barge'] ? '✅' : '❌';
+      if (teamPitData[pitScouting.trait1] !== undefined) {
+        trait1 = teamPitData[pitScouting.trait1] ? '✅' : '❌';
       }
 
-      if (teamPitData['Ground Processor'] !== undefined) {
-        groundProcessor = teamPitData['Ground Processor'] ? '✅' : '❌';
+      if (teamPitData[pitScouting.trait2] !== undefined) {
+        trait2 = teamPitData[pitScouting.trait2] ? '✅' : '❌';
       }
     }
   }
-  document.getElementById(groundBargeId).textContent = groundBarge;
-  document.getElementById(groundProcessorId).textContent = groundProcessor;
+  document.getElementById(trait1Id).textContent = trait1;
+  document.getElementById(trait2Id).textContent = trait2;
 
-  const climbScores = teamData.map(row => parseFloat(row['Climb Score'] || 0));
-  const successfulClimbs = climbScores.filter(score => score === 12 || score === 6).length;
-  const totalClimbAttempts = climbScores.filter(score => score === 12 || score === 6 || score === 2.1).length;
+  const climbScores = teamData.map(row => parseFloat(row[tele.endGame.header] || 0));
+  const successfulClimbs = climbScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2).length;
+  const totalClimbAttempts = climbScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.notAttempted).length;
   const climbSuccessRate = totalClimbAttempts > 0 ? (successfulClimbs / totalClimbAttempts * 100).toFixed(1) : "0.00";
-  const robotDiedRate = teamData.length > 0 ? (teamData.filter(row => row['Died or Immobilized'] === '1').length / teamData.length * 100).toFixed(1) : "0.00";
+  const robotDiedRate = teamData.length > 0 ? (teamData.filter(row => row[died.header] === died.yes).length / teamData.length * 100).toFixed(1) : "0.00";
 
   document.getElementById(climbSuccessRateId).textContent = climbSuccessRate;
   document.getElementById(robotDiedRateId).textContent = robotDiedRate;
 
-  const totalScore = teamData.reduce((sum, row) => sum + (parseFloat(row['Total Score']) || 0), 0);
-  const totalCoral = teamData.reduce((sum, row) => {
+  const totalScore = teamData.reduce((sum, row) => sum + (parseFloat(row[total_score]) || 0), 0);
+  const totalMechanism1 = teamData.reduce((sum, row) => {
     return sum +
-      (parseInt(row['Auton L1']) || 0) +
-      (parseInt(row['Auton L2']) || 0) +
-      (parseInt(row['Auton L3']) || 0) +
-      (parseInt(row['Auton L4']) || 0) +
-      (parseInt(row['L1']) || 0) +
-      (parseInt(row['L2']) || 0) +
-      (parseInt(row['L3']) || 0) +
-      (parseInt(row['L4']) || 0);
+      (parseInt(row[auto.mechanism1.scoringLocation4]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation3]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation2]) || 0) +
+      (parseInt(row[auto.mechanism1.scoringLocation1]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation4]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
+      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0);
   }, 0);
 
-  const totalAlgae = teamData.reduce((sum, row) => {
+  const totalMechanism2 = teamData.reduce((sum, row) => {
     return sum +
-      (parseInt(row['Auton Algae in Net'] || 0)) * 2 +
-      (parseInt(row['Auton Algae in Processor'] || 0)) * 3 +
-      (parseInt(row['Algae in Net'] || 0) * 2) +
-      (parseInt(row['Algae in Processor'] || 0) * 3);
+      (parseInt(row[auto.mechanism2.scoringLocation1] || 0)) * 2 +
+      (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) * 3 +
+      (parseInt(row[tele.mechanism2.scoringLocation1] || 0) * 2) +
+      (parseInt(row[tele.mechanism2.scoringLocation2] || 0) * 3);
   }, 0);
 
   const averageEPA = teamData.length > 0 ? (totalScore / teamData.length).toFixed(1) : "0.00";
-  const averageCoral = teamData.length > 0 ? (totalCoral / teamData.length).toFixed(1) : "0.00";
-  const averageAlgae = teamData.length > 0 ? (totalAlgae / teamData.length).toFixed(1) : "0.00";
+  const averageMechanism1 = teamData.length > 0 ? (totalMechanism1 / teamData.length).toFixed(1) : "0.00";
+  const averageMechanism2 = teamData.length > 0 ? (totalMechanism2 / teamData.length).toFixed(1) : "0.00";
 
   document.getElementById(averageEPAId).textContent = averageEPA;
-  document.getElementById(averageCoralId).textContent = averageCoral;
-  document.getElementById(averageAlgaeId).textContent = averageAlgae;
+  document.getElementById(averageMechanism1Id).textContent = averageMechanism1;
+  document.getElementById(averageMechanism2Id).textContent = averageMechanism2;
 }
 
 function renderScouterCommentsForTeam(teamData, containerId) {
@@ -3764,8 +3781,8 @@ function renderScouterCommentsForTeam(teamData, containerId) {
   scouterCommentsDiv.innerHTML = '';
 
   const notes = teamData
-    .filter(row => row['Comments'] && row['Comments'].trim() !== '')
-    .map(row => `Q${row.Match}: ${row['Comments']}`);
+    .filter(row => row[comments] && row[comments].trim() !== '')
+    .map(row => `Q${row.Match}: ${row[comments]}`);
 
   if (notes.length > 0) {
     scouterCommentsDiv.innerHTML = notes.join('<hr style="border: 0; margin: 10px 0;">');
@@ -3774,8 +3791,8 @@ function renderScouterCommentsForTeam(teamData, containerId) {
   }
 }
 function syncDropdownsAndFilter(value) {
-  const algae1 = document.getElementById('algaeTypeFilter1').value;
-  const algae2 = document.getElementById('algaeTypeFilter2').value;
+  const mechanism2_team1 = document.getElementById('mechanism2TypeFilter1').value;
+  const mechanism2_team2 = document.getElementById('mechanism2TypeFilter2').value;
 
   document.querySelectorAll('.comparison-filter').forEach(dropdown => {
     dropdown.value = value;
@@ -3787,35 +3804,35 @@ function syncDropdownsAndFilter(value) {
   const team1Data = filterTeamData(team1Input);
   const team2Data = filterTeamData(team2Input);
 
-  const maxAutoCoral = getMaxAutoCoral(team1Data, team2Data, value);
-  const maxAutoAlgae = getMaxAutoAlgae(team1Data, team2Data, value);
+  const maxAutoMechanism1 = getMaxAutoMechanism1(team1Data, team2Data, value);
+  const maxAutoMechanism2 = getMaxAutoMechanism2(team1Data, team2Data, value);
 
-  filterAndRenderComparisonCharts(1, value, maxAutoCoral, maxAutoAlgae);
-  filterAndRenderComparisonCharts(2, value, maxAutoCoral, maxAutoAlgae);
+  filterAndRenderComparisonCharts(1, value, maxAutoMechanism1, maxAutoMechanism2);
+  filterAndRenderComparisonCharts(2, value, maxAutoMechanism1, maxAutoMechanism2);
 
-  document.getElementById('algaeTypeFilter1').value = algae1;
-  document.getElementById('algaeTypeFilter2').value = algae2;
-  filterAndRenderAlgaeCharts(1, algae1);
-  filterAndRenderAlgaeCharts(2, algae2);
+  document.getElementById('mechanism2TypeFilter1').value = mechanism2_team1;
+  document.getElementById('mechanism2TypeFilter2').value = mechanism2_team2;
+  filterAndRenderMechanism2Charts(1, mechanism2_team1);
+  filterAndRenderMechanism2Charts(2, mechanism2_team2);
 }
 
-function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxCoral = null, yMaxAlgae = null) {
+function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxMechanism1 = null, yMaxMechanism2 = null) {
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
-  const coralCanvasId = teamNumber === 1 ? 'autoCoralTeam1' : 'autoCoralTeam2';
-  const algaeCanvasId = teamNumber === 1 ? 'autoAlgaeTeam1' : 'autoAlgaeTeam2';
+  const mechanism1CanvasId = teamNumber === 1 ? 'autoMechanism1Team1' : 'autoMechanism1Team2';
+  const mechanism2CanvasId = teamNumber === 1 ? 'autoMechanism2Team1' : 'autoMechanism2Team2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
 
   if (!teamNumberInput) {
-    renderBlankChart(coralCanvasId);
-    renderBlankChart(algaeCanvasId);
+    renderBlankChart(mechanism1CanvasId);
+    renderBlankChart(mechanism2CanvasId);
     return;
   }
 
   let teamData = filterTeamData(teamNumberInput);
   if (teamData.length === 0) {
-    renderBlankChart(coralCanvasId);
-    renderBlankChart(algaeCanvasId);
+    renderBlankChart(mechanism1CanvasId);
+    renderBlankChart(mechanism2CanvasId);
     return;
   }
 
@@ -3823,59 +3840,59 @@ function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxCoral = nu
 
   let filteredData = [...teamData];
   if (filterValue === 'side') {
-    filteredData = filteredData.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
+    filteredData = filteredData.filter(row => [auto.starting.side1, auto.starting.side2].includes(row[auto.starting.position]));
   } else if (filterValue === 'center') {
-    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'c');
-  } else if (filterValue === 'processor') {
-    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'p');
-  } else if (filterValue === 'scoringLocation3') {
-    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'o');
+    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.center);
+  } else if (filterValue === 'side1') {
+    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.side1);
+  } else if (filterValue === 'side2') {
+    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.side2);
   }
 
   const dataToUse = filterValue === 'all' ? teamData : filteredData;
 
   if (dataToUse.length > 0) {
-    renderAutoCoralChartForTeam(dataToUse, coralCanvasId, yMaxCoral);
-    renderAutoAlgaeChartForTeam(dataToUse, algaeCanvasId, yMaxAlgae);
+    renderAutoMechanism1ChartForTeam(dataToUse, mechanism1CanvasId, yMaxMechanism1);
+    renderAutoMechanism2ChartForTeam(dataToUse, mechanism2CanvasId, yMaxMechanism2);
   } else {
-    renderBlankChart(coralCanvasId);
-    renderBlankChart(algaeCanvasId);
+    renderBlankChart(mechanism1CanvasId);
+    renderBlankChart(mechanism2CanvasId);
   }
 }
 
 function getMetricValues(teamData, metricKey) {
   switch (metricKey) {
     case 'Total Points':
-      return teamData.map(row => parseFloat(row['Total Score'] || 0));
+      return teamData.map(row => parseFloat(row[total_score] || 0));
     case 'Auto Points':
-      return teamData.map(row => parseFloat(row['Auton Score'] || 0));
+      return teamData.map(row => parseFloat(row[auto_score] || 0));
     case 'Tele Points':
-      return teamData.map(row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)));
+      return teamData.map(row => (parseFloat(row[total_score] || 0) - parseFloat(row[auto_score] || 0)));
     case 'Total Cycles':
       return teamData.map(row =>
-      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
-        parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+      (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0) +
+        parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
       );
-    case 'Total Coral Cycles':
+    case 'Total Mechanism 1 Cycles':
       return teamData.map(row =>
-        (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
+        (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0))
       );
-    case 'L4 Cycles':
-      return teamData.map(row => parseInt(row['L4'] || 0));
-    case 'L3 Cycles':
-      return teamData.map(row => parseInt(row['L3'] || 0));
-    case 'L2 Cycles':
-      return teamData.map(row => parseInt(row['L2'] || 0));
-    case 'L1 Cycles':
-      return teamData.map(row => parseInt(row['L1'] || 0));
-    case 'Total Algae Cycles':
+    case 'Mechanism 1 Scoring Location 1 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation4] || 0));
+    case 'Mechanism 1 Scoring Location 2 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation3] || 0));
+    case 'Mechanism 1 Scoring Location 3 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation2] || 0));
+    case 'Mechanism 1 Scoring Location 4 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation1] || 0));
+    case 'Total Mechanism 2 Cycles':
       return teamData.map(row =>
-        (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
+        (parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
       );
-    case 'Barge Cycles':
-      return teamData.map(row => parseInt(row['Algae in Net'] || 0));
-    case 'Processor Cycles':
-      return teamData.map(row => parseInt(row['Algae in Processor'] || 0));
+    case 'Mechanism 2 Scoring Location 1 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0));
+    case 'Mechanism 2 Scoring Location 2 Cycles':
+      return teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0));
     default:
       return [];
   }
@@ -3902,14 +3919,14 @@ function renderComparisonMetricBoxPlots() {
     { label: 'Auto Points', left: 'leftAutoPointsChart', right: 'rightAutoPointsChart', color: '#51E7CF' },
     { label: 'Tele Points', left: 'leftTelePointsChart', right: 'rightTelePointsChart', color: '#3ecdd0' },
     { label: 'Total Cycles', left: 'leftTotalCyclesChart', right: 'rightTotalCyclesChart', color: '#cf8ffc' },
-    { label: 'Total Coral Cycles', left: 'leftTotalCoralCyclesChart', right: 'rightTotalCoralCyclesChart', color: '#ff83fa' },
-    { label: 'L4 Cycles', left: 'leftL4CyclesChart', right: 'rightL4CyclesChart', color: '#ff8bfc' },
-    { label: 'L3 Cycles', left: 'leftL3CyclesChart', right: 'rightL3CyclesChart', color: '#ed0cef' },
-    { label: 'L2 Cycles', left: 'leftL2CyclesChart', right: 'rightL2CyclesChart', color: '#BF02ff' },
-    { label: 'L1 Cycles', left: 'leftL1CyclesChart', right: 'rightL1CyclesChart', color: '#8105d8' },
-    { label: 'Total Algae Cycles', left: 'leftTotalAlgaeCyclesChart', right: 'rightTotalAlgaeCyclesChart', color: '#006fff' },
-    { label: 'Barge Cycles', left: 'leftBargeCyclesChart', right: 'rightBargeCyclesChart', color: '#3498db' },
-    { label: 'Processor Cycles', left: 'leftProcessorCyclesChart', right: 'rightProcessorCyclesChart', color: '#14c7de' }
+    { label: 'Total Mechanism 1 Cycles', left: 'leftTotalMechanism1CyclesChart', right: 'rightTotalMechanism1CyclesChart', color: '#ff83fa' },
+    { label: 'Mechanism 1 Scoring Location 1 Cycles', left: 'leftMechanism1ScoringLocation1Chart', right: 'rightMechanism1ScoringLocation1Chart', color: '#ff8bfc' },
+    { label: 'Mechanism 1 Scoring Location 2 Cycles', left: 'leftMechanism1ScoringLocation2Chart', right: 'rightMechanism1ScoringLocation2Chart', color: '#ed0cef' },
+    { label: 'Mechanism 1 Scoring Location 3 Cycles', left: 'leftMechanism1ScoringLocation3Chart', right: 'rightMechanism1ScoringLocation3Chart', color: '#BF02ff' },
+    { label: 'Mechanism 1 Scoring Location 4 Cycles', left: 'leftMechanism1ScoringLocation4Chart', right: 'rightMechanism1ScoringLocation4Chart', color: '#8105d8' },
+    { label: 'Total Mechanism 2 Cycles', left: 'leftTotalMechanism2CyclesChart', right: 'rightTotalMechanism2CyclesChart', color: '#006fff' },
+    { label: 'Mechanism 2 Scoring Location 1 Cycles', left: 'leftMechanism2ScoringLocation1Chart', right: 'rightMechanism2ScoringLocation1Chart', color: '#3498db' },
+    { label: 'Mechanism 2 Scoring Location 2 Cycles', left: 'leftMechanism2ScoringLocation2Chart', right: 'rightMechanism2ScoringLocation2Chart', color: '#14c7de' }
   ];
 
   metrics.forEach(metric => {
@@ -4554,8 +4571,8 @@ function renderHiddenTeamsList() {
     list.appendChild(listItem);
   });
 
-  const itemHeight = 42; 
-  const maxVisibleItems = 8; 
+  const itemHeight = 42;
+  const maxVisibleItems = 8;
   container.style.transition = 'max-height 0.20s ease, height 0.20s ease';
   if (hiddenTeams.length === 0) {
     container.style.maxHeight = '0px';
@@ -5964,15 +5981,15 @@ function openAllianceComparison(alliance) {
     content.appendChild(teamContainer);
 
     const allTeamData = teamNumbers.map(t => filterTeamData(t));
-    const maxTeleCoral = getMaxTeleCoral(...allTeamData);
-    const maxTeleAlgae = getMaxTeleAlgae(...allTeamData);
-    const maxAutoCoral = getMaxAutoCoral(...allTeamData);
-    const maxAutoAlgae = getMaxAutoAlgae(...allTeamData);
+    const maxTeleCoral = getMaxTeleMechanism1(...allTeamData);
+    const maxTeleAlgae = getMaxTeleMechanism2(...allTeamData);
+    const maxAutoCoral = getMaxAutoMechanism1(...allTeamData);
+    const maxAutoAlgae = getMaxAutoMechanism2(...allTeamData);
 
-    renderAutoCoralChartForTeam(teamData, `allianceAutoCoral${index}`, maxAutoCoral);
-    renderAutoAlgaeChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
-    renderTeleCoralChartForTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
-    renderTeleAlgaeChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
+    renderAutoMechanism1ChartForTeam(teamData, `allianceAutoCoral${index}`, maxAutoCoral);
+    renderAutoMechanism2ChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
+    renderTeleMechanism1ChartforTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
+    renderTeleMechanism2ChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
     renderEndGameChartForTeam(teamData, `allianceClimb${index}`);
   });
 

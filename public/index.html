@@ -490,16 +490,16 @@
                   <div class="statsText">
                     <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate1">0.00</span>%</p>
                     <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate1">0.00</span>%</p>
-                    <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge1"></span></p>
-                    <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor1"></span></p>
+                    <p><strong>Ground Barge:</strong> <span id="comparisonTrait1_1"></span></p>
+                    <p><strong>Ground Processor:</strong> <span id="comparisonTrait2_1"></span></p>
                   </div>
                 </div>
                 <div class="teamStatsFormatting2">
                   <h3 class="statsContainerText">Averages</h3>
                   <div class="statsText">
                     <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA1">0.00</span></p>
-                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral1">0.00</span></p>
-                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae1">0.00</span></p>
+                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageMechanism1_1">0.00</span></p>
+                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageMechanism2_1">0.00</span></p>
                     <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank1">N/A</span> <a href="#"
                         onclick="showTab(event, 'defenseRankingInfo')">
                         <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
@@ -517,11 +517,11 @@
                   <option value="all">All</option>
                   <option value="side">Side</option>
                   <option value="center">Center</option>
-                  <option value="processor">Side - Processor</option>
-                  <option value="barge">Side - Barge</option>
+                  <option value="side1">Side - Processor</option>
+                  <option value="side2">Side - Barge</option>
                 </select>
               </div>
-              <canvas id="autoCoralTeam1"></canvas>
+              <canvas id="autoMechanism1Team1"></canvas>
             </div>
 
             <div id="comparisonResultAlgae1">
@@ -532,32 +532,32 @@
                   <option value="all">All</option>
                   <option value="side">Side</option>
                   <option value="center">Center</option>
-                  <option value="processor">Side - Processor</option>
-                  <option value="barge">Side - Barge</option>
+                  <option value="side1">Side - Processor</option>
+                  <option value="side2">Side - Barge</option>
                 </select>
               </div>
-              <canvas id="autoAlgaeTeam1"></canvas>
+              <canvas id="autoMechanism2Team1"></canvas>
             </div>
 
             <div id="comparisonResultTeleCoral1">
               <div class="comparisonTele">
                 <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
-                <canvas id="teleCoralTeam1"></canvas>
+      <canvas id="teleMechanism1Team1"></canvas>
               </div>
             </div>
 
             <div id="comparisonResultTeleAlgae1">
               <div class="autoCharts">
                 <h3 class="chart-title">Tele Algae</h3>
-                <select id="algaeTypeFilter1" class="dropdown comparison-filter"
+                <select id="mechanism2TypeFilter1" class="dropdown comparison-filter"
                   onchange="syncAlgaeDropdownsAndFilter(this.value)">
                   <option value="all">All</option>
-                  <option value="remove">Remove</option>
-                  <option value="process">Process</option>
-                  <option value="barge">Barge</option>
+                  <option value="scoringLocation3">Remove</option>
+                  <option value="scoringLocation2">Process</option>
+                  <option value="scoringLocation1">Barge</option>
                 </select>
               </div>
-              <canvas id="teleAlgaeTeam1"></canvas>
+              <canvas id="teleMechanism2Team1"></canvas>
             </div>
 
             <div id="comparisonResultEndGame1">
@@ -596,16 +596,16 @@
                   <div class="statsText">
                     <p><strong>Climb Success:</strong> <span id="comparisonClimbSuccessRate2">0.00</span>%</p>
                     <p><strong>Robot Died:</strong> <span id="comparisonRobotDiedRate2">0.00</span>%</p>
-                    <p><strong>Ground Barge:</strong> <span id="comparisonGroundBarge2"></span></p>
-                    <p><strong>Ground Processor:</strong> <span id="comparisonGroundProcessor2"></span></p>
+                    <p><strong>Ground Barge:</strong> <span id="comparisonTrait1_2"></span></p>
+                    <p><strong>Ground Processor:</strong> <span id="comparisonTrait2_2"></span></p>
                   </div>
                 </div>
                 <div class="teamStatsFormatting2">
                   <h3 class="statsContainerText">Averages</h3>
                   <div class="statsText">
                     <p><strong>Avg EPA:</strong> <span id="comparisonAverageEPA2">0.00</span></p>
-                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageCoral2">0.00</span></p>
-                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageAlgae2">0.00</span></p>
+                    <p><strong>Avg Coral:</strong> <span id="comparisonAverageMechanism1_2">0.00</span></p>
+                    <p><strong>Avg Algae:</strong> <span id="comparisonAverageMechanism2_2">0.00</span></p>
                     <p><strong>Defense Rank:</strong> <span id="comparisonDefenseRank2">N/A</span> <a href="#"
                         onclick="showTab(event, 'defenseRankingInfo')">
                         <img src="images/information_icon.png" alt="Info" style="width: 16px; height: 16px;">
@@ -623,11 +623,11 @@
                   <option value="all">All</option>
                   <option value="side">Side</option>
                   <option value="center">Center</option>
-                  <option value="processor">Side - Processor</option>
-                  <option value="barge">Side - Barge</option>
+                  <option value="side1">Side - Processor</option>
+                  <option value="side2">Side - Barge</option>
                 </select>
               </div>
-              <canvas id="autoCoralTeam2"></canvas>
+              <canvas id="autoMechanism1Team2"></canvas>
             </div>
 
             <div id="comparisonResultAlgae2">
@@ -638,32 +638,32 @@
                   <option value="all">All</option>
                   <option value="side">Side</option>
                   <option value="center">Center</option>
-                  <option value="processor">Side - Processor</option>
-                  <option value="barge">Side - Barge</option>
+                  <option value="side1">Side - Processor</option>
+                  <option value="side2">Side - Barge</option>
                 </select>
               </div>
-              <canvas id="autoAlgaeTeam2"></canvas>
+              <canvas id="autoMechanism2Team2"></canvas>
             </div>
 
             <div id="comparisonResultTeleCoral2">
               <div class="comparisonTele">
                 <h3 class="chart-title" style="margin-bottom: 10px;">Tele Coral</h3>
-                <canvas id="teleCoralTeam2"></canvas>
+                <canvas id="teleMechanism1Team2"></canvas>
               </div>
             </div>
 
             <div id="comparisonResultTeleAlgae2">
               <div class="autoCharts">
                 <h3 class="chart-title">Tele Algae</h3>
-                <select id="algaeTypeFilter2" class="dropdown comparison-filter"
+                <select id="mechanism2TypeFilter2" class="dropdown comparison-filter"
                   onchange="syncAlgaeDropdownsAndFilter(this.value)">
                   <option value="all">All</option>
-                  <option value="remove">Remove</option>
-                  <option value="process">Process</option>
-                  <option value="barge">Barge</option>
+                  <option value="scoringLocation3">Remove</option>
+                  <option value="scoringLocation2">Process</option>
+                  <option value="scoringLocation1">Barge</option>
                 </select>
               </div>
-              <canvas id="teleAlgaeTeam2"></canvas>
+              <canvas id="teleMechanism2Team2"></canvas>
             </div>
 
             <div id="comparisonResultEndGame2">
@@ -702,11 +702,11 @@
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Total Coral Cycles</h3>
-              <canvas id="leftTotalCoralCyclesChart"></canvas>
+              <canvas id="leftTotalMechanism1CyclesChart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L4 Cycles</h3>
-              <canvas id="leftL4CyclesChart"></canvas>
+              <canvas id="leftMechanism1ScoringLocation1Chart"></canvas>
             </div>
           </div>
 
@@ -729,11 +729,11 @@
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Total Coral Cycles</h3>
-              <canvas id="rightTotalCoralCyclesChart"></canvas>
+              <canvas id="rightTotalMechanism1CyclesChart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L4 Cycles</h3>
-              <canvas id="rightL4CyclesChart"></canvas>
+              <canvas id="rightMechanism1ScoringLocation1Chart"></canvas>
             </div>
           </div>
         </div>
@@ -742,54 +742,54 @@
           <div class="comparison-half left-half">
             <div class="metric-chart-container">
               <h3 class="chart-title">L3 Cycles</h3>
-              <canvas id="leftL3CyclesChart"></canvas>
+              <canvas id="leftMechanism1ScoringLocation2Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L2 Cycles</h3>
-              <canvas id="leftL2CyclesChart"></canvas>
+              <canvas id="leftMechanism1ScoringLocation3Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L1 Cycles</h3>
-              <canvas id="leftL1CyclesChart"></canvas>
+              <canvas id="leftMechanism1ScoringLocation4Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Total Algae Cycles</h3>
-              <canvas id="leftTotalAlgaeCyclesChart"></canvas>
+              <canvas id="leftTotalMechanism2CyclesChart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Barge Cycles</h3>
-              <canvas id="leftBargeCyclesChart"></canvas>
+              <canvas id="leftMechanism2ScoringLocation1Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Processor Cycles</h3>
-              <canvas id="leftProcessorCyclesChart"></canvas>
+              <canvas id="leftMechanism2ScoringLocation2Chart"></canvas>
             </div>
           </div>
 
           <div class="comparison-half right-half">
             <div class="metric-chart-container">
               <h3 class="chart-title">L3 Cycles</h3>
-              <canvas id="rightL3CyclesChart"></canvas>
+              <canvas id="rightMechanism1ScoringLocation2Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L2 Cycles</h3>
-              <canvas id="rightL2CyclesChart"></canvas>
+              <canvas id="rightMechanism1ScoringLocation3Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">L1 Cycles</h3>
-              <canvas id="rightL1CyclesChart"></canvas>
+              <canvas id="rightMechanism1ScoringLocation4Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Total Algae Cycles</h3>
-              <canvas id="rightTotalAlgaeCyclesChart"></canvas>
+              <canvas id="rightTotalMechanism2CyclesChart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Barge Cycles</h3>
-              <canvas id="rightBargeCyclesChart"></canvas>
+              <canvas id="rightMechanism2ScoringLocation1Chart"></canvas>
             </div>
             <div class="metric-chart-container">
               <h3 class="chart-title">Processor Cycles</h3>
-              <canvas id="rightProcessorCyclesChart"></canvas>
+              <canvas id="rightMechanism2ScoringLocation2Chart"></canvas>
             </div>
           </div>
         </div>
