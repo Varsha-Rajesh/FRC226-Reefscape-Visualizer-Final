@@ -1282,7 +1282,7 @@ function restorePitScoutingData() {
       skipEmptyLines: true,
       transform: (value, header) => {
         const normalizedHeader = header.trim();
-        if (normalizedHeader === 'Ground Barge' || normalizedHeader === 'Ground Processor') {
+        if (normalizedHeader === pitScouting.trait1 || normalizedHeader === pitScouting.trait2) {
           return value === '1';
         }
         return value;
@@ -1290,9 +1290,9 @@ function restorePitScoutingData() {
     });
 
     pitScoutingData = result.data.filter(row => {
-      return row['Team No.'] &&
-        (row['Ground Barge'] !== undefined) &&
-        (row['Ground Processor'] !== undefined);
+      return row[team_number] &&
+        (row[pitScouting.trait1] !== undefined) &&
+        (row[pitScouting.trait2] !== undefined);
     });
 
     const statusEl = document.getElementById('statusPit');
@@ -1372,7 +1372,7 @@ async function handlePitUpload(fileInputId, statusId) {
       skipEmptyLines: true,
       transform: (value, header) => {
         const normalizedHeader = header.trim();
-        if (normalizedHeader === 'Ground Barge' || normalizedHeader === 'Ground Processor') {
+        if (normalizedHeader === pitScouting.trait1 || normalizedHeader === pitScouting.trait2) {
           return value === '1';
         }
         return value;
@@ -1380,9 +1380,9 @@ async function handlePitUpload(fileInputId, statusId) {
     });
 
     pitScoutingData = result.data.filter(row => {
-      return row['Team No.'] &&
-        (row['Ground Barge'] !== undefined) &&
-        (row['Ground Processor'] !== undefined);
+      return row[team_number] &&
+        (row[pitScouting.trait1] !== undefined) &&
+        (row[pitScouting.trait2] !== undefined);
     });
 
     localStorage.setItem('pitCsvText', text);
