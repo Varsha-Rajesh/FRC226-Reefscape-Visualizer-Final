@@ -84,6 +84,7 @@ const comparision = {
 
 const callback_mechanism1 = "Total Coral";
 const callback_mechanism2 = "Total Algae";
+
 // Teams
 let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 let showHiddenTeamsInFilter = false;
@@ -164,7 +165,9 @@ const auto_score = "Auton Score";
 const tele_score = "Tele Score";
 
 const team_number = "Team No.";
+const robot_color = "Robot Color";
 const comments = "Comments";
+const match = "Match";
 
 const died = {
   header: "Died or Immobilized",
@@ -1542,9 +1545,9 @@ function calculateDefenseRankings(data) {
   };
 
   data.forEach(row => {
-    const match = row['Match'];
-    const teamNumber = row['Team No.'];
-    const died = row['Died or Immobilized'] === '1';
+    const match = row[match];
+    const teamNumber = row[team_number];
+    const died = row[died.header] === died.yes;
 
     if (match && teamNumber) {
       if (!robotDiedMap[match]) {
@@ -1557,10 +1560,10 @@ function calculateDefenseRankings(data) {
   });
 
   data.forEach(row => {
-    const match = row['Match'];
-    const teamNumber = row['Team No.'];
-    const robotColor = row['Robot Color'];
-    const totalScore = parseFloat(row['Total Score']) || 0;
+    const match = row[match];
+    const teamNumber = row[team_number];
+    const robotColor = row[robot_color];
+    const totalScore = parseFloat(row[total_score]) || 0;
 
     if (!match || !teamNumber || !robotColor) return;
 
@@ -1593,10 +1596,10 @@ function calculateDefenseRankings(data) {
   });
 
   data.forEach(row => {
-    const teamNumber = row['Team No.'];
-    const match = row['Match'];
-    const robotColor = row['Robot Color'];
-    const defenseRating = parseFloat(row['Defense Rating']);
+    const match = row[match];
+    const teamNumber = row[team_number];
+    const robotColor = row[robot_color];
+    const defenseRating = parseFloat(row[defense.rating]);
 
     if (!match || !teamNumber || isNaN(defenseRating) || defenseRating <= 0) return;
 
