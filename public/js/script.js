@@ -755,17 +755,17 @@ function renderRankingTable() {
     const vals = Object.values(teams).map(arr => {
       if (key === 'Tele Coral') {
         return arr.map(r =>
-          (parseInt(r['L1'] || 0)) +
-          (parseInt(r['L2'] || 0)) +
-          (parseInt(r['L3'] || 0)) +
-          (parseInt(r['L4'] || 0))
+          (parseInt(r[tele.mechanism1.scoringLocation4] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation3] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation2] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation1] || 0))
         ).reduce((a, b) => a + b, 0) / arr.length;
       }
       if (key === 'Tele Algae') {
         return arr.map(r =>
           (parseInt(r['Algae in Net'] || 0)) +
           (parseInt(r['Algae in Processor'] || 0))
-        ).reduce((a, b) => a + b, 0) / arr.length;
+        ).reduce((a, b) => a + b, 0) /  arr.length;
       }
       if (key === 'Climb Attempts') {
         return arr.filter(r => r['Climb Score'] !== undefined && r['Climb Score'] !== '').length;
@@ -4905,7 +4905,7 @@ function renderMatchPredictor() {
   const teamStats = {};
 
   allTeams.forEach(team => {
-    const teamData = parsedData.filter(row => row['Team No.'] === team);
+    const teamData = parsedData.filter(row => row[team_number] === team);
     if (teamData.length === 0) return;
 
     const stats = {
@@ -4915,16 +4915,37 @@ function renderMatchPredictor() {
         mostCommonStats: null
       },
       tele: {
-        L1: 0, L2: 0, L3: 0, L4: 0,
-        barge: 0, processor: 0, removed: 0
+        mechanism1: {
+          scoringLocation1: 0,
+          scoringLocation2: 0,
+          scoringLocation3: 0,
+          scoringLocation4: 0,
+          scoringLocation5: 0
+        },
+        mechanism2: {
+          scoringLocation1: 0,
+          scoringLocation2: 0,
+          scoringLocation3: 0,
+          scoringLocation4: 0,
+          scoringLocation5: 0
+        }
       },
       endgame: {
-        deepClimb: 0,
-        shallowClimb: 0,
-        deepAttempts: 0,
-        shallowAttempts: 0,
-        deepClimbRate: '-',
-        shallowClimbRate: '-'
+        state1: 0,
+        state2: 0,
+        state3: 0,
+        state4: 0,
+        state5: 0,
+        state1attempts: 0,
+        state2attempts:0,
+        state3attempts:0,
+        state4attempts:0,
+        state5attempts:0,
+        state1Rate: '-',
+        state2Rate: '-',
+        state3Rate: '-',
+        state4Rate: '-',
+        state5Rate: '-'
       },
       epa: 0,
       matches: teamData.length
@@ -4932,17 +4953,17 @@ function renderMatchPredictor() {
 
     teamData.forEach(row => {
       const autoRun = {
-        L1: parseInt(row['Auton L1'] || 0),
-        L2: parseInt(row['Auton L2'] || 0),
-        L3: parseInt(row['Auton L3'] || 0),
-        L4: parseInt(row['Auton L4'] || 0),
-        barge: parseInt(row['Auton Algae in Net'] || 0),
-        processor: parseInt(row['Auton Algae in Processor'] || 0),
-        removed: parseInt(row['Auton Algae Removed'] || 0),
-        score: parseInt(row['Auton Score'] || 0)
+        mechanism1_scoringLocation4: parseInt(row[auto.mechanism1.scoringLocation4] || 0),
+        mechanism1_scoringLocation3: parseInt(row[auto.mechanism1.scoringLocation3] || 0),
+        mechanism1_scoringLocation2: parseInt(row[auto.mechanism1.scoringLocation2] || 0),
+        mechanism1_scoringLocation1: parseInt(row[auto.mechanism1.scoringLocation1] || 0),
+        mechanism2_scoringLocation1: parseInt(row[auto.mechanism2.scoringLocation1] || 0),
+        mechanism2_scoringLocation2: parseInt(row[auto.mechanism2.scoringLocation2] || 0),
+        mechanism2_scoringLocation3: parseInt(row[auto.mechanism2.scoringLocation3] || 0),
+        score: parseInt(row[auto_score] || 0),
       };
 
-      const runKey = `${autoRun.L1}-${autoRun.L2}-${autoRun.L3}-${autoRun.L4}`;
+      const runKey = `${autoRun.mechanism1_scoringLocation4}-${autoRun.mechanism1_scoringLocation3}-${autoRun.mechanism1_scoringLocation2}-${autoRun.mechanism1_scoringLocation1}`;
 
       if (!stats.auto.modes[runKey]) {
         stats.auto.modes[runKey] = {
@@ -4968,56 +4989,64 @@ function renderMatchPredictor() {
 
     if (mostCommonRun) {
       stats.auto.mostCommonStats = {
-        L1: mostCommonRun.L1,
-        L2: mostCommonRun.L2,
-        L3: mostCommonRun.L3,
-        L4: mostCommonRun.L4,
-        barge: mostCommonRun.barge,
-        processor: mostCommonRun.processor,
-        removed: mostCommonRun.removed
+        mechanism1_scoringLocation4: mostCommonRun.mechanism1_scoringLocation4,
+        mechanism1_scoringLocation3: mostCommonRun.mechanism1_scoringLocation3,
+        mechanism1_scoringLocation2: mostCommonRun.mechanism1_scoringLocation2,
+        mechanism1_scoringLocation1: mostCommonRun.mechanism1_scoringLocation1,
+        mechanism2_scoringLocation1: mostCommonRun.mechanism2_scoringLocation1,
+        mechanism2_scoringLocation2: mostCommonRun.mechanism2_scoringLocation2,
+        mechanism2_scoringLocation3: mostCommonRun.mechanism2_scoringLocation3,
       };
     }
 
     teamData.forEach(row => {
-      stats.tele.L1 += parseInt(row['L1'] || 0);
-      stats.tele.L2 += parseInt(row['L2'] || 0);
-      stats.tele.L3 += parseInt(row['L3'] || 0);
-      stats.tele.L4 += parseInt(row['L4'] || 0);
-      stats.tele.barge += parseInt(row['Algae in Net'] || 0);
-      stats.tele.processor += parseInt(row['Algae in Processor'] || 0);
-      stats.tele.removed += parseInt(row['Algae removed'] || 0);
-
-      const climbScore = parseFloat(row['Climb Score'] || 0);
+      stats.tele.mechanism1_scoringLocation4 += parseInt(row[tele.mechanism1.scoringLocation4] || 0);
+      stats.tele.mechanism1_scoringLocation3 += parseInt(row[tele.mechanism1.scoringLocation3] || 0);
+      stats.tele.mechanism1_scoringLocation2 += parseInt(row[tele.mechanism1.scoringLocation2] || 0);
+      stats.tele.mechanism1_scoringLocation1 += parseInt(row[tele.mechanism1.scoringLocation1] || 0);
+      stats.tele.mechanism2_scoringLocation1 += parseInt(row[tele.mechanism2.scoringLocation1] || 0);
+      stats.tele.mechanism2_scoringLocation2 += parseInt(row[tele.mechanism2.scoringLocation2] || 0);
+      stats.tele.mechanism2_scoringLocation3 += parseInt(row[tele.mechanism2.scoringLocation3] || 0);
+ 
+      const climbScore = parseFloat(row[tele.endGame.header] || 0);
 
       if (climbScore === 12 || climbScore === 2.1) {
-        stats.endgame.deepAttempts++;
-        if (climbScore === 12) stats.endgame.deepClimb++;
+        stats.endgame.state1attempts++;
+        if (climbScore === 12) stats.endgame.state1++;
       }
 
       if (climbScore === 6 || climbScore === 2.1) {
         stats.endgame.shallowAttempts++;
-        if (climbScore === 6) stats.endgame.shallowClimb++;
+        if (climbScore === 6) stats.endgame.state2attempts++;
       }
-
-      stats.epa += parseFloat(row['Total Score'] || 0);
+      if (climbScore === 12) {
+      stats.endgame.state1attempts++;
+       stats.endgame.state1++;     } else if (climbScore === 6) {
+      stats.endgame.state2attempts++;
+      stats.endgame.state2++;
+     } else if (climbScore === 2.1) {
+       stats.endgame.state1attempts++;
+       stats.endgame.state2attempts++;
+     }
+      stats.epa += parseFloat(row[total_score] || 0);
     });
 
     if (stats.matches > 0) {
-      stats.tele.L1 = (stats.tele.L1 / stats.matches).toFixed(1);
-      stats.tele.L2 = (stats.tele.L2 / stats.matches).toFixed(1);
-      stats.tele.L3 = (stats.tele.L3 / stats.matches).toFixed(1);
-      stats.tele.L4 = (stats.tele.L4 / stats.matches).toFixed(1);
-      stats.tele.barge = (stats.tele.barge / stats.matches).toFixed(1);
-      stats.tele.processor = (stats.tele.processor / stats.matches).toFixed(1);
-      stats.tele.removed = (stats.tele.removed / stats.matches).toFixed(1);
+      stats.tele.mechanism1_scoringLocation4 = (stats.tele.mechanism1_scoringLocation4 / stats.matches).toFixed(1);
+      stats.tele.mechanism1_scoringLocation3 = (stats.tele.mechanism1_scoringLocation3 / stats.matches).toFixed(1);
+      stats.tele.mechanism1_scoringLocation2 = (stats.tele.mechanism1_scoringLocation2 / stats.matches).toFixed(1);
+      stats.tele.mechanism1_scoringLocation1 = (stats.tele.mechanism1_scoringLocation1 / stats.matches).toFixed(1);
+      stats.tele.mechanism2_scoringLocation1 = (stats.tele.mechanism2_scoringLocation1 / stats.matches).toFixed(1);
+      stats.tele.mechanism2_scoringLocation2 = (stats.tele.mechanism2_scoringLocation2 / stats.matches).toFixed(1);
+      stats.tele.mechanism2_scoringLocation3 = (stats.tele.mechanism2_scoringLocation3 / stats.matches).toFixed(1);
 
-      if (stats.endgame.deepAttempts > 0) {
-        const rate = (stats.endgame.deepClimb / stats.endgame.deepAttempts * 100);
-        stats.endgame.deepClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
+      if (stats.endgame.state1attempts > 0) {
+        const rate = (stats.endgame.state1 / stats.endgame.state1attempts * 100);
+        stats.endgame.state1Rate = rate === 0 ? '-' : rate.toFixed(1) + '%';
       }
-      if (stats.endgame.shallowAttempts > 0) {
-        const rate = (stats.endgame.shallowClimb / stats.endgame.shallowAttempts * 100);
-        stats.endgame.shallowClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
+      if (stats.endgame.state2attempts > 0) {
+        const rate = (stats.endgame.state2 / stats.endgame.state2attempts * 100);
+        stats.endgame.state2Rate = rate === 0 ? '-' : rate.toFixed(1) + '%';
       }
 
       stats.epa = (stats.epa / stats.matches).toFixed(1);
@@ -5186,37 +5215,37 @@ function renderMatchPredictor() {
   `;
   table.appendChild(endgameHeader);
 
-  const deepClimbRow = document.createElement('tr');
-  deepClimbRow.innerHTML = `
+  const state1row = document.createElement('tr');
+  state1row.innerHTML = `
     <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Deep Climb</td>
     ${redTeams.map(team => `
       <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.deepClimbRate || '-'}
+        ${teamStats[team]?.endgame.state1rate || '-'}
       </td>
     `).join('')}
     ${blueTeams.map(team => `
       <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.deepClimbRate || '-'}
+        ${teamStats[team]?.endgame.state1rate || '-'}
       </td>
     `).join('')}
   `;
-  table.appendChild(deepClimbRow);
+  table.appendChild(state1row);
 
-  const shallowClimbRow = document.createElement('tr');
-  shallowClimbRow.innerHTML = `
+  const state2row = document.createElement('tr');
+  state2row.innerHTML = `
     <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Shallow Climb</td>
     ${redTeams.map(team => `
       <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.shallowClimbRate || '-'}
+        ${teamStats[team]?.endgame.state2rate || '-'}
       </td>
     `).join('')}
     ${blueTeams.map(team => `
       <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.shallowClimbRate || '-'}
+        ${teamStats[team]?.endgame.state2rate || '-'}
       </td>
     `).join('')}
   `;
-  table.appendChild(shallowClimbRow);
+  table.appendChild(state2row);
 
   const epaRow = document.createElement('tr');
   epaRow.innerHTML = `
