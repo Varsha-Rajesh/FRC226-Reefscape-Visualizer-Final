@@ -105,6 +105,7 @@ let pitScoutingData = [];
 // CSV Headers
 
 const auto = {
+  leave: "Auto Leave starting line",
   mechanism1: {
     scoringLocation1: 'Auton L4',
     scoringLocation2: 'Auton L3',
@@ -181,6 +182,8 @@ const defense = {
     yes: "1"
   }
 }
+
+const driver_skill = "Driver Skill";
 
 const pitScouting = {
   trait1: 'Ground Barge',
@@ -5302,122 +5305,124 @@ function updateAllianceCompareTable(redTeams, blueTeams) {
   thead.appendChild(headerRow);
 
   const parsedData = parseCSV().data;
+  
   function getTeamRows(team) {
-    return parsedData.filter(row => row['Team No.'] === team);
+    return parsedData.filter(row => row[team_number] === team);
   }
+  
   function avg(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
   }
+  
   function sum(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? vals.reduce((a, b) => a + b, 0) : '-';
+    return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '0.00';
   }
+  
   function max(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? Math.max(...vals) : '-';
+    return vals.length ? Math.max(...vals).toFixed(2) : '0.00';
   }
+  
   function count(rows, key) {
     return rows.filter(r => r[key] !== undefined && r[key] !== '').length;
   }
 
   const statDefs = [
-    { label: "Avg Total Points", fn: rows => avg(rows, 'Total Score') },
-    { label: "Avg Auto Points", fn: rows => avg(rows, 'Auton Score') },
-    { label: "Avg TeleOp Points", fn: rows => avg(rows, 'Teleop Score') },
-    { label: "Avg Climb Points", fn: rows => avg(rows, 'Climb Score') },
-    { label: "Avg Auto L4", fn: rows => avg(rows, 'Auton L4') },
-    { label: "Avg Leave", fn: rows => avg(rows, 'Auton Leave starting line') },
-    { label: "Avg L4", fn: rows => avg(rows, 'L4') },
-    { label: "Avg L3", fn: rows => avg(rows, 'L3') },
-    { label: "Avg L2", fn: rows => avg(rows, 'L2') },
-    { label: "Avg L1", fn: rows => avg(rows, 'L1') },
+    { label: 'Avg Total Score', fn: rows => avg(rows, total_score) },
+    { label: 'Avg Auto Score', fn: rows => avg(rows, auto_score) },
+    { label: 'Avg Tele Score', fn: rows => {
+      const vals = rows.map(r => parseFloat(r[total_score] || 0) - parseFloat(r[auto_score] || 0)).filter(v => !isNaN(v));
+      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+    }},
+    { label: 'Avg Climb Score', fn: rows => avg(rows, tele.endGame.header) },
+    { label: 'Avg Auto L4', fn: rows => avg(rows, auto.mechanism1.scoringLocation4) },
+    { label: 'Avg Auto Leave', fn: rows => avg(rows, auto.leave) },
+    { label: 'Avg Tele L4', fn: rows => avg(rows, tele.mechanism1.scoringLocation4) },
+    { label: 'Avg Tele L3', fn: rows => avg(rows, tele.mechanism1.scoringLocation3) },
+    { label: 'Avg Tele L2', fn: rows => avg(rows, tele.mechanism1.scoringLocation2) },
+    { label: 'Avg Tele L1', fn: rows => avg(rows, tele.mechanism1.scoringLocation1) },
     {
-      label: "Avg Coral Cycles", fn: rows => {
+      label: 'Avg Coral Cycles', fn: rows => {
         const vals = rows.map(r =>
-          (parseInt(r['L1'] || 0)) +
-          (parseInt(r['L2'] || 0)) +
-          (parseInt(r['L3'] || 0)) +
-          (parseInt(r['L4'] || 0))
+          (parseInt(r[tele.mechanism1.scoringLocation4] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation3] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation2] || 0)) +
+          (parseInt(r[tele.mechanism1.scoringLocation1] || 0))
         );
-        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+      }
+    },
+    { label: 'Avg Algae Removed', fn: rows => avg(rows, tele.mechanism2.scoringLocation3) },
+    { label: 'Avg Algae Processor', fn: rows => avg(rows, tele.mechanism2.scoringLocation2) },
+    { label: 'Avg Algae Net', fn: rows => avg(rows, tele.mechanism2.scoringLocation1) },
+    { label: 'Max Algae Net', fn: rows => max(rows, tele.mechanism2.scoringLocation1) },
+    {
+      label: 'Avg Algae Cycles', fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r[tele.mechanism2.scoringLocation1] || 0)) +
+          (parseInt(r[tele.mechanism2.scoringLocation2] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
       }
     },
     {
-      label: "Avg A+T L4", fn: rows => {
-        const vals = rows.map(r =>
-          (parseInt(r['Auton L4'] || 0)) +
-          (parseInt(r['L4'] || 0))
-        );
-        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
-      }
-    },
-    { label: "Avg Algae Remove", fn: rows => avg(rows, 'Algae removed') },
-    { label: "Avg Alg in Processor", fn: rows => avg(rows, 'Algae in Processor') },
-    { label: "Avg Alg in Net", fn: rows => avg(rows, 'Algae in Net') },
-    { label: "Max Alg in Net", fn: rows => max(rows, 'Algae in Net') },
-    {
-      label: "Avg Alg Cycles", fn: rows => {
-        const vals = rows.map(r =>
-          (parseInt(r['Algae in Net'] || 0)) +
-          (parseInt(r['Algae in Processor'] || 0))
-        );
-        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
-      }
-    },
-    {
-      label: "Attempted Climbs", fn: rows => {
+      label: 'Climb Attempts', fn: rows => {
         return rows.filter(r => {
-          const v = parseFloat(r['Climb Score'] || 0);
+          const v = parseFloat(r[tele.endGame.header] || 0);
           return v === 12 || v === 6 || v === 2.1;
         }).length;
       }
     },
     {
-      label: "Successful Climbs", fn: rows => {
+      label: 'Climb Success', fn: rows => {
         return rows.filter(r => {
-          const v = parseFloat(r['Climb Score'] || 0);
+          const v = parseFloat(r[tele.endGame.header] || 0);
           return v === 12 || v === 6;
         }).length;
       }
     },
     {
-      label: "Climb Rate", fn: rows => {
+      label: 'Climb Rate', fn: rows => {
         const attempts = rows.filter(r => {
-          const v = parseFloat(r['Climb Score'] || 0);
+          const v = parseFloat(r[tele.endGame.header] || 0);
           return v === 12 || v === 6 || v === 2.1;
         }).length;
         const successes = rows.filter(r => {
-          const v = parseFloat(r['Climb Score'] || 0);
+          const v = parseFloat(r[tele.endGame.header] || 0);
           return v === 12 || v === 6;
         }).length;
-        return attempts > 0 ? ((successes / attempts) * 100).toFixed(1) + "%" : "-";
+        return attempts > 0 ? ((successes / attempts) * 100).toFixed(1) + "%" : "0%";
       }
     },
-    { label: "Avg Driver Skill", fn: rows => avg(rows, 'Driver skill') },
-    { label: "Defense Count", fn: rows => count(rows, 'Defense Rating') },
-    { label: "Max Def. Rating", fn: rows => max(rows, 'Defense Rating') },
-    { label: "SUM of Immobolized", fn: rows => sum(rows, 'Died or Immobilized') }
+    { label: 'Avg Driver Skill', fn: rows => avg(rows, driver_skill) },
+    { label: 'Defense Count', fn: rows => count(rows, defense.rating) },
+    { label: 'Max Defense Rating', fn: rows => max(rows, defense.rating) },
+    { label: 'Robot Died Count', fn: rows => count(rows, died.header) }
   ];
 
   statDefs.forEach((stat, idx) => {
     const borderStyle = "border-bottom: 1px solid #333;";
-    const statCell = `<td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left; width: 180px; ${borderStyle}">${stat.label}</td>`;
-    const redCells = redTeams.map((team, i) => {
-      const bgColor = idx % 2 === 0 ? "#ff5c5c30" : "#ff7b7b30";
-      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
+    const bgColor = idx % 2 === 0 ? "#1C1E21" : "#252829";
+    const statCell = `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: left; width: 180px; ${borderStyle}">${stat.label}</td>`;
+    
+    const redCells = redTeams.map((team) => {
+      const cellBg = idx % 2 === 0 ? "#ff5c5c30" : "#ff7b7b30";
+      const rows = getTeamRows(team);
+      const value = rows.length > 0 ? stat.fn(rows) : '—';
+      return `<td style="background-color: ${cellBg}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${value}</td>`;
     }).join('');
+    
     const redTotalBg = idx % 2 === 0 ? "#ff83fa30" : "#ffb6e630";
     const redTotal = (() => {
       const vals = redTeams.map(team => {
         const rows = getTeamRows(team);
         const v = stat.fn(rows);
-        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+        return parseFloat(v) || 0;
       }).filter(v => typeof v === 'number' && !isNaN(v));
-      if (typeof stat.fn(getTeamRows(redTeams[0])) === 'string' && stat.fn(getTeamRows(redTeams[0])).includes('%')) {
-        return '-';
-      }
-      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
+      if (stat.fn(getTeamRows(redTeams[0])).includes('%')) return '—';
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '—';
     })();
     const redTotalCell = `<td style="background-color: ${redTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${redTotal}</td>`;
 
@@ -5426,19 +5431,18 @@ function updateAllianceCompareTable(redTeams, blueTeams) {
       const vals = blueTeams.map(team => {
         const rows = getTeamRows(team);
         const v = stat.fn(rows);
-        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+        return parseFloat(v) || 0;
       }).filter(v => typeof v === 'number' && !isNaN(v));
-      if (typeof stat.fn(getTeamRows(blueTeams[0])) === 'string' && stat.fn(getTeamRows(blueTeams[0])).includes('%')) {
-        return '-';
-      }
-      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
+      if (stat.fn(getTeamRows(blueTeams[0])).includes('%')) return '—';
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '—';
     })();
-    const blueTotalCell = `<td style="background-color: ${blueTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${blueTotal}</td>`; const blueTotalColor = idx % 2 === 0 ? "#8105d8" : "#cf8ffc";
+    const blueTotalCell = `<td style="background-color: ${blueTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${blueTotal}</td>`;
 
-
-    const blueCells = blueTeams.map((team, i) => {
-      const bgColor = idx % 2 === 0 ? "#3EDBF030" : "#5cf0ff30";
-      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
+    const blueCells = blueTeams.map((team) => {
+      const cellBg = idx % 2 === 0 ? "#3EDBF030" : "#5cf0ff30";
+      const rows = getTeamRows(team);
+      const value = rows.length > 0 ? stat.fn(rows) : '—';
+      return `<td style="background-color: ${cellBg}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${value}</td>`;
     }).join('');
 
     const row = document.createElement('tr');
