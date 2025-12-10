@@ -5128,18 +5128,21 @@ function renderMatchPredictor() {
   `;
   table.appendChild(autoHeader);
 
+// In the renderMatchPredictor function, update the auto table rendering:
+
   ['L1', 'L2', 'L3', 'L4'].forEach(level => {
     const row = document.createElement('tr');
+    const levelKey = `mechanism1_scoringLocation${{'L1': 1, 'L2': 2, 'L3': 3, 'L4': 4}[level]}`;
     row.innerHTML = `
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Auto ${level}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[level] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[levelKey] : '0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[level] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[levelKey] : '0'}
         </td>
       `).join('')}
     `;
@@ -5148,16 +5151,21 @@ function renderMatchPredictor() {
 
   ['Barge', 'Processor', 'Removed'].forEach(type => {
     const row = document.createElement('tr');
+    const typeKey = {
+      'Barge': 'mechanism2_scoringLocation1',
+      'Processor': 'mechanism2_scoringLocation2',
+      'Removed': 'mechanism2_scoringLocation3'
+    }[type];
     row.innerHTML = `
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Auto ${type}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[type.toLowerCase()] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[typeKey] : '0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[type.toLowerCase()] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[typeKey] : '0'}
         </td>
       `).join('')}
     `;
@@ -5531,39 +5539,6 @@ function addStatRows(category, stats, statType, table, redTeams, blueTeams, team
     table.appendChild(row);
   });
 }
-
-function addStatRows(category, stats, statType, table, redTeams, blueTeams, teamStats) {
-  const categoryRow = document.createElement('tr');
-  categoryRow.innerHTML = `
-    <td colspan="${redTeams.length + blueTeams.length + 1}" 
-        style="background-color: #2a2d31; color: white; font-weight: bold; padding: 8px;">
-      ${category}
-    </td>
-  `;
-  table.appendChild(categoryRow);
-
-  stats.forEach(stat => {
-    const statKey = stat.toLowerCase().replace(' ', '');
-    const row = document.createElement('tr');
-
-    row.innerHTML = `
-      <td style="background-color: #1C1E21; color: white; padding: 8px;">${stat}</td>
-      ${redTeams.map(team => `
-        <td style="background-color: #ff5c5c30; color: white;">
-          ${teamStats[team]?.[statType]?.[statKey] || 'N/A'}
-        </td>
-      `).join('')}
-      ${blueTeams.map(team => `
-        <td style="background-color: #3EDBF030; color: white;">
-          ${teamStats[team]?.[statType]?.[statKey] || 'N/A'}
-        </td>
-      `).join('')}
-    `;
-
-    table.appendChild(row);
-  });
-}
-
 function toggleStatsTable() {
   const container = document.getElementById('matchStatsTableContainer');
   const arrow = document.getElementById('statsToggleArrow');
