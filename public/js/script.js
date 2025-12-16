@@ -5003,54 +5003,47 @@ function renderMatchPredictor() {
     }
 
     teamData.forEach(row => {
-      stats.tele.mechanism1_scoringLocation4 += parseInt(row[tele.mechanism1.scoringLocation4] || 0);
-      stats.tele.mechanism1_scoringLocation3 += parseInt(row[tele.mechanism1.scoringLocation3] || 0);
-      stats.tele.mechanism1_scoringLocation2 += parseInt(row[tele.mechanism1.scoringLocation2] || 0);
-      stats.tele.mechanism1_scoringLocation1 += parseInt(row[tele.mechanism1.scoringLocation1] || 0);
-      stats.tele.mechanism2_scoringLocation1 += parseInt(row[tele.mechanism2.scoringLocation1] || 0);
-      stats.tele.mechanism2_scoringLocation2 += parseInt(row[tele.mechanism2.scoringLocation2] || 0);
-      stats.tele.mechanism2_scoringLocation3 += parseInt(row[tele.mechanism2.scoringLocation3] || 0);
- 
+      stats.tele.mechanism1.scoringLocation4 += parseInt(row[tele.mechanism1.scoringLocation4] || 0);
+      stats.tele.mechanism1.scoringLocation3 += parseInt(row[tele.mechanism1.scoringLocation3] || 0);
+      stats.tele.mechanism1.scoringLocation2 += parseInt(row[tele.mechanism1.scoringLocation2] || 0);
+      stats.tele.mechanism1.scoringLocation1 += parseInt(row[tele.mechanism1.scoringLocation1] || 0);
+
+      stats.tele.mechanism2.scoringLocation1 += parseInt(row[tele.mechanism2.scoringLocation1] || 0);
+      stats.tele.mechanism2.scoringLocation2 += parseInt(row[tele.mechanism2.scoringLocation2] || 0);
+      stats.tele.mechanism2.scoringLocation3 += parseInt(row[tele.mechanism2.scoringLocation3] || 0);
+
       const climbScore = parseFloat(row[tele.endGame.header] || 0);
-
-      if (climbScore === 12 || climbScore === 2.1) {
-        stats.endgame.state1attempts++;
-        if (climbScore === 12) stats.endgame.state1++;
+      if (climbScore === tele.endGame.state1) {
+        stats.endgame.state1++;
+      } else if (climbScore === tele.endGame.state2) {
+        stats.endgame.state2++;
       }
 
-      if (climbScore === 6 || climbScore === 2.1) {
-        stats.endgame.shallowAttempts++;
-        if (climbScore === 6) stats.endgame.state2attempts++;
-      }
-      if (climbScore === 12) {
-      stats.endgame.state1attempts++;
-       stats.endgame.state1++;     } else if (climbScore === 6) {
-      stats.endgame.state2attempts++;
-      stats.endgame.state2++;
-     } else if (climbScore === 2.1) {
-       stats.endgame.state1attempts++;
-       stats.endgame.state2attempts++;
-     }
       stats.epa += parseFloat(row[total_score] || 0);
     });
 
     if (stats.matches > 0) {
-      stats.tele.mechanism1_scoringLocation4 = (stats.tele.mechanism1_scoringLocation4 / stats.matches).toFixed(1);
-      stats.tele.mechanism1_scoringLocation3 = (stats.tele.mechanism1_scoringLocation3 / stats.matches).toFixed(1);
-      stats.tele.mechanism1_scoringLocation2 = (stats.tele.mechanism1_scoringLocation2 / stats.matches).toFixed(1);
-      stats.tele.mechanism1_scoringLocation1 = (stats.tele.mechanism1_scoringLocation1 / stats.matches).toFixed(1);
-      stats.tele.mechanism2_scoringLocation1 = (stats.tele.mechanism2_scoringLocation1 / stats.matches).toFixed(1);
-      stats.tele.mechanism2_scoringLocation2 = (stats.tele.mechanism2_scoringLocation2 / stats.matches).toFixed(1);
-      stats.tele.mechanism2_scoringLocation3 = (stats.tele.mechanism2_scoringLocation3 / stats.matches).toFixed(1);
+      stats.tele.L4 = (stats.tele.mechanism1.scoringLocation4 / stats.matches).toFixed(1);
+      stats.tele.L3 = (stats.tele.mechanism1.scoringLocation3 / stats.matches).toFixed(1);
+      stats.tele.L2 = (stats.tele.mechanism1.scoringLocation2 / stats.matches).toFixed(1);
+      stats.tele.L1 = (stats.tele.mechanism1.scoringLocation1 / stats.matches).toFixed(1);
 
-      if (stats.endgame.state1attempts > 0) {
-        const rate = (stats.endgame.state1 / stats.endgame.state1attempts * 100);
-        stats.endgame.state1Rate = rate === 0 ? '-' : rate.toFixed(1) + '%';
-      }
-      if (stats.endgame.state2attempts > 0) {
-        const rate = (stats.endgame.state2 / stats.endgame.state2attempts * 100);
-        stats.endgame.state2Rate = rate === 0 ? '-' : rate.toFixed(1) + '%';
-      }
+      stats.tele.Barge = (stats.tele.mechanism2.scoringLocation1 / stats.matches).toFixed(1);
+      stats.tele.Processor = (stats.tele.mechanism2.scoringLocation2 / stats.matches).toFixed(1);
+      stats.tele.Removed = (stats.tele.mechanism2.scoringLocation3 / stats.matches).toFixed(1);
+
+      const totalAttempts = teamData.filter(r => {
+        const cs = parseFloat(r[tele.endGame.header] || 0);
+        return cs === tele.endGame.state1 || cs === tele.endGame.state2 || cs === tele.endGame.failed || cs === tele.endGame.notAttempted || cs === tele.endGame.park;
+      }).length;
+
+      const state1Rate = totalAttempts > 0 ? (stats.endgame.state1 / totalAttempts * 100) : 0;
+      const state2Rate = totalAttempts > 0 ? (stats.endgame.state2 / totalAttempts * 100) : 0;
+
+      stats.endgame.state1Rate = state1Rate > 0 ? state1Rate.toFixed(1) + '%' : '-';
+      stats.endgame.state2Rate = state2Rate > 0 ? state2Rate.toFixed(1) + '%' : '-';
+      stats.endgame.state1rate = stats.endgame.state1Rate;
+      stats.endgame.state2rate = stats.endgame.state2Rate;
 
       stats.epa = (stats.epa / stats.matches).toFixed(1);
     }
@@ -5128,8 +5121,6 @@ function renderMatchPredictor() {
   `;
   table.appendChild(autoHeader);
 
-// In the renderMatchPredictor function, update the auto table rendering:
-
   ['L1', 'L2', 'L3', 'L4'].forEach(level => {
     const row = document.createElement('tr');
     const levelKey = `mechanism1_scoringLocation${{'L1': 1, 'L2': 2, 'L3': 3, 'L4': 4}[level]}`;
@@ -5205,12 +5196,12 @@ function renderMatchPredictor() {
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Tele ${type}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.tele[type.toLowerCase()] || '0.0'}
+          ${teamStats[team]?.tele[type] || '0.0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.tele[type.toLowerCase()] || '0.0'}
+          ${teamStats[team]?.tele[type] || '0.0'}
         </td>
       `).join('')}
     `;
