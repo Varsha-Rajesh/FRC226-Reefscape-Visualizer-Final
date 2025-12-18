@@ -2,10 +2,10 @@
 
 // Charts
 const charts = {
-  autoMechanism1: null,
-  autoMechanism2: null,
-  teleMechanism1: null,
-  teleMechanism2: null,
+  autoCoral: null,
+  autoAlgae: null,
+  teleCoral: null,
+  teleAlgae: null,
   endGame: null,
   overviewStackedChart: null,
   coralCyclesChart: null,
@@ -13,182 +13,20 @@ const charts = {
   reliabilityChartsArea: null,
 };
 
-//Labels 
-const reliability = {
-  points: {
-    total: 'Total Points',
-    auto: 'Auto Points',
-    tele: 'Tele Points'
-  },
-  mechanism1: {
-    scoringLocation1: "L4 Cycles",
-    scoringLocation2: "L3 Cycles",
-    scoringLocation3: "L2 Cycles",
-    scoringLocation4: "L1 Cycles",
-    scoringLocation5: "",
-    total: "Total Coral Cycles"
-  },
-  mechanism2: {
-    scoringLocation1: "Barge Cycles",
-    scoringLocation2: "Processor Cycles",
-    scoringLocation3: "",
-    scoringLocation4: "",
-    scoringLocation5: "",
-    total: "Total Algae Cycles"
-  },
-  cycles: "Total Cycles"
-}
-
-let isBoxPlot = true;
-
-const mechanism2Filter = {
-  scoringLocation1: "Net",
-  scoringLocation2: "Processor",
-  scoringLocation3: "Remove",
-  scoringLocation4: "",
-  scoringLocation5: "",
-
-}
-
-const individual = {
-  mechanism1: {
-    scoringLocation1: "L4",
-    scoringLocation2: "L3",
-    scoringLocation3: "L2",
-    scoringLocation4: "L1",
-    scoringLocation5: "",
-  },
-  mechanism2: {
-    scoringLocation1: "Net",
-    scoringLocation2: "Processor",
-    scoringLocation3: "Remove",
-  },
-  endGame: "Climb Score"
-}
-
-const comparision = {
-  mechanism1: {
-    scoringLocation1: "L4",
-    scoringLocation2: "L3",
-    scoringLocation3: "L2",
-    scoringLocation4: "L1",
-    scoringLocation5: "",
-  },
-  mechanism2: {
-    scoringLocation1: "Net",
-    scoringLocation2: "Processor",
-    scoringLocation3: "Remove",
-  },
-  endGame: "Climb Score"
-}
-
-const callback_mechanism1 = "Total Coral";
-const callback_mechanism2 = "Total Algae";
-
-// Teams
+let pitScoutingData = [];
+let tbaClimbData = {};
+let coralMismatchData = [];
 let hiddenTeams = JSON.parse(localStorage.getItem('hiddenTeams') || '[]');
 let showHiddenTeamsInFilter = false;
 let isolatedTeams = [];
 let isIsolated = false;
 let highlightedOverviewTeam = null;
-
-// TBA
-let tbaClimbData = {};
-let coralMismatchData = [];
-
-// File Upload Data
 let csvText = localStorage.getItem('csvText') || "";
 let pitCsvText = localStorage.getItem('pitCsvText') || "";
 let scheduleCsvText = localStorage.getItem('scheduleCsvText') || "";
-let pitScoutingData = [];
 
-// CSV Headers
+let isBoxPlot = true;
 
-const auto = {
-  leave: "Auto Leave starting line",
-  mechanism1: {
-    scoringLocation1: 'Auton L4',
-    scoringLocation2: 'Auton L3',
-    scoringLocation3: 'Auton L2',
-    scoringLocation4: 'Auton L1',
-    scoringLocation: '',
-    total: ""
-  },
-  mechanism2: {
-    scoringLocation1: 'Auton Algae in Net',
-    scoringLocation2: 'Auton Algae in Processor',
-    scoringLocation3: 'Auton Algae Removed',
-    scoringLocation4: '',
-    scoringLocation5: '',
-    total: ''
-  },
-  starting: {
-    position: 'Auton Starting Position',
-    noShow: 'r.',
-    center: "c",
-    side1: "p",
-    side2: "o"
-  }
-}
-
-const tele = {
-  mechanism1: {
-    scoringLocation1: 'L4',
-    scoringLocation2: 'L3',
-    scoringLocation3: 'L2',
-    scoringLocation4: 'L1',
-    scoringLocation5: '',
-    total: ''
-  },
-  mechanism2: {
-    scoringLocation1: 'Algae in Net',
-    scoringLocation2: 'Algae in Processor',
-    scoringLocation3: 'Algae removed',
-    scoringLocation4: '',
-    scoringLocation5: '',
-    total: ''
-  },
-  endGame: {
-    header: "Climb Score",
-    notAttempted: 0,
-    park: 2,
-    failed: 2.1,
-    state1: 12,
-    state2: 6,
-    state3: "",
-    state4: "",
-    state5: ""
-  }
-}
-
-const total_score = "Total Score";
-const auto_score = "Auton Score";
-const tele_score = "Tele Score";
-
-const team_number = "Team No.";
-const robot_color = "Robot Color";
-const comments = "Comments";
-const match = "Match";
-
-const died = {
-  header: "Died or Immobilized",
-  yes: "1"
-}
-
-const defense = {
-  rating: "Defense Rating",
-  onBot: {
-    header: "Defense was played on robot",
-    yes: "1"
-  }
-}
-
-const driver_skill = "Driver Skill";
-
-const pitScouting = {
-  trait1: 'Ground Barge',
-  trait2: 'Ground Processor'
-}
 /*-----RELIABILITY CHARTS-----*/
 
 if (typeof Chart !== 'undefined' && window.ChartBoxplot) {
@@ -204,28 +42,28 @@ Chart.register({
 });
 
 const reliabilityMetrics = [
-  { id: 'reliabilityTotalPoints', label: reliability.points.total, color: '#3ED098', getValue: row => parseFloat(row[total_score] || 0) },
-  { id: 'reliabilityAutoPoints', label: reliability.points.auto, color: '#51E7CF', getValue: row => parseFloat(row[auto_score] || 0) },
-  { id: 'reliabilityTelePoints', label: reliability.points.tele, color: '#3ecdd0', getValue: row => (parseFloat(row[total_score] || 0) - parseFloat(row[auto_score] || 0)) },
+  { id: 'reliabilityTotalPoints', label: 'Total Points', color: '#3ED098', getValue: row => parseFloat(row['Total Score'] || 0) },
+  { id: 'reliabilityAutoPoints', label: 'Auto Points', color: '#51E7CF', getValue: row => parseFloat(row['Auton Score'] || 0) },
+  { id: 'reliabilityTelePoints', label: 'Tele Points', color: '#3ecdd0', getValue: row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)) },
   {
-    id: 'reliabilityTotalCycles', label: reliability.cycles, color: '#cf8ffc', getValue: row =>
-    (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0) +
-      parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
+    id: 'reliabilityTotalCycles', label: 'Total Cycles', color: '#cf8ffc', getValue: row =>
+    (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
+      parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
   },
   {
-    id: 'reliabilityTotalMechanism1Cycles', label: reliability.mechanism1.total, color: '#ff83fa', getValue: row =>
-      (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0))
+    id: 'reliabilityTotalCoralCycles', label: 'Total Coral Cycles', color: '#ff83fa', getValue: row =>
+      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
   },
-  { id: 'reliabilityMechanism1ScoringLocation1Cycles', label: reliability.mechanism1.scoringLocation1, color: '#ff8bfc', getValue: row => parseInt(row[tele.mechanism1.scoringLocation4] || 0) },
-  { id: 'reliabilityMechanism1ScoringLocation2Cycles', label: reliability.mechanism1.scoringLocation2, color: '#ed0cef', getValue: row => parseInt(row[tele.mechanism1.scoringLocation3] || 0) },
-  { id: 'reliabilityMechanism1ScoringLocation3Cycles', label: reliability.mechanism1.scoringLocation3, color: '#BF02ff', getValue: row => parseInt(row[tele.mechanism1.scoringLocation2] || 0) },
-  { id: 'reliabilityMechanism1ScoringLocation4Cycles', label: reliability.mechanism1.scoringLocation4, color: '#8105d8', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
+  { id: 'reliabilityL4Cycles', label: 'L4 Cycles', color: '#ff8bfc', getValue: row => parseInt(row['L4'] || 0) },
+  { id: 'reliabilityL3Cycles', label: 'L3 Cycles', color: '#ed0cef', getValue: row => parseInt(row['L3'] || 0) },
+  { id: 'reliabilityL2Cycles', label: 'L2 Cycles', color: '#BF02ff', getValue: row => parseInt(row['L2'] || 0) },
+  { id: 'reliabilityL1Cycles', label: 'L1 Cycles', color: '#8105d8', getValue: row => parseInt(row['L1'] || 0) },
   {
-    id: 'reliabilityTotalMechanism2Cycles', label: reliability.mechanism2.total, color: '#006fff', getValue: row =>
-      (parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
+    id: 'reliabilityTotalAlgaeCycles', label: 'Total Algae Cycles', color: '#006fff', getValue: row =>
+      (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
   },
-  { id: 'reliabilityMechanism2ScoringLocation1Cycles', label: reliability.mechanism2.scoringLocation1, color: '#3498db', getValue: row => parseInt(row[tele.mechanism1.scoringLocation1] || 0) },
-  { id: 'reliabilityMechanism2ScoringLocation2Cycles', label: reliability.mechanism2.scoringLocation2, color: '#14c7de', getValue: row => parseInt(row[tele.mechanism1.scoringLocation2] || 0) },
+  { id: 'reliabilityBargeCycles', label: 'Barge Cycles', color: '#3498db', getValue: row => parseInt(row['Algae in Net'] || 0) },
+  { id: 'reliabilityProcessorCycles', label: 'Processor Cycles', color: '#14c7de', getValue: row => parseInt(row['Algae in Processor'] || 0) }
 ];
 
 function toggleEPAAvg(containerId, show) {
@@ -244,371 +82,6 @@ function toggleEPAAvg(containerId, show) {
       });
       chart.update('none');
     }
-  });
-}
-
-function renderReliabilityCharts() {
-  const container = document.getElementById('reliabilityChartsArea');
-  if (!container) return;
-
-  const teamNumber = document.getElementById('teamSearch').value.trim();
-  if (!teamNumber) return;
-
-  let data = filterTeamData(teamNumber);
-  if (!data || data.length === 0) return;
-
-  container.innerHTML = '';
-
-  data = data.slice().sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
-
-  const showAvg = document.getElementById('showEPAAvg')?.checked ?? true;
-
-  const metricsToShow = reliabilityMetrics.filter(metric => {
-    const checkbox = document.getElementById(metric.id);
-    return checkbox && checkbox.checked;
-  });
-
-  const chartContainer = document.createElement('div');
-  chartContainer.className = 'reliability-charts-grid';
-  chartContainer.style.display = 'grid';
-  chartContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(400px, 1fr))';
-  chartContainer.style.gap = '20px';
-  container.appendChild(chartContainer);
-
-  metricsToShow.forEach(metric => {
-    const chartCard = document.createElement('div');
-    chartCard.className = 'reliability-chart-card';
-    chartCard.style.background = '#1C1E21';
-    chartCard.style.borderRadius = '8px';
-    chartCard.style.padding = '15px';
-    chartCard.style.boxShadow = '0 0 20px #131416';
-
-    const title = document.createElement('h3');
-    title.textContent = metric.label;
-    title.style.margin = '0 0 10px 0';
-    title.style.color = metric.color;
-    title.style.fontSize = '16px';
-    title.style.fontFamily = "'Lato', sans-serif";
-    chartCard.appendChild(title);
-
-    const canvasContainer = document.createElement('div');
-    canvasContainer.style.position = 'relative';
-    canvasContainer.style.height = '320px';
-    canvasContainer.style.width = '100%';
-    chartCard.appendChild(canvasContainer);
-
-    const canvas = document.createElement('canvas');
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvasContainer.appendChild(canvas);
-
-    chartContainer.appendChild(chartCard);
-
-    if (isBoxPlot) {
-      const values = data.map(metric.getValue);
-      const avg = values.reduce((a, b) => a + b, 0) / values.length;
-
-      try {
-        createBoxPlot(canvas, metric, values, avg, showAvg);
-      } catch (error) {
-        console.error('Error creating boxplot chart:', error);
-        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
-      }
-    } else {
-      const labels = data.map(row => "Q" + row.Match);
-      const values = data.map(metric.getValue);
-      const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
-
-      const maxValue = Math.max(...values);
-      const stepSize = 1;
-      const yMax = Math.ceil(maxValue / stepSize) * stepSize;
-
-      try {
-        new Chart(canvas.getContext('2d'), {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: metric.label,
-                data: values,
-                borderColor: metric.color,
-                backgroundColor: metric.color + '55',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-              },
-              {
-                label: 'Average',
-                data: Array(labels.length).fill(avgValue),
-                borderColor: '#FFD700',
-                borderWidth: 2,
-                borderDash: [6, 6],
-                pointRadius: 0,
-                fill: false,
-                tension: 0,
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            devicePixelRatio: 3,
-            scales: {
-              x: {
-                ticks: {
-                  color: 'white',
-                  font: { family: 'Lato', size: 12, weight: 'bold' },
-                },
-                grid: { color: 'rgba(255,255,255,0.1)' },
-              },
-              y: {
-                beginAtZero: true,
-                max: yMax,
-                ticks: {
-                  color: 'white',
-                  font: { family: 'Lato', size: 14, weight: 'bold' },
-                  stepSize: stepSize,
-                },
-                grid: { color: 'rgba(255,255,255,0.1)' },
-              },
-            },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: '#1C1E21',
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                borderColor: '#000',
-                borderWidth: 1,
-                titleFont: { family: 'Lato', size: 14 },
-                bodyFont: { family: 'Lato', size: 14 },
-                padding: 10,
-                callbacks: {
-                  label: function (context) {
-                    if (context.dataset.label === 'Average') {
-                      return `Average: ${avgValue.toFixed(2)}`;
-                    } else {
-                      const value = context.parsed.y;
-                      const delta = value - avgValue;
-                      const sign = delta >= 0 ? '+' : '';
-                      return [
-                        `Value: ${value}`,
-                        `Average: ${avgValue.toFixed(2)}`,
-                        `Δ: ${sign}${delta.toFixed(2)}`
-                      ];
-                    }
-                  }
-                }
-              }
-            },
-          },
-        });
-      } catch (error) {
-        console.error('Error creating line chart:', error);
-        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
-      }
-    }
-  });
-}
-
-function createBoxPlot(canvas, metric, values, avg, showAvg) {
-  const sortedValues = [...values].sort((a, b) => a - b);
-  const q1 = calculatePercentile(sortedValues, 25);
-  const median = calculatePercentile(sortedValues, 50);
-  const q3 = calculatePercentile(sortedValues, 75);
-  const iqr = q3 - q1;
-  const lowerWhisker = Math.max(sortedValues[0], q1 - 1.5 * iqr);
-  const upperWhisker = Math.min(sortedValues[sortedValues.length - 1], q3 + 1.5 * iqr);
-  const outliers = values.filter(v => v < lowerWhisker || v > upperWhisker);
-
-  const boxPlotData = {
-    labels: [metric.label],
-    datasets: [{
-      backgroundColor: metric.color + '40',
-      borderColor: metric.color,
-      borderWidth: 2,
-      outlierBackgroundColor: '#ff5c5c',
-      outlierRadius: 5,
-      data: [{
-        min: lowerWhisker,
-        q1: q1,
-        median: median,
-        q3: q3,
-        max: upperWhisker,
-        outliers: outliers
-      }]
-    }]
-  };
-
-  const chart = new Chart(canvas.getContext('2d'), {
-    type: 'boxplot',
-    data: boxPlotData,
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      devicePixelRatio: 3,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          mode: 'point',
-          intersect: true,
-          backgroundColor: '#1C1E21',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: '#000',
-          borderWidth: 1,
-          titleFont: {
-            family: 'Lato',
-            size: 14,
-            weight: 'bold'
-          },
-          bodyFont: {
-            family: 'Lato',
-            size: 14
-          },
-          padding: 10,
-          displayColors: false,
-          callbacks: {
-            title: function () {
-              return metric.label;
-            },
-            label: function (context) {
-              if (context.datasetIndex === 0 && context.dataIndex === 0) {
-                return null;
-              }
-              return `Outlier: ${context.raw}`;
-            },
-            beforeBody: function (context) {
-              if (context[0].datasetIndex === 0) {
-                const data = context[0].dataset.data[context[0].dataIndex];
-                return [
-                  `Minimum: ${data.min.toFixed(1)}`,
-                  `Q1: ${data.q1.toFixed(1)}`,
-                  `Median: ${data.median.toFixed(1)}`,
-                  `Q3: ${data.q3.toFixed(1)}`,
-                  `Maximum: ${data.max.toFixed(1)}`,
-                  `IQR: ${q3 - q1}`,
-                ];
-              }
-              return null;
-            },
-            afterBody: function (context) {
-              if (context[0].datasetIndex === 0 && showAvg) {
-                return [`Average: ${avg.toFixed(1)}`];
-              }
-              return null;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          display: false
-        },
-        x: {
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(255,255,255,0.1)',
-            drawBorder: false
-          },
-          ticks: {
-            color: 'white',
-            font: {
-              family: 'Lato',
-              size: 14,
-              weight: 'bold'
-            }
-          }
-        }
-      }
-    }
-  });
-
-  return chart;
-}
-const reliabilityCheckboxIds = [
-  'reliabilityTotalPoints',
-  'reliabilityAutoPoints',
-  'reliabilityTelePoints',
-  'reliabilityTotalCycles',
-  'reliabilityTotalMechanism1Cycles',
-  'reliabilityMechanism1ScoringLocation1Cycles',
-  'reliabilityMechanism1ScoringLocation2Cycles',
-  'reliabilityMechanism1ScoringLocation3Cycles',
-  'reliabilityMechanism1ScoringLocation4Cycles',
-  'reliabilityTotalMechanism2Cycles',
-  'reliabilityMechanism2ScoringLocation1Cycles',
-  'reliabilityMechanism2ScoringLocation2Cycles',
-];
-
-function setDefaultReliabilityCheckboxes() {
-  reliabilityCheckboxIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      if (id === 'reliabilityTotalPoints' || id === 'showEPAAvg') {
-        el.checked = true;
-      } else {
-        el.checked = false;
-      }
-    }
-  });
-}
-
-function getReliabilityCheckboxState() {
-  const state = {};
-  reliabilityCheckboxIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) state[id] = el.checked;
-  });
-  return state;
-}
-function setReliabilityCheckboxState(state) {
-  reliabilityCheckboxIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el && typeof state[id] === 'boolean') el.checked = state[id];
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  setDefaultReliabilityCheckboxes();
-});
-
-let lastReliabilityCheckboxState = getReliabilityCheckboxState();
-reliabilityCheckboxIds.forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('change', () => {
-      lastReliabilityCheckboxState = getReliabilityCheckboxState();
-      renderReliabilityCharts();
-    });
-  }
-});
-
-function renderBlankChart(canvasId, label = "No Data") {
-  const ctx = document.getElementById(canvasId).getContext('2d');
-
-  if (charts[canvasId]) {
-    charts[canvasId].destroy();
-  }
-
-  charts[canvasId] = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [label],
-      datasets: [
-        {
-          label: label,
-          data: [0],
-          backgroundColor: '#888888'
-        }
-      ]
-    },
-    options: getChartOptions(false)
   });
 }
 
@@ -730,18 +203,18 @@ function renderRankingTable() {
     maxAlgaeNet: 23,
     maxTeleCoral: 24
   };
-  const visibleColumns = new Set([0, 1, 2]);
+  const visibleColumns = new Set([0, 1, 2]); 
   checked.forEach(key => visibleColumns.add(statMap[key]));
 
   const visibleTeamsData = parsed.filter(row => {
     if (isIsolated && isolatedTeams.length > 0) {
-      return isolatedTeams.includes(row[team_number]);
+      return isolatedTeams.includes(row['Team No.']);
     }
-    return !hiddenTeams.includes(row[team_number]);
+    return !hiddenTeams.includes(row['Team No.']);
   });
   const teams = {};
   visibleTeamsData.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!team) return;
     if (!teams[team]) teams[team] = [];
     teams[team].push(row);
@@ -758,17 +231,17 @@ function renderRankingTable() {
     const vals = Object.values(teams).map(arr => {
       if (key === 'Tele Coral') {
         return arr.map(r =>
-          (parseInt(r[tele.mechanism1.scoringLocation4] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation3] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation2] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation1] || 0))
+          (parseInt(r['L1'] || 0)) +
+          (parseInt(r['L2'] || 0)) +
+          (parseInt(r['L3'] || 0)) +
+          (parseInt(r['L4'] || 0))
         ).reduce((a, b) => a + b, 0) / arr.length;
       }
       if (key === 'Tele Algae') {
         return arr.map(r =>
-          (parseInt(r[tele.mechanism2.scoringLocation1] || 0)) +
-          (parseInt(r[tele.mechanism2.scoringLocation2] || 0))
-        ).reduce((a, b) => a + b, 0) /  arr.length;
+          (parseInt(r['Algae in Net'] || 0)) +
+          (parseInt(r['Algae in Processor'] || 0))
+        ).reduce((a, b) => a + b, 0) / arr.length;
       }
       if (key === 'Climb Attempts') {
         return arr.filter(r => r['Climb Score'] !== undefined && r['Climb Score'] !== '').length;
@@ -842,7 +315,7 @@ function renderRankingTable() {
     let html = `<td>${idx + 1}</td><td>${team}</td>`;
 
     metricValues.forEach((val, i) => {
-      const colIdx = i + 2;
+      const colIdx = i + 2; 
       const numVal = parseFloat(val);
       const bg = getGradientColor(numVal, metricStats[i].vals);
       const displayStyle = visibleColumns.has(colIdx) ? '' : 'display:none;';
@@ -1107,7 +580,7 @@ document.addEventListener('keydown', function (e) {
     e.preventDefault();
   }
 
-  if (e.key === 'Enter' && e.location === 3) {
+  if (e.key === 'Enter' && e.location === 3){
     const teamNumber = numpadBuffer.trim();
 
     if (teamNumber && !hiddenTeams.includes(teamNumber)) {
@@ -1274,46 +747,6 @@ function deleteFile(type) {
 
 }
 
-function restorePitScoutingData() {
-  pitCsvText = localStorage.getItem('pitCsvText') || "";
-
-  if (!pitCsvText) {
-    pitScoutingData = [];
-    return;
-  }
-
-  try {
-    const result = Papa.parse(pitCsvText, {
-      header: true,
-      skipEmptyLines: true,
-      transform: (value, header) => {
-        const normalizedHeader = header.trim();
-        if (normalizedHeader === pitScouting.trait1 || normalizedHeader === pitScouting.trait2) {
-          return value === '1';
-        }
-        return value;
-      }
-    });
-
-    pitScoutingData = result.data.filter(row => {
-      return row[team_number] &&
-        (row[pitScouting.trait1] !== undefined) &&
-        (row[pitScouting.trait2] !== undefined);
-    });
-
-    const statusEl = document.getElementById('statusPit');
-    if (statusEl && pitScoutingData.length > 0) {
-      statusEl.textContent = `Pit data restored: ${pitScoutingData.length} teams`;
-    }
-  } catch (error) {
-    console.error('Error restoring pit scouting data:', error);
-    pitScoutingData = [];
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  restorePitScoutingData();
-});
 async function uploadFile(fileInputId, statusId, uploadType) {
   const fileInput = document.getElementById(fileInputId);
   const statusEl = document.getElementById(statusId);
@@ -1347,8 +780,8 @@ async function handleDataUpload(e) {
   uploadFile('dataFile', 'statusData', 'csvData').then(() => {
     const parsedData = parseCSV();
     renderOverviewStackedChart(parsedData.data, 'all');
-    renderMechanism1CyclesChart(parsedData.data);
-    renderMechanism2CyclesChart(parsedData.data);
+    renderCoralCyclesChart(parsedData.data);
+    renderAlgaeCyclesChart(parsedData.data);
     renderRescoutTable(parsedData.data);
     updateDefenseRankings(parsedData.data);
     applyFilters();
@@ -1372,13 +805,17 @@ async function handlePitUpload(fileInputId, statusId) {
   }
 
   try {
+    const formData = new FormData();
+    formData.append('dataFile', file);
+    formData.append('uploadType', 'csvPitScouting');
+
     const text = await file.text();
     const result = Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
       transform: (value, header) => {
         const normalizedHeader = header.trim();
-        if (normalizedHeader === pitScouting.trait1 || normalizedHeader === pitScouting.trait2) {
+        if (normalizedHeader === 'Ground Barge' || normalizedHeader === 'Ground Processor') {
           return value === '1';
         }
         return value;
@@ -1386,13 +823,10 @@ async function handlePitUpload(fileInputId, statusId) {
     });
 
     pitScoutingData = result.data.filter(row => {
-      return row[team_number] &&
-        (row[pitScouting.trait1] !== undefined) &&
-        (row[pitScouting.trait2] !== undefined);
+      return row['Team No.'] &&
+        (row['Ground Barge'] !== undefined) &&
+        (row['Ground Processor'] !== undefined);
     });
-
-    localStorage.setItem('pitCsvText', text);
-    pitCsvText = text;
 
     statusEl.textContent = `Successfully loaded pit data for ${pitScoutingData.length} teams`;
 
@@ -1427,7 +861,6 @@ async function handlePitUpload(fileInputId, statusId) {
     pitScoutingData = [];
   }
 }
-
 async function deleteFile(fileType) {
   let filename, statusId, fileInputId;
 
@@ -1533,7 +966,6 @@ function parseScheduleCSV() {
 }
 
 /*-----DEFENSE RANKING FUNCTIONS----*/
-
 function calculateDefenseRankings(data) {
   const matches = {};
   const teamMatches = {};
@@ -1548,9 +980,9 @@ function calculateDefenseRankings(data) {
   };
 
   data.forEach(row => {
-    const match = row[match];
-    const teamNumber = row[team_number];
-    const died = row[died.header] === died.yes;
+    const match = row['Match'];
+    const teamNumber = row['Team No.'];
+    const died = row['Died or Immobilized'] === '1';
 
     if (match && teamNumber) {
       if (!robotDiedMap[match]) {
@@ -1563,10 +995,10 @@ function calculateDefenseRankings(data) {
   });
 
   data.forEach(row => {
-    const match = row[match];
-    const teamNumber = row[team_number];
-    const robotColor = row[robot_color];
-    const totalScore = parseFloat(row[total_score]) || 0;
+    const match = row['Match'];
+    const teamNumber = row['Team No.'];
+    const robotColor = row['Robot Color'];
+    const totalScore = parseFloat(row['Total Score']) || 0;
 
     if (!match || !teamNumber || !robotColor) return;
 
@@ -1599,10 +1031,10 @@ function calculateDefenseRankings(data) {
   });
 
   data.forEach(row => {
-    const match = row[match];
-    const teamNumber = row[team_number];
-    const robotColor = row[robot_color];
-    const defenseRating = parseFloat(row[defense.rating]);
+    const teamNumber = row['Team No.'];
+    const match = row['Match'];
+    const robotColor = row['Robot Color'];
+    const defenseRating = parseFloat(row['Defense Rating']);
 
     if (!match || !teamNumber || isNaN(defenseRating) || defenseRating <= 0) return;
 
@@ -1760,13 +1192,13 @@ function clearAllCharts() {
     charts['overviewStackedChart'].destroy();
     charts['overviewStackedChart'] = null;
   }
-  if (charts['mechanism1CyclesChart']) {
-    charts['mechanism1CyclesChart'].destroy();
-    charts['mechanism1CyclesChart'] = null;
+  if (charts['coralCyclesChart']) {
+    charts['coralCyclesChart'].destroy();
+    charts['coralCyclesChart'] = null;
   }
-  if (charts['mechanism2CyclesChart']) {
-    charts['mechanism2CyclesChart'].destroy();
-    charts['mechanism2CyclesChart'] = null;
+  if (charts['algaeCyclesChart']) {
+    charts['algaeCyclesChart'].destroy();
+    charts['algaeCyclesChart'] = null;
   }
   if (charts['reliabilityChartsArea']) {
     charts['reliabilityChartsArea'].destroy();
@@ -1832,16 +1264,16 @@ function showTab(event, tabId) {
     }
   }
 
-  try {
+    try {
     if (typeof renderHiddenTeamsList === 'function') renderHiddenTeamsList();
-  } catch (err) { }
+  } catch (err) {}
   try {
     if (typeof renderHiddenTeamsListRanking === 'function') renderHiddenTeamsListRanking();
-  } catch (err) { }
+  } catch (err) {}
 
   if (tabId === 'ranking') {
-    try { renderRankingTable(); } catch (e) { }
-    try { updateRankingTableColumns(); } catch (e) { }
+    try { renderRankingTable(); } catch (e) {}
+    try { updateRankingTableColumns(); } catch (e) {}
   }
 }
 
@@ -1908,13 +1340,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-document.getElementById('mechanism2TypeFilter').addEventListener('change', function () {
+document.getElementById('algaeTypeFilter').addEventListener('change', function () {
   const value = this.value;
   const teamNumber = document.getElementById('teamSearch').value.trim();
   if (!teamNumber) return;
 
   const data = filterTeamData(teamNumber);
-  renderTeleMechanism2ChartFiltered(data, value);
+  renderTeleAlgaeChartFiltered(data, value);
 });
 
 // CSV Upload
@@ -1947,16 +1379,16 @@ document.getElementById('chartFilterDropdown').addEventListener('change', update
 document.querySelectorAll('#startingPositionFilter').forEach(dropdown => {
   dropdown.addEventListener('change', function () {
     syncDropdowns(this.value);
-    const mechanism2Filter = document.getElementById('mechanism2TypeFilter').value;
+    const algaeFilter = document.getElementById('algaeTypeFilter').value;
     filterAndRenderCharts(this.value);
-    document.getElementById('mechanism2TypeFilter').value = mechanism2Filter;
+    document.getElementById('algaeTypeFilter').value = algaeFilter;
   });
 });
-document.getElementById('mechanism2TypeFilter1').addEventListener('change', function () {
+document.getElementById('algaeTypeFilter1').addEventListener('change', function () {
   syncAlgaeDropdownsAndFilter(this.value);
 });
 
-document.getElementById('mechanism2TypeFilter2').addEventListener('change', function () {
+document.getElementById('algaeTypeFilter2').addEventListener('change', function () {
   syncAlgaeDropdownsAndFilter(this.value);
 })
 
@@ -2424,7 +1856,7 @@ function processTbaAutoLeaveData(matches) {
   return autoLeaveData;
 }
 
-
+ 
 async function fetchTeamData(teamNumber) {
   try {
     const response = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNumber}`, {
@@ -2650,11 +2082,11 @@ function searchTeam() {
   let teamData = filterTeamData(teamNumber);
 
   const startingPosition = 'all';
-  const mechanism2Filter = 'all';
+  const algaeFilter = 'all';
 
   syncDropdowns(startingPosition);
   renderAutoCharts(teamData);
-  renderTeleMechanism2ChartFiltered(teamData, mechanism2Filter);
+  renderTeleAlgaeChartFiltered(teamData, algaeFilter);
   renderTeleCharts(teamData);
   renderEndGameChart(teamData);
   renderQualitativeNotes(teamData);
@@ -2664,13 +2096,13 @@ function searchTeam() {
   renderReliabilityCharts(teamData, 'reliabilityChartsArea');
 
   document.getElementById('startingPositionFilter').value = startingPosition;
-  document.getElementById('mechanism2TypeFilter').value = mechanism2Filter;
+  document.getElementById('algaeTypeFilter').value = algaeFilter;
 
   displayTeamNickname(teamNumber, 'teamNicknameDisplay');
 }
 function filterTeamData(teamNumber) {
   const parsed = parseCSV();
-  return parsed.data.filter(row => row[team_number] === teamNumber);
+  return parsed.data.filter(row => row['Team No.'] === teamNumber);
 
 }
 
@@ -2678,33 +2110,33 @@ function renderAutoCharts(data) {
   const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   const matchLabels = sortedData.map(row => 'Q' + row.Match);
 
-  destroyChart('autoMechanism1');
-  charts.autoMechanism1 = createChart(
-    document.getElementById('autoMechanism1').getContext('2d'),
+  destroyChart('autoCoral');
+  charts.autoCoral = createChart(
+    document.getElementById('autoCoral').getContext('2d'),
     'bar',
     {
       labels: matchLabels,
       datasets: [
-        { label: individual.mechanism1.scoringLocation4, data: sortedData.map(row => parseInt(row[auto.mechanism1.scoringLocation4] || 0)), backgroundColor: '#3B064D' },
-        { label: individual.mechanism1.scoringLocation3, data: sortedData.map(row => parseInt(row[auto.mechanism1.scoringLocation3] || 0)), backgroundColor: '#8105D8' },
-        { label: individual.mechanism1.scoringLocation2, data: sortedData.map(row => parseInt(row[auto.mechanism1.scoringLocation2] || 0)), backgroundColor: '#ED0CEF' },
-        { label: individual.mechanism1.scoringLocation1, data: sortedData.map(row => parseInt(row[auto.mechanism1.scoringLocation1] || 0)), backgroundColor: '#FF8BFC' }
+        { label: 'L1', data: sortedData.map(row => parseInt(row['Auton L1'] || 0)), backgroundColor: '#3B064D' },
+        { label: 'L2', data: sortedData.map(row => parseInt(row['Auton L2'] || 0)), backgroundColor: '#8105D8' },
+        { label: 'L3', data: sortedData.map(row => parseInt(row['Auton L3'] || 0)), backgroundColor: '#ED0CEF' },
+        { label: 'L4', data: sortedData.map(row => parseInt(row['Auton L4'] || 0)), backgroundColor: '#FF8BFC' }
       ]
     },
 
     getChartOptions(true)
   );
 
-  destroyChart('autoMechanism2');
-  charts.autoMechanism2 = createChart(
-    document.getElementById('autoMechanism2').getContext('2d'),
+  destroyChart('autoAlgae');
+  charts.autoAlgae = createChart(
+    document.getElementById('autoAlgae').getContext('2d'),
     'bar',
     {
       labels: matchLabels,
       datasets: [
-        { label: individual.mechanism2.scoringLocation1, data: sortedData.map(row => parseInt(row[auto.mechanism2.scoringLocation1] || 0)), backgroundColor: '#002BFF' },
-        { label: individual.mechanism2.scoringLocation3, data: sortedData.map(row => parseInt(row[auto.mechanism2.scoringLocation3] || 0)), backgroundColor: '#00D2F3' },
-        { label: individual.mechanism2.scoringLocation2, data: sortedData.map(row => parseInt(row[auto.mechanism2.scoringLocation2] || 0)), backgroundColor: '#5cffd5' }
+        { label: 'Removed', data: sortedData.map(row => parseInt(row['Auton Algae Removed'] || 0)), backgroundColor: '#002BFF' },
+        { label: 'Net', data: sortedData.map(row => parseInt(row['Auton Algae in Net'] || 0)), backgroundColor: '#00D2F3' },
+        { label: 'Processor', data: sortedData.map(row => parseInt(row['Auton Algae in Processor'] || 0)), backgroundColor: '#5cffd5' }
       ]
     },
     getChartOptions(true)
@@ -2717,8 +2149,8 @@ function renderQualitativeNotes(data) {
   scouterCommentsDiv.innerHTML = '';
 
   const notes = data
-    .filter(row => row[comments] && row[comments].trim() !== '')
-    .map(row => `Q${row.Match}: ${row[comments]}`);
+    .filter(row => row['Comments'] && row['Comments'].trim() !== '')
+    .map(row => `Q${row.Match}: ${row['Comments']}`);
 
   if (notes.length > 0) {
     scouterCommentsDiv.innerHTML = notes.join('<hr style="border: 0; margin: 10px 0;">');
@@ -2731,28 +2163,28 @@ function renderTeleCharts(data) {
   const matchLabels = data.map(row => 'Q' + row.Match);
   const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
-  const mechanism1Total = sortedData.map(row =>
-    (parseInt(row[tele.mechanism1.scoringLocation4] || 0)) +
-    (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
-    (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
-    (parseInt(row[tele.mechanism1.scoringLocation1] || 0))
+  const coralTotals = sortedData.map(row =>
+    (parseInt(row['L1'] || 0)) +
+    (parseInt(row['L2'] || 0)) +
+    (parseInt(row['L3'] || 0)) +
+    (parseInt(row['L4'] || 0))
   );
 
-  const yMax = Math.max(...mechanism1Total, 0);
+  const yMax = Math.max(...coralTotals, 0);
   const stepSize = yMax > 16 ? 4 : 2;
   const adjustedYMax = Math.ceil(yMax / stepSize) * stepSize;
 
-  destroyChart('teleMechanism1');
-  charts.teleMechanism1 = createChart(
-    document.getElementById('teleMechanism1').getContext('2d'),
+  destroyChart('teleCoral');
+  charts.teleCoral = createChart(
+    document.getElementById('teleCoral').getContext('2d'),
     'bar',
     {
       labels: matchLabels,
       datasets: [
-        { label: individual.mechanism1.scoringLocation4, data: sortedData.map(row => parseInt(row[tele.mechanism1.scoringLocation4] || 0)), backgroundColor: '#3B064D' },
-        { label: individual.mechanism1.scoringLocation3, data: sortedData.map(row => parseInt(row[tele.mechanism1.scoringLocation3] || 0)), backgroundColor: '#8105D8' },
-        { label: individual.mechanism1.scoringLocation2, data: sortedData.map(row => parseInt(row[tele.mechanism1.scoringLocation2] || 0)), backgroundColor: '#ED0CEF' },
-        { label: individual.mechanism1.scoringLocation1, data: sortedData.map(row => parseInt(row[tele.mechanism1.scoringLocation1] || 0)), backgroundColor: '#FF8BFC' }
+        { label: 'L1', data: sortedData.map(row => parseInt(row['L1'] || 0)), backgroundColor: '#3B064D' },
+        { label: 'L2', data: sortedData.map(row => parseInt(row['L2'] || 0)), backgroundColor: '#8105D8' },
+        { label: 'L3', data: sortedData.map(row => parseInt(row['L3'] || 0)), backgroundColor: '#ED0CEF' },
+        { label: 'L4', data: sortedData.map(row => parseInt(row['L4'] || 0)), backgroundColor: '#FF8BFC' }
       ]
     },
     {
@@ -2773,11 +2205,11 @@ function renderTeleCharts(data) {
               const dataIndex = context[0].dataIndex;
               const row = sortedData[dataIndex];
               const total =
-                (parseInt(row[tele.mechanism1.scoringLocation1] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation4] || 0));
-              return `${callback_mechanism1}: ${total}`;
+                (parseInt(row['L1'] || 0)) +
+                (parseInt(row['L2'] || 0)) +
+                (parseInt(row['L3'] || 0)) +
+                (parseInt(row['L4'] || 0));
+              return `Total Coral: ${total}`;
             }
           }
         }
@@ -2785,80 +2217,77 @@ function renderTeleCharts(data) {
     }
   );
 
-  destroyChart('teleMechanism2');
-  charts.teleMechanism2 = createChart(
-    document.getElementById('teleMechanism2').getContext('2d'),
+  destroyChart('teleAlgae');
+  charts.teleAlgae = createChart(
+    document.getElementById('teleAlgae').getContext('2d'),
     'bar',
     {
       labels: matchLabels,
       datasets: [
-        { label: individual.mechanism2.scoringLocation1, data: data.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0)), backgroundColor: '#002BFF' },
-        { label: individual.mechanism2.scoringLocation3, data: data.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0)), backgroundColor: '#00D2F3' },
-        { label: individual.mechanism2.scoringLocation2, data: data.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0)), backgroundColor: '#5cffd5' }
+        { label: 'Removed', data: data.map(row => parseInt(row['Algae removed'] || 0)), backgroundColor: '#002BFF' },
+        { label: 'Net', data: data.map(row => parseInt(row['Algae in Net'] || 0)), backgroundColor: '#00D2F3' },
+        { label: 'Processor', data: data.map(row => parseInt(row['Algae in Processor'] || 0)), backgroundColor: '#5cffd5' }
       ]
     },
     getChartOptions(true, 2)
   );
 }
 
-function renderTeleMechanism2ChartFiltered(data, filter) {
+function renderTeleAlgaeChartFiltered(data, filter) {
   const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   let filteredRows;
 
-  if (filter === 'scoringLocation3') {
-    filteredRows = sortedData.filter(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0);
-  } else if (filter === 'scoringLocation2') {
-    filteredRows = sortedData.filter(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0);
-  } else if (filter === 'scoringLocation1') {
-    filteredRows = sortedData.filter(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0);
+  if (filter === 'remove') {
+    filteredRows = sortedData.filter(row => parseInt(row['Algae removed'] || 0) > 0);
+  } else if (filter === 'process') {
+    filteredRows = sortedData.filter(row => parseInt(row['Algae in Processor'] || 0) > 0);
+  } else if (filter === 'barge') {
+    filteredRows = sortedData.filter(row => parseInt(row['Algae in Net'] || 0) > 0);
   } else {
     filteredRows = sortedData.filter(row =>
-      parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0 ||
-      parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0 ||
-      parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0
+      parseInt(row['Algae removed'] || 0) > 0 ||
+      parseInt(row['Algae in Processor'] || 0) > 0 ||
+      parseInt(row['Algae in Net'] || 0) > 0
     );
   }
 
   if (filteredRows.length === 0) {
-    renderBlankChart('teleMechanism2', "No Data");
+    renderBlankChart('teleAlgae', "No Data");
     return;
   }
 
   const matchLabels = filteredRows.map(row => 'Q' + row.Match);
   const datasets = [];
 
-  if (filter === 'all' || filter === 'scoringLocation3') {
+  if (filter === 'all' || filter === 'remove') {
     datasets.push({
-      label: mechanism2Filter.scoringLocation3,
-      data: filteredRows.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0)),
+      label: 'Removed',
+      data: filteredRows.map(row => parseInt(row['Algae removed'] || 0)),
       backgroundColor: '#002BFF'
     });
   }
 
-  if (filter === 'all' || filter === 'scoringLocation2') {
+  if (filter === 'all' || filter === 'process') {
     datasets.push({
-      label: mechanism2Filter.scoringLocation2,
-      data: filteredRows.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0)),
+      label: 'Processor',
+      data: filteredRows.map(row => parseInt(row['Algae in Processor'] || 0)),
       backgroundColor: '#5cffd5'
     });
   }
 
-  if (filter === 'all' || filter === 'scoringLocation1') {
+  if (filter === 'all' || filter === 'barge') {
     datasets.push({
-      label: mechanism2Filter.scoringLocation1,
-      data: filteredRows.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0)),
+      label: 'Net',
+      data: filteredRows.map(row => parseInt(row['Algae in Net'] || 0)),
       backgroundColor: '#00D2F3'
     });
   }
 
-  destroyChart('teleMechanism2');
-  charts.teleMechanism2 = createChart(
-    document.getElementById('teleMechanism2').getContext('2d'),
+  destroyChart('teleAlgae');
+  charts.teleAlgae = createChart(
+    document.getElementById('teleAlgae').getContext('2d'),
     'bar',
-    {
-      labels: matchLabels,
-      datasets: datasets
-    },
+    { labels: matchLabels, datasets },
     getChartOptions(true, 2)
   );
 }
@@ -2870,99 +2299,102 @@ function renderTeamStatistics(data, pitData) {
 
   clearValue('climbSuccessRate', '0.00');
   clearValue('robotDiedRate', '0.00');
-  clearValue('trait1');
-  clearValue('trait2');
+  clearValue('groundBarge');
+  clearValue('groundProcessor');
   clearValue('averageEPA', '0.00');
-  clearValue('averageMechanism1', '0.00');
-  clearValue('averageMechanism2', '0.00');
+  clearValue('averageCoral', '0.00');
+  clearValue('averageAlgae', '0.00');
   clearValue('defenseRank', 'N/A')
-  clearValue('maxMechanism1', '0');
-  clearValue('maxMechanism1Match', 'N/A');
-  clearValue('maxMechanism2', '0');
-  clearValue('maxMechanism2Match', 'N/A');
+  clearValue('maxCoral', '0');
+  clearValue('maxCoralMatch', 'N/A');
+  clearValue('maxAlgae', '0');
+  clearValue('maxAlgaeMatch', 'N/A');
 
   if (!data || data.length === 0) return;
 
-  const teamNumber = data[0][team_number].toString().trim();
+  const teamNumber = data[0]['Team No.'].toString().trim();
 
-  let trait1 = '';
-  let trait2 = '';
+  let groundBarge = '';
+  let groundProcessor = '';
 
   if (pitData && pitData.length > 0) {
     const teamPitData = pitData.find(team => {
-      const pitTeamNumber = team[team_number]?.toString().trim();
+      const pitTeamNumber = team['Team No.']?.toString().trim();
       return pitTeamNumber === teamNumber;
     });
 
     if (teamPitData) {
-      trait1 = teamPitData[pitScouting.trait1] == 1 ? '✅' : '❌';
+      if (teamPitData['Ground Barge'] !== undefined) {
+        groundBarge = teamPitData['Ground Barge'] ? '✅' : '❌';
+      }
 
-      trait2 = teamPitData[pitScouting.trait2] == 1 ? '✅' : '❌';
+      if (teamPitData['Ground Processor'] !== undefined) {
+        groundProcessor = teamPitData['Ground Processor'] ? '✅' : '❌';
+      }
     }
   }
-  document.getElementById('trait1').textContent = trait1;
-  document.getElementById('trait2').textContent = trait2;
+  document.getElementById('groundBarge').textContent = groundBarge;
+  document.getElementById('groundProcessor').textContent = groundProcessor;
 
-  const endGameScores = data.map(row => parseFloat(row[tele.endGame.header] || 0));
-  const successfulClimbs = endGameScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2).length;
-  const totalClimbAttempts = endGameScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.failed).length;
+  const climbScores = data.map(row => parseFloat(row['Climb Score'] || 0));
+  const successfulClimbs = climbScores.filter(score => score === 12 || score === 6).length;
+  const totalClimbAttempts = climbScores.filter(score => score === 12 || score === 6 || score === 2.1).length;
   const climbSuccessRate = totalClimbAttempts > 0 ? (successfulClimbs / totalClimbAttempts * 100).toFixed(1) : "0.00";
-  const robotDiedRate = data.length > 0 ? (data.filter(row => row[died.header] === died.yes).length / data.length * 100).toFixed(1) : "0.00";
+  const robotDiedRate = data.length > 0 ? (data.filter(row => row['Died or Immobilized'] === '1').length / data.length * 100).toFixed(1) : "0.00";
 
   document.getElementById('climbSuccessRate').textContent = climbSuccessRate;
   document.getElementById('robotDiedRate').textContent = robotDiedRate;
 
 
-  const totalScore = data.reduce((sum, row) => sum + (parseFloat(row[total_score]) || 0), 0);
-  const totalMechanism1 = data.reduce((sum, row) => {
+  const totalScore = data.reduce((sum, row) => sum + (parseFloat(row['Total Score']) || 0), 0);
+  const totalCoral = data.reduce((sum, row) => {
     return sum +
-      (parseInt(row[auto.mechanism1.scoringLocation1]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation4]) || 0);
+      (parseInt(row['Auton L1']) || 0) +
+      (parseInt(row['Auton L2']) || 0) +
+      (parseInt(row['Auton L3']) || 0) +
+      (parseInt(row['Auton L4']) || 0) +
+      (parseInt(row['L1']) || 0) +
+      (parseInt(row['L2']) || 0) +
+      (parseInt(row['L3']) || 0) +
+      (parseInt(row['L4']) || 0);
   }, 0);
 
-  const totalMechanism2 = data.reduce((sum, row) => {
+  const totalAlgae = data.reduce((sum, row) => {
     return sum +
-      (parseInt(row[auto.mechanism2.scoringLocation1]) || 0) +
-      (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) * 3 +
-      (parseInt(row[tele.mechanism2.scoringLocation1] || 0) * 2) +
-      (parseInt(row[tele.mechanism2.scoringLocation2] || 0) * 3);
+      (parseInt(row['Auton Algae in Net'] || 0)) * 2 +
+      (parseInt(row['Auton Algae in Processor'] || 0)) * 3 +
+      (parseInt(row['Algae in Net'] || 0) * 2) +
+      (parseInt(row['Algae in Processor'] || 0) * 3);
   }, 0);
 
   const averageEPA = data.length > 0 ? (totalScore / data.length).toFixed(1) : "";
-  const averageMechanism1 = data.length > 0 ? (totalMechanism1 / data.length).toFixed(1) : "";
-  const averageMechanism2 = data.length > 0 ? (totalMechanism2 / data.length).toFixed(1) : "";
+  const averageCoral = data.length > 0 ? (totalCoral / data.length).toFixed(1) : "";
+  const averageAlgae = data.length > 0 ? (totalAlgae / data.length).toFixed(1) : "";
 
   document.getElementById('averageEPA').textContent = averageEPA;
-  document.getElementById('averageMechanism1').textContent = averageMechanism1;
-  document.getElementById('averageMechanism2').textContent = averageMechanism2;
+  document.getElementById('averageCoral').textContent = averageCoral;
+  document.getElementById('averageAlgae').textContent = averageAlgae;
 
-  const mechanism1Cycles = data.map(row => {
-    return (parseInt(row[tele.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0);
+  const coralCycles = data.map(row => {
+    return (parseInt(row['L1']) || 0) +
+      (parseInt(row['L2']) || 0) +
+      (parseInt(row['L3']) || 0) +
+      (parseInt(row['L4']) || 0);
   });
+  const maxCoral = Math.max(...coralCycles, 0);
+  const maxCoralMatch = maxCoral > 0 ? `Q${data[coralCycles.indexOf(maxCoral)].Match}` : "";
 
-  const maxMechanism1 = Math.max(...mechanism1Cycles, 0);
-  const maxMechanism1Match = maxMechanism1 > 0 ? `Q${data[mechanism1Cycles.indexOf(maxMechanism1)].Match}` : "";
-
-  const mechanism2Cycles = data.map(row => {
-    return (parseInt(row[tele.mechanism2.scoringLocation1] || 0)) +
-      (parseInt(row[tele.mechanism2.scoringLocation2] || 0));
+  const algaeCycles = data.map(row => {
+    return (parseInt(row['Algae in Net'] || 0)) +
+      (parseInt(row['Algae in Processor'] || 0));
   });
-  const maxMechanism2 = Math.max(...mechanism2Cycles, 0);
-  const maxMechanism2Match = maxMechanism2 > 0 ? `Q${data[mechanism2Cycles.indexOf(maxMechanism2)].Match}` : "";
+  const maxAlgae = Math.max(...algaeCycles, 0);
+  const maxAlgaeMatch = maxAlgae > 0 ? `Q${data[algaeCycles.indexOf(maxAlgae)].Match}` : "";
 
-  document.getElementById('maxMechanism1').textContent = maxMechanism1 > 0 ? maxMechanism1 : "";
-  document.getElementById('maxMechanism1Match').textContent = maxMechanism1Match;
-  document.getElementById('maxMechanism2').textContent = maxMechanism2 > 0 ? maxMechanism2 : "";
-  document.getElementById('maxMechanism2Match').textContent = maxMechanism2Match;
+  document.getElementById('maxCoral').textContent = maxCoral > 0 ? maxCoral : "";
+  document.getElementById('maxCoralMatch').textContent = maxCoralMatch;
+  document.getElementById('maxAlgae').textContent = maxAlgae > 0 ? maxAlgae : "";
+  document.getElementById('maxAlgaeMatch').textContent = maxAlgaeMatch;
 
   const defenseData = defenseRankings.find(t => t.team === teamNumber);
   const defenseRank = defenseData ? `${defenseData.rank}/${defenseRankings.length}` : 'N/A';
@@ -2978,8 +2410,8 @@ function renderFlaggedMatches(data) {
     return;
   }
 
-  const validMatches = data.filter(row => row[died.header] !== died.yes);
-  const scores = validMatches.map(row => parseFloat(row[total_score] || 0));
+  const validMatches = data.filter(row => row['Died or Immobilized'] !== '1');
+  const scores = validMatches.map(row => parseFloat(row['Total Score'] || 0));
 
   const sortedScores = [...scores].sort((a, b) => a - b);
   const q1 = calculatePercentile(sortedScores, 25);
@@ -2989,37 +2421,37 @@ function renderFlaggedMatches(data) {
   const upperBound = q3 + 1.5 * iqr;
 
   const lowestScoreMatch = data.reduce((lowest, row) => {
-    const score = parseFloat(row[total_score] || 0);
+    const score = parseFloat(row['Total Score'] || 0);
     return score < lowest.score ? { match: row.Match, score } : lowest;
   }, { match: null, score: Infinity });
 
   const flaggedMatches = data
     .filter(row => {
-      const score = parseFloat(row[total_score] || 0);
+      const score = parseFloat(row['Total Score'] || 0);
       const isOutlier = score < lowerBound || score > upperBound;
-      const startingPos = (row[auto.starting.position] || '').toLowerCase().trim();
-      const isNoShow = startingPos === auto.starting.noShow;
+      const startingPos = (row['Auton Starting Position'] || '').toLowerCase().trim();
+      const isNoShow = startingPos === 'r.';
 
       return (
-        row[died.header] === died.yes ||
-        row[defense.onBot.header] === defense.onBot.yes ||
-        parseFloat(row[defense.rating] || 0) > 1 ||
+        row['Died or Immobilized'] === '1' ||
+        row['Defense was played on robot'] === '1' ||
+        parseFloat(row['Defense Rating'] || 0) > 1 ||
         row.Match === lowestScoreMatch.match ||
-        (isOutlier && row[died.header] !== died.yes) ||
+        (isOutlier && row['Died or Immobilized'] !== '1') ||
         isNoShow
       );
     })
     .map(row => {
       const reasons = [];
-      const startingPos = (row[auto.starting.position] || '').toLowerCase().trim();
-      if (startingPos === auto.starting.noShow || startingPos === 'r' || startingPos.includes('no show')) {
+      const startingPos = (row['Auton Starting Position'] || '').toLowerCase().trim();
+      if (startingPos === 'r.' || startingPos === 'r' || startingPos.includes('no show')) {
         reasons.push('<span style="color:#ff5c5c;font-weight:bold;text-transform:uppercase;">NO SHOW</span>');
-      } if (row[died.header] === died.yes) reasons.push(' Robot Died');
-      if (row[defense.onBot.header] === defense.onBot.yes) reasons.push(' Defended On');
-      if (parseFloat(row[defense.rating] || 0) > 1) reasons.push(' Played Defense');
+      } if (row['Died or Immobilized'] === '1') reasons.push(' Robot Died');
+      if (row['Defense was played on robot'] === '1') reasons.push(' Defended On');
+      if (parseFloat(row['Defense Rating'] || 0) > 1) reasons.push(' Played Defense');
       if (row.Match === lowestScoreMatch.match) reasons.push(' Lowest Score');
 
-      const score = parseFloat(row[total_score] || 0);
+      const score = parseFloat(row['Total Score'] || 0);
       if (score < lowerBound || score > upperBound) {
         reasons.push(' Outlier Score');
       }
@@ -3048,11 +2480,11 @@ function renderEndGameChart(data) {
 
   const sortedData = data.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   const matchLabels = sortedData.map(row => 'Q' + row.Match);
-  const endGameScores = sortedData.map(row => parseFloat(row[tele.endGame.header] || 0));
+  const climbScores = sortedData.map(row => parseFloat(row['Climb Score'] || 0));
 
-  const colors = endGameScores.map(score => {
-    if (score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.park) return '#3EDBF0';
-    if (score === tele.endGame.failed) return '#FF5C5C';
+  const colors = climbScores.map(score => {
+    if (score === 12 || score === 6 || score === 2) return '#3EDBF0';
+    if (score === 2.1) return '#FF5C5C';
     return '#888888';
   });
 
@@ -3063,8 +2495,8 @@ function renderEndGameChart(data) {
       labels: matchLabels,
       datasets: [
         {
-          label: individual.endGame,
-          data: endGameScores,
+          label: 'Climb Score',
+          data: climbScores,
           backgroundColor: colors
         }
       ]
@@ -3082,6 +2514,370 @@ function renderEndGameChart(data) {
   );
 }
 
+function renderReliabilityCharts() {
+  const container = document.getElementById('reliabilityChartsArea');
+  if (!container) return;
+
+  const teamNumber = document.getElementById('teamSearch').value.trim();
+  if (!teamNumber) return;
+
+  let data = filterTeamData(teamNumber);
+  if (!data || data.length === 0) return;
+
+  container.innerHTML = '';
+
+  data = data.slice().sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
+
+  const showAvg = document.getElementById('showEPAAvg')?.checked ?? true;
+
+  const metricsToShow = reliabilityMetrics.filter(metric => {
+    const checkbox = document.getElementById(metric.id);
+    return checkbox && checkbox.checked;
+  });
+
+  const chartContainer = document.createElement('div');
+  chartContainer.className = 'reliability-charts-grid';
+  chartContainer.style.display = 'grid';
+  chartContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(400px, 1fr))';
+  chartContainer.style.gap = '20px';
+  container.appendChild(chartContainer);
+
+  metricsToShow.forEach(metric => {
+    const chartCard = document.createElement('div');
+    chartCard.className = 'reliability-chart-card';
+    chartCard.style.background = '#1C1E21';
+    chartCard.style.borderRadius = '8px';
+    chartCard.style.padding = '15px';
+    chartCard.style.boxShadow = '0 0 20px #131416';
+
+    const title = document.createElement('h3');
+    title.textContent = metric.label;
+    title.style.margin = '0 0 10px 0';
+    title.style.color = metric.color;
+    title.style.fontSize = '16px';
+    title.style.fontFamily = "'Lato', sans-serif";
+    chartCard.appendChild(title);
+
+    const canvasContainer = document.createElement('div');
+    canvasContainer.style.position = 'relative';
+    canvasContainer.style.height = '320px';
+    canvasContainer.style.width = '100%';
+    chartCard.appendChild(canvasContainer);
+
+    const canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvasContainer.appendChild(canvas);
+
+    chartContainer.appendChild(chartCard);
+
+    if (isBoxPlot) {
+      const values = data.map(metric.getValue);
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+      try {
+        createBoxPlot(canvas, metric, values, avg, showAvg);
+      } catch (error) {
+        console.error('Error creating boxplot chart:', error);
+        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+      }
+    } else {
+      const labels = data.map(row => "Q" + row.Match);
+      const values = data.map(metric.getValue);
+      const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
+
+      const maxValue = Math.max(...values);
+      const stepSize = 1;
+      const yMax = Math.ceil(maxValue / stepSize) * stepSize;
+
+      try {
+        new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: metric.label,
+                data: values,
+                borderColor: metric.color,
+                backgroundColor: metric.color + '55',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Average',
+                data: Array(labels.length).fill(avgValue),
+                borderColor: '#FFD700',
+                borderWidth: 2,
+                borderDash: [6, 6],
+                pointRadius: 0,
+                fill: false,
+                tension: 0,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 3,
+            scales: {
+              x: {
+                ticks: {
+                  color: 'white',
+                  font: { family: 'Lato', size: 12, weight: 'bold' },
+                },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+              y: {
+                beginAtZero: true,
+                max: yMax,
+                ticks: {
+                  color: 'white',
+                  font: { family: 'Lato', size: 14, weight: 'bold' },
+                  stepSize: stepSize,
+                },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1C1E21',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#000',
+                borderWidth: 1,
+                titleFont: { family: 'Lato', size: 14 },
+                bodyFont: { family: 'Lato', size: 14 },
+                padding: 10,
+                callbacks: {
+                  label: function (context) {
+                    if (context.dataset.label === 'Average') {
+                      return `Average: ${avgValue.toFixed(2)}`;
+                    } else {
+                      const value = context.parsed.y;
+                      const delta = value - avgValue;
+                      const sign = delta >= 0 ? '+' : '';
+                      return [
+                        `Value: ${value}`,
+                        `Average: ${avgValue.toFixed(2)}`,
+                        `Δ: ${sign}${delta.toFixed(2)}`
+                      ];
+                    }
+                  }
+                }
+              }
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Error creating line chart:', error);
+        canvasContainer.innerHTML = '<p style="color: #ff5c5c;">Error rendering chart</p>';
+      }
+    }
+  });
+}
+
+function createBoxPlot(canvas, metric, values, avg, showAvg) {
+  const sortedValues = [...values].sort((a, b) => a - b);
+  const q1 = calculatePercentile(sortedValues, 25);
+  const median = calculatePercentile(sortedValues, 50);
+  const q3 = calculatePercentile(sortedValues, 75);
+  const iqr = q3 - q1;
+  const lowerWhisker = Math.max(sortedValues[0], q1 - 1.5 * iqr);
+  const upperWhisker = Math.min(sortedValues[sortedValues.length - 1], q3 + 1.5 * iqr);
+  const outliers = values.filter(v => v < lowerWhisker || v > upperWhisker);
+
+  const boxPlotData = {
+    labels: [metric.label],
+    datasets: [{
+      backgroundColor: metric.color + '40',
+      borderColor: metric.color,
+      borderWidth: 2,
+      outlierBackgroundColor: '#ff5c5c',
+      outlierRadius: 5,
+      data: [{
+        min: lowerWhisker,
+        q1: q1,
+        median: median,
+        q3: q3,
+        max: upperWhisker,
+        outliers: outliers
+      }]
+    }]
+  };
+
+  const chart = new Chart(canvas.getContext('2d'), {
+    type: 'boxplot',
+    data: boxPlotData,
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      devicePixelRatio: 3,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          mode: 'point',
+          intersect: true,
+          backgroundColor: '#1C1E21',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#000',
+          borderWidth: 1,
+          titleFont: {
+            family: 'Lato',
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            family: 'Lato',
+            size: 14
+          },
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            title: function () {
+              return metric.label;
+            },
+            label: function (context) {
+              if (context.datasetIndex === 0 && context.dataIndex === 0) {
+                return null;
+              }
+              return `Outlier: ${context.raw}`;
+            },
+            beforeBody: function (context) {
+              if (context[0].datasetIndex === 0) {
+                const data = context[0].dataset.data[context[0].dataIndex];
+                return [
+                  `Minimum: ${data.min.toFixed(1)}`,
+                  `Q1: ${data.q1.toFixed(1)}`,
+                  `Median: ${data.median.toFixed(1)}`,
+                  `Q3: ${data.q3.toFixed(1)}`,
+                  `Maximum: ${data.max.toFixed(1)}`,
+                  `IQR: ${q3 - q1}`,
+                ];
+              }
+              return null;
+            },
+            afterBody: function (context) {
+              if (context[0].datasetIndex === 0 && showAvg) {
+                return [`Average: ${avg.toFixed(1)}`];
+              }
+              return null;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          display: false
+        },
+        x: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(255,255,255,0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: 'white',
+            font: {
+              family: 'Lato',
+              size: 14,
+              weight: 'bold'
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return chart;
+}
+const reliabilityCheckboxIds = [
+  'reliabilityTotalPoints',
+  'reliabilityAutoPoints',
+  'reliabilityTelePoints',
+  'reliabilityTotalCycles',
+  'reliabilityTotalCoralCycles',
+  'reliabilityL4Cycles',
+  'reliabilityL3Cycles',
+  'reliabilityL2Cycles',
+  'reliabilityL1Cycles',
+  'reliabilityTotalAlgaeCycles',
+  'reliabilityBargeCycles',
+  'reliabilityProcessorCycles',
+];
+
+function setDefaultReliabilityCheckboxes() {
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === 'reliabilityTotalPoints' || id === 'showEPAAvg') {
+        el.checked = true;
+      } else {
+        el.checked = false;
+      }
+    }
+  });
+}
+
+function getReliabilityCheckboxState() {
+  const state = {};
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) state[id] = el.checked;
+  });
+  return state;
+}
+function setReliabilityCheckboxState(state) {
+  reliabilityCheckboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && typeof state[id] === 'boolean') el.checked = state[id];
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setDefaultReliabilityCheckboxes();
+});
+
+let lastReliabilityCheckboxState = getReliabilityCheckboxState();
+reliabilityCheckboxIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', () => {
+      lastReliabilityCheckboxState = getReliabilityCheckboxState();
+      renderReliabilityCharts();
+    });
+  }
+});
+
+function renderBlankChart(canvasId, label = "No Data") {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+
+  if (charts[canvasId]) {
+    charts[canvasId].destroy();
+  }
+
+  charts[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [label],
+      datasets: [
+        {
+          label: label,
+          data: [0],
+          backgroundColor: '#888888'
+        }
+      ]
+    },
+    options: getChartOptions(false)
+  });
+}
 
 function filterAndRenderCharts(filterValue) {
   const teamNumber = document.getElementById('teamSearch').value.trim();
@@ -3090,33 +2886,32 @@ function filterAndRenderCharts(filterValue) {
     return;
   }
 
-  const mechanism2Filter = document.getElementById('mechanism2TypeFilter').value;
+  const algaeFilter = document.getElementById('algaeTypeFilter').value;
 
   const filteredData = filterTeamData(teamNumber);
   let autoFilteredData = [...filteredData];
 
   if (filterValue === 'side') {
-    autoFilteredData = autoFilteredData.filter(row => [auto.starting.side1, auto.starting.side2].includes(row[auto.starting.position]));
+    autoFilteredData = autoFilteredData.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
-    autoFilteredData = autoFilteredData.filter(row => row[auto.starting.position] === auto.starting.center);
-  } else if (filterValue === 'side1') {
-    autoFilteredData = autoFilteredData.filter(row => row[auto.starting.position] === auto.starting.side1);
-  } else if (filterValue === 'side2') {
-    autoFilteredData = autoFilteredData.filter(row => row[auto.starting.position] === auto.starting.side2);
+    autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    autoFilteredData = autoFilteredData.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   if (autoFilteredData.length === 0) {
-    renderBlankChart('autoMechanism1', "No Data");
-    renderBlankChart('autoMechanism2', "No Data");
+    renderBlankChart('autoCoral', "No Data");
+    renderBlankChart('autoAlgae', "No Data");
   } else {
     renderAutoCharts(autoFilteredData);
   }
 
   renderTeleCharts(filteredData);
   renderEndGameChart(filteredData);
-  renderTeleMechanism2ChartFiltered(filteredData, mechanism2Filter);
+  renderTeleAlgaeChartFiltered(filteredData, algaeFilter);
 }
-
 function syncDropdowns(value) {
   document.querySelectorAll('#startingPositionFilter').forEach(dropdown => {
     dropdown.value = value;
@@ -3125,20 +2920,20 @@ function syncDropdowns(value) {
 
 /*-----COMPARISON VIEW----*/
 
-function getMaxTeleMechanism1(team1Data, team2Data) {
+function getMaxTeleCoral(team1Data, team2Data) {
   const combined = [...team1Data, ...team2Data];
 
   let maxTotal = 0;
 
   combined.forEach(row => {
-    const totalMechanism1 =
-      (parseInt(row[tele.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0);
+    const totalCoral =
+      (parseInt(row['L1']) || 0) +
+      (parseInt(row['L2']) || 0) +
+      (parseInt(row['L3']) || 0) +
+      (parseInt(row['L4']) || 0);
 
-    if (totalMechanism1 > maxTotal) {
-      maxTotal = totalMechanism1;
+    if (totalCoral > maxTotal) {
+      maxTotal = totalCoral;
     }
   });
 
@@ -3146,23 +2941,23 @@ function getMaxTeleMechanism1(team1Data, team2Data) {
 }
 
 
-function getMaxTeleMechanism2(team1Data, team2Data, filter = 'all') {
+function getMaxTeleAlgae(team1Data, team2Data, filter = 'all') {
   const combined = [...team1Data, ...team2Data];
   let max = 0;
 
   combined.forEach(row => {
     let value = 0;
-    if (filter === 'scoringLocation3') {
-      value = parseInt(row[tele.mechanism2.scoringLocation3] || 0);
-    } else if (filter === 'scoringLocation1') {
-      value = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
-    } else if (filter === 'scoringLocation2') {
-      value = parseInt(row[tele.mechanism2.scoringLocation2] || 0);
+    if (filter === 'remove') {
+      value = parseInt(row['Algae removed'] || 0);
+    } else if (filter === 'barge') {
+      value = parseInt(row['Algae in Net'] || 0);
+    } else if (filter === 'process') {
+      value = parseInt(row['Algae in Processor'] || 0);
     } else {
       value =
-        (parseInt(row[tele.mechanism2.scoringLocation3] || 0)) +
-        (parseInt(row[tele.mechanism2.scoringLocation1] || 0)) +
-        (parseInt(row[tele.mechanism2.scoringLocation2] || 0));
+        (parseInt(row['Algae removed'] || 0)) +
+        (parseInt(row['Algae in Net'] || 0)) +
+        (parseInt(row['Algae in Processor'] || 0));
     }
 
     if (value > max) {
@@ -3173,53 +2968,53 @@ function getMaxTeleMechanism2(team1Data, team2Data, filter = 'all') {
   return Math.ceil(max / 2) * 2;
 }
 
-function getMaxAutoMechanism1(team1Data, team2Data, filterValue = 'all') {
+function getMaxAutoCoral(team1Data, team2Data, filterValue = 'all') {
   const combined = [...team1Data, ...team2Data];
 
   let filtered = combined;
   if (filterValue === 'side') {
-    filtered = filtered.filter(row => [auto.starting.side2, auto.starting.side1].includes(row[auto.starting.position]));
+    filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.center);
-  } else if (filterValue === 'side1') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side1);
-  } else if (filterValue === 'side2') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side2);
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row[auto.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation1]) || 0);
+      (parseInt(row['Auton L1']) || 0) +
+      (parseInt(row['Auton L2']) || 0) +
+      (parseInt(row['Auton L3']) || 0) +
+      (parseInt(row['Auton L4']) || 0);
     if (total > max) max = total;
   });
 
   return Math.ceil(max / 1) * 1;
 }
 
-function getMaxAutoMechanism2(team1Data, team2Data, filterValue = 'all') {
+function getMaxAutoAlgae(team1Data, team2Data, filterValue = 'all') {
   const combined = [...team1Data, ...team2Data];
 
   let filtered = combined;
   if (filterValue === 'side') {
-    filtered = filtered.filter(row => [auto.starting.side2, auto.starting.side1].includes(row[auto.starting.position]));
+    filtered = filtered.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.center);
-  } else if (filterValue === 'side1') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side1);
-  } else if (filterValue === 'side2') {
-    filtered = filtered.filter(row => row[auto.starting.position] === auto.starting.side2);
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filtered = filtered.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   let max = 0;
   filtered.forEach(row => {
     const total =
-      (parseInt(row[auto.mechanism2.scoringLocation1] || 0)) +
-      (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) +
-      (parseInt(row[auto.mechanism2.scoringLocation3] || 0));
+      (parseInt(row['Auton Algae Removed'] || 0)) +
+      (parseInt(row['Auton Algae in Net'] || 0)) +
+      (parseInt(row['Auton Algae in Processor'] || 0));
     if (total > max) max = total;
   });
 
@@ -3236,27 +3031,27 @@ function searchComparisonBothTeams() {
   const team1Data = filterTeamData(team1);
   const team2Data = filterTeamData(team2);
 
-  const maxTeleopMechanism1 = getMaxTeleMechanism1(team1Data, team2Data);
-  const mechanism2Filter = document.getElementById('mechanism2TypeFilter1').value || 'all';
-  const maxTeleopMechanism2 = getMaxTeleMechanism2(team1Data, team2Data, mechanism2Filter);
-  const yMax = Math.ceil(maxTeleopMechanism1 / 2) * 2;
+  const maxTeleopCoral = getMaxTeleCoral(team1Data, team2Data);
+  const algaeFilter = document.getElementById('algaeTypeFilter1').value || 'all';
+  const maxTeleopAlgae = getMaxTeleAlgae(team1Data, team2Data, algaeFilter);
+  const yMax = Math.ceil(maxTeleopCoral / 2) * 2;
   const startFilter = document.getElementById('startingPositionFilter1').value || 'all';
-  const maxAutoMechanism1 = getMaxAutoMechanism1(team1Data, team2Data, startFilter);
-  const maxAutoMechanism2 = getMaxAutoMechanism2(team1Data, team2Data, startFilter);
+  const maxAutoCoral = getMaxAutoCoral(team1Data, team2Data, startFilter);
+  const maxAutoAlgae = getMaxAutoAlgae(team1Data, team2Data, startFilter);
 
-  searchComparison(1, yMax, maxTeleopMechanism2, maxAutoMechanism1, maxAutoMechanism2);
-  searchComparison(2, yMax, maxTeleopMechanism2, maxAutoMechanism1, maxAutoMechanism2);
+  searchComparison(1, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
+  searchComparison(2, yMax, maxTeleopAlgae, maxAutoCoral, maxAutoAlgae);
   renderComparisonMetricBoxPlots();
 
 }
-function searchComparison(teamNumber, yMaxOverride = null, yMaxMechanism2Override = null, maxAutoMechanism1Override = null, maxAutoMechanism2Override = null) {
+function searchComparison(teamNumber, yMaxOverride = null, yMaxAlgaeOverride = null, maxAutoCoralOverride = null, maxAutoAlgaeOverride = null) {
 
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
   const otherTeamInputId = teamNumber === 1 ? 'comparisonSearch2' : 'comparisonSearch1';
-  const mechanism1CanvasId = teamNumber === 1 ? 'autoMechanism1Team1' : 'autoMechanism1Team2';
-  const mechanism2CanvasId = teamNumber === 1 ? 'autoMechanism2Team1' : 'autoMechanism2Team2';
-  const teleMechanism1CanvasId = teamNumber === 1 ? 'teleMechanism1Team1' : 'teleMechanism1Team2';
-  const teleMechanism2CanvasId = teamNumber === 1 ? 'teleMechanism2Team1' : 'teleMechanism2Team2';
+  const coralCanvasId = teamNumber === 1 ? 'autoCoralTeam1' : 'autoCoralTeam2';
+  const algaeCanvasId = teamNumber === 1 ? 'autoAlgaeTeam1' : 'autoAlgaeTeam2';
+  const teleCoralCanvasId = teamNumber === 1 ? 'teleCoralTeam1' : 'teleCoralTeam2';
+  const teleAlgaeCanvasId = teamNumber === 1 ? 'teleAlgaeTeam1' : 'teleAlgaeTeam2';
   const endGameCanvasId = teamNumber === 1 ? 'endGameTeam1' : 'endGameTeam2';
   const scouterCommentsId = teamNumber === 1 ? 'scouterComments1' : 'scouterComments2';
   const teamNameDisplayId = teamNumber === 1 ? 'teamNameDisplay1' : 'teamNameDisplay2';
@@ -3269,30 +3064,32 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxMechanism2Overrid
   document.getElementById(`startingPositionFilter${teamNumber}`).value = 'all';
   document.querySelectorAll('.showEPAAvgComparison').forEach(cb => cb.checked = true);
 
+
   let teamData = filterTeamData(teamNumberInput);
   let otherTeamData = filterTeamData(otherTeamNumberInput);
 
   const yMax = yMaxOverride !== null
     ? yMaxOverride
-    : Math.ceil(getMaxTeleMechanism1(teamData, otherTeamData) / 2) * 2;
+    : Math.ceil(getMaxTeleCoral(teamData, otherTeamData) / 2) * 2;
 
-  const yMaxAlgae = yMaxMechanism2Override !== null
-    ? yMaxMechanism2Override
+  const yMaxAlgae = yMaxAlgaeOverride !== null
+    ? yMaxAlgaeOverride
     : Math.ceil(getTopAlgaeMatchFromTwoTeams(teamData, otherTeamData) / 2) * 2;
 
-  const maxAutoCoral = maxAutoMechanism1Override !== null
-    ? maxAutoMechanism1Override
-    : Math.ceil(getMaxAutoMechanism1(teamData, otherTeamData) / 1) * 1;
 
-  const maxAutoAlgae = maxAutoMechanism2Override !== null
-    ? maxAutoMechanism2Override
-    : Math.ceil(getMaxAutoMechanism2(teamData, otherTeamData) / 1) * 1;
+  const maxAutoCoral = maxAutoCoralOverride !== null
+    ? maxAutoCoralOverride
+    : Math.ceil(getMaxAutoCoral(teamData, otherTeamData) / 1) * 1;
+
+  const maxAutoAlgae = maxAutoAlgaeOverride !== null
+    ? maxAutoAlgaeOverride
+    : Math.ceil(getMaxAutoAlgae(teamData, otherTeamData) / 1) * 1;
 
   if (teamData.length === 0) {
-    renderBlankChart(mechanism1CanvasId);
-    renderBlankChart(mechanism2CanvasId);
-    renderBlankChart(teleMechanism1CanvasId);
-    renderBlankChart(teleMechanism2CanvasId);
+    renderBlankChart(coralCanvasId);
+    renderBlankChart(algaeCanvasId);
+    renderBlankChart(teleCoralCanvasId);
+    renderBlankChart(teleAlgaeCanvasId);
     renderBlankChart(endGameCanvasId);
     document.getElementById(scouterCommentsId).innerHTML = 'No qualitative notes available for this team.';
     return;
@@ -3301,10 +3098,10 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxMechanism2Overrid
   teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
   otherTeamData = otherTeamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
-  renderAutoMechanism1ChartForTeam(teamData, mechanism1CanvasId, maxAutoCoral);
-  renderAutoMechanism2ChartForTeam(teamData, mechanism2CanvasId, maxAutoAlgae);
-  renderTeleMechanism1ChartforTeam(teamData, teleMechanism1CanvasId, yMax);
-  renderTeleMechanism2ChartForTeam(teamData, teleMechanism2CanvasId, yMaxAlgae);
+  renderAutoCoralChartForTeam(teamData, coralCanvasId, maxAutoCoral);
+  renderAutoAlgaeChartForTeam(teamData, algaeCanvasId, maxAutoAlgae);
+  renderTeleCoralChartForTeam(teamData, teleCoralCanvasId, yMax);
+  renderTeleAlgaeChartForTeam(teamData, teleAlgaeCanvasId, yMaxAlgae);
   renderEndGameChartForTeam(teamData, endGameCanvasId);
   renderScouterCommentsForTeam(teamData, scouterCommentsId);
   renderComparisonTeamStatistics(teamData, pitScoutingData, teamNumber);
@@ -3312,10 +3109,10 @@ function searchComparison(teamNumber, yMaxOverride = null, yMaxMechanism2Overrid
   const currentFilterValue = document.getElementById(`startingPositionFilter${teamNumber}`).value;
   syncDropdownsAndFilter(currentFilterValue);
 
-  filterAndRenderMechanism2Charts(1, 'all');
-  filterAndRenderMechanism2Charts(2, 'all');
+  filterAndRenderAlgaeCharts(1, 'all');
+  filterAndRenderAlgaeCharts(2, 'all');
 }
-function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) {
+function renderTeleCoralChartForTeam(teamData, canvasId, maxYValue = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3323,12 +3120,12 @@ function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) 
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const mechanism1_scoringLocation4 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation4] || 0));
-  const mechanism1_scoringLocation3 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation3] || 0));
-  const mechanism1_scoringLocation2 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation2] || 0));
-  const mechanism1_scoringLocation1 = teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation1] || 0));
+  const coralL1 = teamData.map(row => parseInt(row['L1'] || 0));
+  const coralL2 = teamData.map(row => parseInt(row['L2'] || 0));
+  const coralL3 = teamData.map(row => parseInt(row['L3'] || 0));
+  const coralL4 = teamData.map(row => parseInt(row['L4'] || 0));
 
-  const yMax = maxYValue !== null ? maxYValue : getMaxTeleMechanism1(teamData, []);
+  const yMax = maxYValue !== null ? maxYValue : getMaxTeleCoral(teamData, []);
 
   const stepSize = maxYValue > 16 ? 4 : 2;
   const newMax = Math.ceil(yMax / stepSize) * stepSize;
@@ -3338,10 +3135,10 @@ function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) 
     data: {
       labels: matchLabels,
       datasets: [
-        { label: comparision.mechanism1.scoringLocation4, data: mechanism1_scoringLocation4, backgroundColor: '#3B064D' },
-        { label: comparision.mechanism1.scoringLocation3, data: mechanism1_scoringLocation3, backgroundColor: '#8105D8' },
-        { label: comparision.mechanism1.scoringLocation2, data: mechanism1_scoringLocation2, backgroundColor: '#ED0CEF' },
-        { label: comparision.mechanism1.scoringLocation1, data: mechanism1_scoringLocation1, backgroundColor: '#FF8BFC' }
+        { label: 'L1', data: coralL1, backgroundColor: '#3B064D' },
+        { label: 'L2', data: coralL2, backgroundColor: '#8105D8' },
+        { label: 'L3', data: coralL3, backgroundColor: '#ED0CEF' },
+        { label: 'L4', data: coralL4, backgroundColor: '#FF8BFC' }
       ]
     },
     options: {
@@ -3366,11 +3163,11 @@ function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) 
               const dataIndex = context[0].dataIndex;
               const row = teamData[dataIndex];
               const total =
-                (parseInt(row[tele.mechanism1.scoringLocation4] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
-                (parseInt(row[tele.mechanism1.scoringLocation1] || 0));
-              return `${callback_mechanism1}: ${total}`;
+                (parseInt(row['L1'] || 0)) +
+                (parseInt(row['L2'] || 0)) +
+                (parseInt(row['L3'] || 0)) +
+                (parseInt(row['L4'] || 0));
+              return `Total Coral: ${total}`;
             }
           }
         }
@@ -3381,7 +3178,7 @@ function renderTeleMechanism1ChartforTeam(teamData, canvasId, maxYValue = null) 
   return newMax;
 }
 
-function renderAutoMechanism1ChartForTeam(teamData, canvasId, maxY = null) {
+function renderAutoCoralChartForTeam(teamData, canvasId, maxY = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3389,22 +3186,22 @@ function renderAutoMechanism1ChartForTeam(teamData, canvasId, maxY = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const mechanism1_scoringLocation4 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation4] || 0));
-  const mechanism1_scoringLocation3 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation3] || 0));
-  const mechanism1_scoringLocation2 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation2] || 0));
-  const mechanism1_scoringLocation1 = teamData.map(row => parseInt(row[auto.mechanism1.scoringLocation1] || 0));
+  const coralL1 = teamData.map(row => parseInt(row['Auton L1'] || 0));
+  const coralL2 = teamData.map(row => parseInt(row['Auton L2'] || 0));
+  const coralL3 = teamData.map(row => parseInt(row['Auton L3'] || 0));
+  const coralL4 = teamData.map(row => parseInt(row['Auton L4'] || 0));
 
-  const yMax = maxY ?? Math.ceil(Math.max(...mechanism1_scoringLocation4, ...mechanism1_scoringLocation3, ...mechanism1_scoringLocation2, ...mechanism1_scoringLocation1) / 1) * 1;
+  const yMax = maxY ?? Math.ceil(Math.max(...coralL1, ...coralL2, ...coralL3, ...coralL4) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: comparision.mechanism1.scoringLocation4, data: mechanism1_scoringLocation4, backgroundColor: '#3B064D' },
-        { label: comparision.mechanism1.scoringLocation3, data: mechanism1_scoringLocation3, backgroundColor: '#8105D8' },
-        { label: comparision.mechanism1.scoringLocation2, data: mechanism1_scoringLocation2, backgroundColor: '#ED0CEF' },
-        { label: comparision.mechanism1.scoringLocation1, data: mechanism1_scoringLocation1, backgroundColor: '#FF8BFC' }
+        { label: 'L1', data: coralL1, backgroundColor: '#3B064D' },
+        { label: 'L2', data: coralL2, backgroundColor: '#8105D8' },
+        { label: 'L3', data: coralL3, backgroundColor: '#ED0CEF' },
+        { label: 'L4', data: coralL4, backgroundColor: '#FF8BFC' }
       ]
     },
     options: {
@@ -3426,7 +3223,7 @@ function renderAutoMechanism1ChartForTeam(teamData, canvasId, maxY = null) {
   return yMax;
 }
 
-function renderAutoMechanism2ChartForTeam(teamData, canvasId, maxY = null) {
+function renderAutoAlgaeChartForTeam(teamData, canvasId, maxY = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3434,20 +3231,20 @@ function renderAutoMechanism2ChartForTeam(teamData, canvasId, maxY = null) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const mechanism2_scoringLocation3 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation3] || 0));
-  const mechanism2_scoringLocation1 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation1] || 0));
-  const mechanism2_scoringLocation2 = teamData.map(row => parseInt(row[auto.mechanism2.scoringLocation2] || 0));
+  const algaeRemoved = teamData.map(row => parseInt(row['Auton Algae Removed'] || 0));
+  const algaeNet = teamData.map(row => parseInt(row['Auton Algae in Net'] || 0));
+  const algaeProcessor = teamData.map(row => parseInt(row['Auton Algae in Processor'] || 0));
 
-  const yMax = maxY ?? Math.ceil(Math.max(...mechanism2_scoringLocation3, ...mechanism2_scoringLocation1, ...mechanism2_scoringLocation2) / 1) * 1;
+  const yMax = maxY ?? Math.ceil(Math.max(...algaeRemoved, ...algaeNet, ...algaeProcessor) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: comparision.mechanism2.scoringLocation3, data: mechanism2_scoringLocation3, backgroundColor: '#002BFF' },
-        { label: comparision.mechanism2.scoringLocation1, data: mechanism2_scoringLocation1, backgroundColor: '#00D2F3' },
-        { label: comparision.mechanism2.scoringLocation2, data: mechanism2_scoringLocation2, backgroundColor: '#5cffd5' }
+        { label: 'Removed', data: algaeRemoved, backgroundColor: '#002BFF' },
+        { label: 'Net', data: algaeNet, backgroundColor: '#00D2F3' },
+        { label: 'Processor', data: algaeProcessor, backgroundColor: '#5cffd5' }
       ]
     },
     options: {
@@ -3479,10 +3276,10 @@ function renderAutoMechanism2ChartForTeam(teamData, canvasId, maxY = null) {
               const dataIndex = context[0].dataIndex;
               const row = teamData[dataIndex];
               const total =
-                (parseInt(row[auto.mechanism2.scoringLocation3] || 0)) +
-                (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) +
-                (parseInt(row[auto.mechanism2.scoringLocation1] || 0));
-              return `${callback_mechanism2}: ${total}`;
+                (parseInt(row['Auton Algae Removed'] || 0)) +
+                (parseInt(row['Auton Algae in Net'] || 0)) +
+                (parseInt(row['Auton Algae in Processor'] || 0));
+              return `Total Algae: ${total}`;
             }
           }
         }
@@ -3492,50 +3289,51 @@ function renderAutoMechanism2ChartForTeam(teamData, canvasId, maxY = null) {
 }
 
 function syncAlgaeDropdownsAndFilter(value) {
-  document.querySelectorAll('#mechanism2TypeFilter1, #mechanism2TypeFilter2').forEach(dropdown => {
+  document.querySelectorAll('#algaeTypeFilter1, #algaeTypeFilter2').forEach(dropdown => {
     dropdown.value = value;
   });
 
-  filterAndRenderMechanism2Charts(1, value);
-  filterAndRenderMechanism2Charts(2, value);
+  filterAndRenderAlgaeCharts(1, value);
+  filterAndRenderAlgaeCharts(2, value);
 }
-function filterAndRenderMechanism2Charts(teamNumber, filterValue) {
+
+function filterAndRenderAlgaeCharts(teamNumber, filterValue) {
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
-  const teleMechanism2CanvasId = teamNumber === 1 ? 'teleMechanism2Team1' : 'teleMechanism2Team2';
+  const teleAlgaeCanvasId = teamNumber === 1 ? 'teleAlgaeTeam1' : 'teleAlgaeTeam2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
   if (!teamNumberInput) {
-    renderBlankChart(teleMechanism2CanvasId);
+    renderBlankChart(teleAlgaeCanvasId);
     return;
   }
 
   let teamData = filterTeamData(teamNumberInput);
   if (teamData.length === 0) {
-    renderBlankChart(teleMechanism2CanvasId);
+    renderBlankChart(teleAlgaeCanvasId);
     return;
   }
 
   teamData = teamData.sort((a, b) => parseInt(a.Match) - parseInt(b.Match));
 
   let filteredData = [...teamData];
-  if (filterValue === 'scoringLocation3') {
-    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0);
-  } else if (filterValue === 'scoringLocation1') {
-    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0);
-  } else if (filterValue === 'scoringLocation2') {
-    filteredData = filteredData.filter(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0);
+  if (filterValue === 'remove') {
+    filteredData = filteredData.filter(row => parseInt(row['Algae removed'] || 0) > 0);
+  } else if (filterValue === 'barge') {
+    filteredData = filteredData.filter(row => parseInt(row['Algae in Net'] || 0) > 0);
+  } else if (filterValue === 'process') {
+    filteredData = filteredData.filter(row => parseInt(row['Algae in Processor'] || 0) > 0);
   }
 
   const otherTeamInputId = teamNumber === 1 ? 'comparisonSearch2' : 'comparisonSearch1';
   const otherTeamInput = document.getElementById(otherTeamInputId).value.trim();
   const otherTeamData = filterTeamData(otherTeamInput);
 
-  const maxY = getMaxTeleMechanism2(teamData, otherTeamData, filterValue);
+  const maxY = getMaxTeleAlgae(teamData, otherTeamData, filterValue);
 
-  renderFilteredTeleMechanism2ChartForTeam(filteredData, teleMechanism2CanvasId, filterValue, maxY);
+  renderFilteredTeleAlgaeChartForTeam(filteredData, teleAlgaeCanvasId, filterValue, maxY);
 }
 
-function renderFilteredTeleMechanism2ChartForTeam(teamData, canvasId, filterValue, yMax = null) {
+function renderFilteredTeleAlgaeChartForTeam(teamData, canvasId, filterValue, yMax = null) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3545,26 +3343,26 @@ function renderFilteredTeleMechanism2ChartForTeam(teamData, canvasId, filterValu
   const matchLabels = teamData.map(row => 'Q' + row.Match);
   const datasets = [];
 
-  if (filterValue === 'all' || filterValue === 'scoringLocation3') {
+  if (filterValue === 'all' || filterValue === 'remove') {
     datasets.push({
-      label: comparision.mechanism2.scoringLocation3,
-      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0)),
+      label: 'Removed',
+      data: teamData.map(row => parseInt(row['Algae removed'] || 0)),
       backgroundColor: '#002BFF'
     });
   }
 
-  if (filterValue === 'all' || filterValue === 'scoringLocation1') {
+  if (filterValue === 'all' || filterValue === 'barge') {
     datasets.push({
-      label: comparision.mechanism2.scoringLocation1,
-      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0)),
+      label: 'Net',
+      data: teamData.map(row => parseInt(row['Algae in Net'] || 0)),
       backgroundColor: '#00D2F3'
     });
   }
 
-  if (filterValue === 'all' || filterValue === 'scoringLocation2') {
+  if (filterValue === 'all' || filterValue === 'process') {
     datasets.push({
-      label: comparision.mechanism2.scoringLocation2,
-      data: teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0)),
+      label: 'Processor',
+      data: teamData.map(row => parseInt(row['Algae in Processor'] || 0)),
       backgroundColor: '#5cffd5'
     });
   }
@@ -3610,7 +3408,7 @@ function renderFilteredTeleMechanism2ChartForTeam(teamData, canvasId, filterValu
   });
 }
 
-function renderTeleMechanism2ChartForTeam(teamData, canvasId, yMax) {
+function renderTeleAlgaeChartForTeam(teamData, canvasId, yMax) {
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   if (charts[canvasId]) {
@@ -3618,20 +3416,20 @@ function renderTeleMechanism2ChartForTeam(teamData, canvasId, yMax) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const mechanism2_scoringLocation3 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation3] || 0));
-  const mechanism2_scoringLocation1 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0));
-  const mechanism2_scoringLocation2 = teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0));
+  const algaeRemoved = teamData.map(row => parseInt(row['Algae removed'] || 0));
+  const algaeNet = teamData.map(row => parseInt(row['Algae in Net'] || 0));
+  const algaeProcessed = teamData.map(row => parseInt(row['Algae in Processor'] || 0));
 
-  const maxYValue = yMax ?? Math.ceil(Math.max(...mechanism2_scoringLocation3, ...mechanism2_scoringLocation1, ...mechanism2_scoringLocation2) / 1) * 1;
+  const maxYValue = yMax ?? Math.ceil(Math.max(...algaeRemoved, ...algaeNet, ...algaeProcessed) / 1) * 1;
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: matchLabels,
       datasets: [
-        { label: comparision.mechanism2.scoringLocation3, data: mechanism2_scoringLocation3, backgroundColor: '#002BFF' },
-        { label: comparision.mechanism2.scoringLocation1, data: mechanism2_scoringLocation1, backgroundColor: '#00D2F3' },
-        { label: comparision.mechanism2.scoringLocation2, data: mechanism2_scoringLocation2, backgroundColor: '#5cffd5' }
+        { label: 'Removed', data: algaeRemoved, backgroundColor: '#002BFF' },
+        { label: 'Net', data: algaeNet, backgroundColor: '#00D2F3' },
+        { label: 'Processor', data: algaeProcessed, backgroundColor: '#5cffd5' }
       ]
     },
     options: {
@@ -3668,7 +3466,7 @@ function renderEndGameChartForTeam(teamData, canvasId) {
   }
 
   const matchLabels = teamData.map(row => 'Q' + row.Match);
-  const climbScores = teamData.map(row => parseFloat(row[tele.endGame.header] || 0));
+  const climbScores = teamData.map(row => parseFloat(row['Climb Score'] || 0));
 
   charts[canvasId] = new Chart(ctx, {
     type: 'bar',
@@ -3676,10 +3474,10 @@ function renderEndGameChartForTeam(teamData, canvasId) {
       labels: matchLabels,
       datasets: [
         {
-          label: comparision.endGame.header,
+          label: 'Climb Score',
           data: climbScores,
           backgroundColor: climbScores.map(score =>
-            score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.park ? '#3EDBF0' : '#FF5C5C'
+            score === 12 || score === 6 || score === 2 ? '#3EDBF0' : '#FF5C5C'
           )
         }
       ]
@@ -3700,11 +3498,11 @@ function renderEndGameChartForTeam(teamData, canvasId) {
 function renderComparisonTeamStatistics(teamData, pitData, teamNumber) {
   const climbSuccessRateId = `comparisonClimbSuccessRate${teamNumber}`;
   const robotDiedRateId = `comparisonRobotDiedRate${teamNumber}`;
-  const trait1Id = `comparisonTrait1_${teamNumber}`;
-  const trait2Id = `comparisonTrait2_${teamNumber}`;
+  const groundBargeId = `comparisonGroundBarge${teamNumber}`;
+  const groundProcessorId = `comparisonGroundProcessor${teamNumber}`;
   const averageEPAId = `comparisonAverageEPA${teamNumber}`;
-  const averageMechanism1Id = `comparisonAverageMechanism1_${teamNumber}`;
-  const averageMechanism2Id = `comparisonAverageMechanism2_${teamNumber}`;
+  const averageCoralId = `comparisonAverageCoral${teamNumber}`;
+  const averageAlgaeId = `comparisonAverageAlgae${teamNumber}`;
 
   const clearValue = (id, defaultValue = '') => {
     document.getElementById(id).textContent = defaultValue;
@@ -3712,73 +3510,73 @@ function renderComparisonTeamStatistics(teamData, pitData, teamNumber) {
 
   clearValue(climbSuccessRateId, '0.00');
   clearValue(robotDiedRateId, '0.00');
-  clearValue(trait1Id);
-  clearValue(trait2Id);
+  clearValue(groundBargeId);
+  clearValue(groundProcessorId);
   clearValue(averageEPAId, '0.00');
-  clearValue(averageMechanism1Id, '0.00');
-  clearValue(averageMechanism2Id, '0.00');
+  clearValue(averageCoralId, '0.00');
+  clearValue(averageAlgaeId, '0.00');
 
   if (!teamData || teamData.length === 0) return;
 
-  let trait1 = '';
-  let trait2 = '';
+  let groundBarge = '';
+  let groundProcessor = '';
 
   if (pitData && pitData.length > 0) {
     const teamPitData = pitData.find(team => {
-      const pitTeamNumber = team[team_number]?.toString().trim();
-      return pitTeamNumber === teamData[0][team_number].toString().trim();
+      const pitTeamNumber = team['Team No.']?.toString().trim();
+      return pitTeamNumber === teamData[0]['Team No.'].toString().trim();
     });
 
     if (teamPitData) {
-      if (teamPitData[pitScouting.trait1] !== undefined) {
-        trait1 = teamPitData[pitScouting.trait1] ? '✅' : '❌';
+      if (teamPitData['Ground Barge'] !== undefined) {
+        groundBarge = teamPitData['Ground Barge'] ? '✅' : '❌';
       }
 
-      if (teamPitData[pitScouting.trait2] !== undefined) {
-        trait2 = teamPitData[pitScouting.trait2] ? '✅' : '❌';
+      if (teamPitData['Ground Processor'] !== undefined) {
+        groundProcessor = teamPitData['Ground Processor'] ? '✅' : '❌';
       }
     }
   }
-  document.getElementById(trait1Id).textContent = trait1;
-  document.getElementById(trait2Id).textContent = trait2;
+  document.getElementById(groundBargeId).textContent = groundBarge;
+  document.getElementById(groundProcessorId).textContent = groundProcessor;
 
-  const climbScores = teamData.map(row => parseFloat(row[tele.endGame.header] || 0));
-  const successfulClimbs = climbScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2).length;
-  const totalClimbAttempts = climbScores.filter(score => score === tele.endGame.state1 || score === tele.endGame.state2 || score === tele.endGame.notAttempted).length;
+  const climbScores = teamData.map(row => parseFloat(row['Climb Score'] || 0));
+  const successfulClimbs = climbScores.filter(score => score === 12 || score === 6).length;
+  const totalClimbAttempts = climbScores.filter(score => score === 12 || score === 6 || score === 2.1).length;
   const climbSuccessRate = totalClimbAttempts > 0 ? (successfulClimbs / totalClimbAttempts * 100).toFixed(1) : "0.00";
-  const robotDiedRate = teamData.length > 0 ? (teamData.filter(row => row[died.header] === died.yes).length / teamData.length * 100).toFixed(1) : "0.00";
+  const robotDiedRate = teamData.length > 0 ? (teamData.filter(row => row['Died or Immobilized'] === '1').length / teamData.length * 100).toFixed(1) : "0.00";
 
   document.getElementById(climbSuccessRateId).textContent = climbSuccessRate;
   document.getElementById(robotDiedRateId).textContent = robotDiedRate;
 
-  const totalScore = teamData.reduce((sum, row) => sum + (parseFloat(row[total_score]) || 0), 0);
-  const totalMechanism1 = teamData.reduce((sum, row) => {
+  const totalScore = teamData.reduce((sum, row) => sum + (parseFloat(row['Total Score']) || 0), 0);
+  const totalCoral = teamData.reduce((sum, row) => {
     return sum +
-      (parseInt(row[auto.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[auto.mechanism1.scoringLocation1]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation4]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation3]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation2]) || 0) +
-      (parseInt(row[tele.mechanism1.scoringLocation1]) || 0);
+      (parseInt(row['Auton L1']) || 0) +
+      (parseInt(row['Auton L2']) || 0) +
+      (parseInt(row['Auton L3']) || 0) +
+      (parseInt(row['Auton L4']) || 0) +
+      (parseInt(row['L1']) || 0) +
+      (parseInt(row['L2']) || 0) +
+      (parseInt(row['L3']) || 0) +
+      (parseInt(row['L4']) || 0);
   }, 0);
 
-  const totalMechanism2 = teamData.reduce((sum, row) => {
+  const totalAlgae = teamData.reduce((sum, row) => {
     return sum +
-      (parseInt(row[auto.mechanism2.scoringLocation1] || 0)) * 2 +
-      (parseInt(row[auto.mechanism2.scoringLocation2] || 0)) * 3 +
-      (parseInt(row[tele.mechanism2.scoringLocation1] || 0) * 2) +
-      (parseInt(row[tele.mechanism2.scoringLocation2] || 0) * 3);
+      (parseInt(row['Auton Algae in Net'] || 0)) * 2 +
+      (parseInt(row['Auton Algae in Processor'] || 0)) * 3 +
+      (parseInt(row['Algae in Net'] || 0) * 2) +
+      (parseInt(row['Algae in Processor'] || 0) * 3);
   }, 0);
 
   const averageEPA = teamData.length > 0 ? (totalScore / teamData.length).toFixed(1) : "0.00";
-  const averageMechanism1 = teamData.length > 0 ? (totalMechanism1 / teamData.length).toFixed(1) : "0.00";
-  const averageMechanism2 = teamData.length > 0 ? (totalMechanism2 / teamData.length).toFixed(1) : "0.00";
+  const averageCoral = teamData.length > 0 ? (totalCoral / teamData.length).toFixed(1) : "0.00";
+  const averageAlgae = teamData.length > 0 ? (totalAlgae / teamData.length).toFixed(1) : "0.00";
 
   document.getElementById(averageEPAId).textContent = averageEPA;
-  document.getElementById(averageMechanism1Id).textContent = averageMechanism1;
-  document.getElementById(averageMechanism2Id).textContent = averageMechanism2;
+  document.getElementById(averageCoralId).textContent = averageCoral;
+  document.getElementById(averageAlgaeId).textContent = averageAlgae;
 }
 
 function renderScouterCommentsForTeam(teamData, containerId) {
@@ -3787,8 +3585,8 @@ function renderScouterCommentsForTeam(teamData, containerId) {
   scouterCommentsDiv.innerHTML = '';
 
   const notes = teamData
-    .filter(row => row[comments] && row[comments].trim() !== '')
-    .map(row => `Q${row.Match}: ${row[comments]}`);
+    .filter(row => row['Comments'] && row['Comments'].trim() !== '')
+    .map(row => `Q${row.Match}: ${row['Comments']}`);
 
   if (notes.length > 0) {
     scouterCommentsDiv.innerHTML = notes.join('<hr style="border: 0; margin: 10px 0;">');
@@ -3797,8 +3595,8 @@ function renderScouterCommentsForTeam(teamData, containerId) {
   }
 }
 function syncDropdownsAndFilter(value) {
-  const mechanism2_team1 = document.getElementById('mechanism2TypeFilter1').value;
-  const mechanism2_team2 = document.getElementById('mechanism2TypeFilter2').value;
+  const algae1 = document.getElementById('algaeTypeFilter1').value;
+  const algae2 = document.getElementById('algaeTypeFilter2').value;
 
   document.querySelectorAll('.comparison-filter').forEach(dropdown => {
     dropdown.value = value;
@@ -3810,35 +3608,35 @@ function syncDropdownsAndFilter(value) {
   const team1Data = filterTeamData(team1Input);
   const team2Data = filterTeamData(team2Input);
 
-  const maxAutoMechanism1 = getMaxAutoMechanism1(team1Data, team2Data, value);
-  const maxAutoMechanism2 = getMaxAutoMechanism2(team1Data, team2Data, value);
+  const maxAutoCoral = getMaxAutoCoral(team1Data, team2Data, value);
+  const maxAutoAlgae = getMaxAutoAlgae(team1Data, team2Data, value);
 
-  filterAndRenderComparisonCharts(1, value, maxAutoMechanism1, maxAutoMechanism2);
-  filterAndRenderComparisonCharts(2, value, maxAutoMechanism1, maxAutoMechanism2);
+  filterAndRenderComparisonCharts(1, value, maxAutoCoral, maxAutoAlgae);
+  filterAndRenderComparisonCharts(2, value, maxAutoCoral, maxAutoAlgae);
 
-  document.getElementById('mechanism2TypeFilter1').value = mechanism2_team1;
-  document.getElementById('mechanism2TypeFilter2').value = mechanism2_team2;
-  filterAndRenderMechanism2Charts(1, mechanism2_team1);
-  filterAndRenderMechanism2Charts(2, mechanism2_team2);
+  document.getElementById('algaeTypeFilter1').value = algae1;
+  document.getElementById('algaeTypeFilter2').value = algae2;
+  filterAndRenderAlgaeCharts(1, algae1);
+  filterAndRenderAlgaeCharts(2, algae2);
 }
 
-function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxMechanism1 = null, yMaxMechanism2 = null) {
+function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxCoral = null, yMaxAlgae = null) {
   const teamInputId = teamNumber === 1 ? 'comparisonSearch1' : 'comparisonSearch2';
-  const mechanism1CanvasId = teamNumber === 1 ? 'autoMechanism1Team1' : 'autoMechanism1Team2';
-  const mechanism2CanvasId = teamNumber === 1 ? 'autoMechanism2Team1' : 'autoMechanism2Team2';
+  const coralCanvasId = teamNumber === 1 ? 'autoCoralTeam1' : 'autoCoralTeam2';
+  const algaeCanvasId = teamNumber === 1 ? 'autoAlgaeTeam1' : 'autoAlgaeTeam2';
 
   const teamNumberInput = document.getElementById(teamInputId).value.trim();
 
   if (!teamNumberInput) {
-    renderBlankChart(mechanism1CanvasId);
-    renderBlankChart(mechanism2CanvasId);
+    renderBlankChart(coralCanvasId);
+    renderBlankChart(algaeCanvasId);
     return;
   }
 
   let teamData = filterTeamData(teamNumberInput);
   if (teamData.length === 0) {
-    renderBlankChart(mechanism1CanvasId);
-    renderBlankChart(mechanism2CanvasId);
+    renderBlankChart(coralCanvasId);
+    renderBlankChart(algaeCanvasId);
     return;
   }
 
@@ -3846,59 +3644,59 @@ function filterAndRenderComparisonCharts(teamNumber, filterValue, yMaxMechanism1
 
   let filteredData = [...teamData];
   if (filterValue === 'side') {
-    filteredData = filteredData.filter(row => [auto.starting.side1, auto.starting.side2].includes(row[auto.starting.position]));
+    filteredData = filteredData.filter(row => ['o', 'p'].includes(row['Auton Starting Position']));
   } else if (filterValue === 'center') {
-    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.center);
-  } else if (filterValue === 'side1') {
-    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.side1);
-  } else if (filterValue === 'side2') {
-    filteredData = filteredData.filter(row => row[auto.starting.position] === auto.starting.side2);
+    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'c');
+  } else if (filterValue === 'processor') {
+    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'p');
+  } else if (filterValue === 'barge') {
+    filteredData = filteredData.filter(row => row['Auton Starting Position'] === 'o');
   }
 
   const dataToUse = filterValue === 'all' ? teamData : filteredData;
 
   if (dataToUse.length > 0) {
-    renderAutoMechanism1ChartForTeam(dataToUse, mechanism1CanvasId, yMaxMechanism1);
-    renderAutoMechanism2ChartForTeam(dataToUse, mechanism2CanvasId, yMaxMechanism2);
+    renderAutoCoralChartForTeam(dataToUse, coralCanvasId, yMaxCoral);
+    renderAutoAlgaeChartForTeam(dataToUse, algaeCanvasId, yMaxAlgae);
   } else {
-    renderBlankChart(mechanism1CanvasId);
-    renderBlankChart(mechanism2CanvasId);
+    renderBlankChart(coralCanvasId);
+    renderBlankChart(algaeCanvasId);
   }
 }
 
 function getMetricValues(teamData, metricKey) {
   switch (metricKey) {
     case 'Total Points':
-      return teamData.map(row => parseFloat(row[total_score] || 0));
+      return teamData.map(row => parseFloat(row['Total Score'] || 0));
     case 'Auto Points':
-      return teamData.map(row => parseFloat(row[auto_score] || 0));
+      return teamData.map(row => parseFloat(row['Auton Score'] || 0));
     case 'Tele Points':
-      return teamData.map(row => (parseFloat(row[total_score] || 0) - parseFloat(row[auto_score] || 0)));
+      return teamData.map(row => (parseFloat(row['Total Score'] || 0) - parseFloat(row['Auton Score'] || 0)));
     case 'Total Cycles':
       return teamData.map(row =>
-      (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0) +
-        parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
+      (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0) +
+        parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
       );
-    case 'Total Mechanism 1 Cycles':
+    case 'Total Coral Cycles':
       return teamData.map(row =>
-        (parseInt(row[tele.mechanism1.scoringLocation4] || 0) + parseInt(row[tele.mechanism1.scoringLocation3] || 0) + parseInt(row[tele.mechanism1.scoringLocation2] || 0) + parseInt(row[tele.mechanism1.scoringLocation1] || 0))
+        (parseInt(row['L1'] || 0) + parseInt(row['L2'] || 0) + parseInt(row['L3'] || 0) + parseInt(row['L4'] || 0))
       );
-    case 'Mechanism 1 Scoring Location 1 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation4] || 0));
-    case 'Mechanism 1 Scoring Location 2 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation3] || 0));
-    case 'Mechanism 1 Scoring Location 3 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation2] || 0));
-    case 'Mechanism 1 Scoring Location 4 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism1.scoringLocation1] || 0));
-    case 'Total Mechanism 2 Cycles':
+    case 'L4 Cycles':
+      return teamData.map(row => parseInt(row['L4'] || 0));
+    case 'L3 Cycles':
+      return teamData.map(row => parseInt(row['L3'] || 0));
+    case 'L2 Cycles':
+      return teamData.map(row => parseInt(row['L2'] || 0));
+    case 'L1 Cycles':
+      return teamData.map(row => parseInt(row['L1'] || 0));
+    case 'Total Algae Cycles':
       return teamData.map(row =>
-        (parseInt(row[tele.mechanism2.scoringLocation1] || 0) + parseInt(row[tele.mechanism2.scoringLocation2] || 0))
+        (parseInt(row['Algae in Net'] || 0) + parseInt(row['Algae in Processor'] || 0))
       );
-    case 'Mechanism 2 Scoring Location 1 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation1] || 0));
-    case 'Mechanism 2 Scoring Location 2 Cycles':
-      return teamData.map(row => parseInt(row[tele.mechanism2.scoringLocation2] || 0));
+    case 'Barge Cycles':
+      return teamData.map(row => parseInt(row['Algae in Net'] || 0));
+    case 'Processor Cycles':
+      return teamData.map(row => parseInt(row['Algae in Processor'] || 0));
     default:
       return [];
   }
@@ -3925,14 +3723,14 @@ function renderComparisonMetricBoxPlots() {
     { label: 'Auto Points', left: 'leftAutoPointsChart', right: 'rightAutoPointsChart', color: '#51E7CF' },
     { label: 'Tele Points', left: 'leftTelePointsChart', right: 'rightTelePointsChart', color: '#3ecdd0' },
     { label: 'Total Cycles', left: 'leftTotalCyclesChart', right: 'rightTotalCyclesChart', color: '#cf8ffc' },
-    { label: 'Total Mechanism 1 Cycles', left: 'leftTotalMechanism1CyclesChart', right: 'rightTotalMechanism1CyclesChart', color: '#ff83fa' },
-    { label: 'Mechanism 1 Scoring Location 1 Cycles', left: 'leftMechanism1ScoringLocation1Chart', right: 'rightMechanism1ScoringLocation1Chart', color: '#ff8bfc' },
-    { label: 'Mechanism 1 Scoring Location 2 Cycles', left: 'leftMechanism1ScoringLocation2Chart', right: 'rightMechanism1ScoringLocation2Chart', color: '#ed0cef' },
-    { label: 'Mechanism 1 Scoring Location 3 Cycles', left: 'leftMechanism1ScoringLocation3Chart', right: 'rightMechanism1ScoringLocation3Chart', color: '#BF02ff' },
-    { label: 'Mechanism 1 Scoring Location 4 Cycles', left: 'leftMechanism1ScoringLocation4Chart', right: 'rightMechanism1ScoringLocation4Chart', color: '#8105d8' },
-    { label: 'Total Mechanism 2 Cycles', left: 'leftTotalMechanism2CyclesChart', right: 'rightTotalMechanism2CyclesChart', color: '#006fff' },
-    { label: 'Mechanism 2 Scoring Location 1 Cycles', left: 'leftMechanism2ScoringLocation1Chart', right: 'rightMechanism2ScoringLocation1Chart', color: '#3498db' },
-    { label: 'Mechanism 2 Scoring Location 2 Cycles', left: 'leftMechanism2ScoringLocation2Chart', right: 'rightMechanism2ScoringLocation2Chart', color: '#14c7de' }
+    { label: 'Total Coral Cycles', left: 'leftTotalCoralCyclesChart', right: 'rightTotalCoralCyclesChart', color: '#ff83fa' },
+    { label: 'L4 Cycles', left: 'leftL4CyclesChart', right: 'rightL4CyclesChart', color: '#ff8bfc' },
+    { label: 'L3 Cycles', left: 'leftL3CyclesChart', right: 'rightL3CyclesChart', color: '#ed0cef' },
+    { label: 'L2 Cycles', left: 'leftL2CyclesChart', right: 'rightL2CyclesChart', color: '#BF02ff' },
+    { label: 'L1 Cycles', left: 'leftL1CyclesChart', right: 'rightL1CyclesChart', color: '#8105d8' },
+    { label: 'Total Algae Cycles', left: 'leftTotalAlgaeCyclesChart', right: 'rightTotalAlgaeCyclesChart', color: '#006fff' },
+    { label: 'Barge Cycles', left: 'leftBargeCyclesChart', right: 'rightBargeCyclesChart', color: '#3498db' },
+    { label: 'Processor Cycles', left: 'leftProcessorCyclesChart', right: 'rightProcessorCyclesChart', color: '#14c7de' }
   ];
 
   metrics.forEach(metric => {
@@ -4088,8 +3886,8 @@ function updateOverviewCharts() {
   const parsedData = parseCSV();
   const filter = document.getElementById('chartFilterDropdown').value;
   (parsedData.data, filter);
-  renderMechanism1CyclesChart(parsedData.data);
-  renderMechanism2CyclesChart(parsedData.data);
+  renderCoralCyclesChart(parsedData.data);
+  renderAlgaeCyclesChart(parsedData.data);
   renderOverviewStackedChart(parsedData.data, filter);
 }
 
@@ -4103,11 +3901,11 @@ function renderOverviewStackedChart(data, filter = 'all') {
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!team) return;
 
-    const autonScore = parseFloat(row[auto_score] || 0);
-    const totalScore = parseFloat(row[total_score] || 0);
+    const autonScore = parseFloat(row['Auton Score'] || 0);
+    const totalScore = parseFloat(row['Total Score'] || 0);
     const teleScore = totalScore - autonScore;
 
     if (!teamScores[team]) {
@@ -4255,59 +4053,59 @@ function renderOverviewStackedChart(data, filter = 'all') {
   });
 }
 
-function renderMechanism1CyclesChart(data) {
-  const ctx = document.getElementById('mechanism1CyclesChart').getContext('2d');
+function renderCoralCyclesChart(data) {
+  const ctx = document.getElementById('coralCyclesChart').getContext('2d');
 
-  if (charts['mechanism1CyclesChart']) {
-    charts['mechanism1CyclesChart'].destroy();
+  if (charts['coralCyclesChart']) {
+    charts['coralCyclesChart'].destroy();
   }
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!team) return;
 
-    const tele_mechanism1_scoringLocation4 = parseInt(row[tele.mechanism1.scoringLocation4] || 0);
-    const tele_mechanism1_scoringLocation3 = parseInt(row[tele.mechanism1.scoringLocation3] || 0);
-    const tele_mechanism1_scoringLocation2 = parseInt(row[tele.mechanism1.scoringLocation2] || 0);
-    const tele_mechanism1_scoringLocation1 = parseInt(row[tele.mechanism1.scoringLocation1] || 0);
+    const teleL1 = parseInt(row['L1'] || 0);
+    const teleL2 = parseInt(row['L2'] || 0);
+    const teleL3 = parseInt(row['L3'] || 0);
+    const teleL4 = parseInt(row['L4'] || 0);
 
-    const totalMechanism1Cycles = tele_mechanism1_scoringLocation4 + tele_mechanism1_scoringLocation3 + tele_mechanism1_scoringLocation2 + tele_mechanism1_scoringLocation1;
+    const totalCoralCycles = teleL1 + teleL2 + teleL3 + teleL4;
 
     if (!teamScores[team]) {
-      teamScores[team] = { mechanism1Cycles: 0, matches: 0 };
+      teamScores[team] = { coralCycles: 0, matches: 0 };
     }
 
-    teamScores[team].mechanism1Cycles += totalMechanism1Cycles;
+    teamScores[team].coralCycles += totalCoralCycles;
     teamScores[team].matches += 1;
   });
 
   const averagedScores = Object.keys(teamScores).map(team => ({
     team,
-    avgMechanism1Cycles: (teamScores[team].mechanism1Cycles / teamScores[team].matches)
+    avgCoralCycles: (teamScores[team].coralCycles / teamScores[team].matches)
   }));
 
-  const sortedScores = averagedScores.sort((a, b) => b.avgMechanism1Cycles - a.avgMechanism1Cycles);
+  const sortedScores = averagedScores.sort((a, b) => b.avgCoralCycles - a.avgCoralCycles);
 
   const labels = sortedScores.map(score => `Team ${score.team}`);
-  const mechanism1Cycles = sortedScores.map(score => score.avgMechanism1Cycles);
+  const coralCycles = sortedScores.map(score => score.avgCoralCycles);
 
-  const mechniams1Colors = sortedScores.map(score => {
+  const coralColors = sortedScores.map(score => {
     if (score.team === '226') return '#FE59D7';
     if (score.team === highlightedOverviewTeam) return '#ffaad3';
     return '#3EDBF0';
   });
 
 
-  charts['mechanism1CyclesChart'] = new Chart(ctx, {
+  charts['coralCyclesChart'] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
           label: 'Cycles',
-          data: mechanism1Cycles,
-          backgroundColor: mechniams1Colors
+          data: coralCycles,
+          backgroundColor: coralColors
         }
       ]
     },
@@ -4367,57 +4165,57 @@ function renderMechanism1CyclesChart(data) {
     }
   });
 }
-function renderMechanism2CyclesChart(data) {
-  const ctx = document.getElementById('mechanism2CyclesChart').getContext('2d');
+function renderAlgaeCyclesChart(data) {
+  const ctx = document.getElementById('algaeCyclesChart').getContext('2d');
 
-  if (charts['mechanism2CyclesChart']) {
-    charts['mechanism2CyclesChart'].destroy();
+  if (charts['algaeCyclesChart']) {
+    charts['algaeCyclesChart'].destroy();
   }
 
   const teamScores = {};
   data.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!team) return;
 
-    const tele_mechanism2_scoringLocation2 = parseInt(row[tele.mechanism2.scoringLocation2] || 0)
-    const tele_mechanism2_scoringLocation1 = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
+    const algaeProcessor = parseInt(row['Algae in Processor'] || 0);
+    const algaeNet = parseInt(row['Algae in Net'] || 0);
 
-    const totalMechanism2Cycles = tele_mechanism2_scoringLocation2 + tele_mechanism2_scoringLocation1;
+    const totalAlgaeCycles = algaeProcessor + algaeNet;
 
     if (!teamScores[team]) {
-      teamScores[team] = { mechanism2Cycles: 0, matches: 0 };
+      teamScores[team] = { algaeCycles: 0, matches: 0 };
     }
 
-    teamScores[team].mechanism2Cycles += totalMechanism2Cycles;
+    teamScores[team].algaeCycles += totalAlgaeCycles;
     teamScores[team].matches += 1;
   });
 
   const averagedScores = Object.keys(teamScores).map(team => ({
     team,
-    avgMechanism2Cycles: teamScores[team].mechanism2Cycles / teamScores[team].matches
+    avgAlgaeCycles: teamScores[team].algaeCycles / teamScores[team].matches
   }));
 
-  const sortedScores = averagedScores.sort((a, b) => b.avgMechanism2Cycles - a.avgMechanism2Cycles);
+  const sortedScores = averagedScores.sort((a, b) => b.avgAlgaeCycles - a.avgAlgaeCycles);
 
   const labels = sortedScores.map(score => `Team ${score.team}`);
-  const mechanism2Cycles = sortedScores.map(score => score.avgMechanism2Cycles);
+  const algaeCycles = sortedScores.map(score => score.avgAlgaeCycles);
 
-  const mechanism2Colors = sortedScores.map(score => {
+  const algaeColors = sortedScores.map(score => {
     if (score.team === '226') return '#FE59D7';
     if (score.team === highlightedOverviewTeam) return '#ffaad3';
     return '#3EDBF0';
   });
 
 
-  charts['mechanism2CyclesChart'] = new Chart(ctx, {
+  charts['algaeCyclesChart'] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
           label: 'Cycles',
-          data: mechanism2Cycles,
-          backgroundColor: mechanism2Colors
+          data: algaeCycles,
+          backgroundColor: algaeColors
         }
       ]
     },
@@ -4486,8 +4284,8 @@ function handleOverviewSearch() {
   highlightedOverviewTeam = input;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
-  renderMechanism1CyclesChart(parsedData.data);
-  renderMechanism2CyclesChart(parsedData.data);
+  renderCoralCyclesChart(parsedData.data);
+  renderAlgaeCyclesChart(parsedData.data);
   displayTeamNickname(input, 'overviewTeamNicknameDisplay');
 
 }
@@ -4499,8 +4297,8 @@ function clearOverviewSearch() {
   highlightedOverviewTeam = null;
   const parsedData = parseCSV();
   renderOverviewStackedChart(parsedData.data, 'all');
-  renderMechanism1CyclesChart(parsedData.data);
-  renderMechanism2CyclesChart(parsedData.data);
+  renderCoralCyclesChart(parsedData.data);
+  renderAlgaeCyclesChart(parsedData.data);
 }
 
 
@@ -4513,7 +4311,7 @@ async function addHiddenTeam(e) {
   const input = document.getElementById('hideTeamInput');
   const teamNumber = input.value.trim();
   const data = parseCSV().data;
-  const teamExists = data.some(row => row[team_number] === teamNumber);
+  const teamExists = data.some(row => row['Team No.'] === teamNumber);
 
   if (!teamNumber) return;
 
@@ -4577,8 +4375,8 @@ function renderHiddenTeamsList() {
     list.appendChild(listItem);
   });
 
-  const itemHeight = 42;
-  const maxVisibleItems = 8;
+  const itemHeight = 42; 
+  const maxVisibleItems = 8; 
   container.style.transition = 'max-height 0.20s ease, height 0.20s ease';
   if (hiddenTeams.length === 0) {
     container.style.maxHeight = '0px';
@@ -4622,12 +4420,12 @@ function applyFilters() {
   const sortBy = document.getElementById('filterTeamsDropdown').value;
 
   const teamMap = {};
-  const hasState1Filter = selectedFilters.includes('deepClimb');
-  const hasState2Filter = selectedFilters.includes('shallowClimb');
-  const hasBothClimbFilters = hasState1Filter && hasState2Filter;
+  const hasDeepClimbFilter = selectedFilters.includes('deepClimb');
+  const hasShallowClimbFilter = selectedFilters.includes('shallowClimb');
+  const hasBothClimbFilters = hasDeepClimbFilter && hasShallowClimbFilter;
 
   parsed.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!team) return;
     if (!showHiddenTeamsInFilter && hiddenTeams.includes(team)) return;
 
@@ -4642,41 +4440,41 @@ function applyFilters() {
       };
     }
 
-    const tele_mechanism1 =
-      (parseInt(row[tele.mechanism1.scoringLocation4] || 0)) +
-      (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
-      (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
-      (parseInt(row[tele.mechanism1.scoringLocation1] || 0));
+    const teleCoral =
+      (parseInt(row['L1'] || 0)) +
+      (parseInt(row['L2'] || 0)) +
+      (parseInt(row['L3'] || 0)) +
+      (parseInt(row['L4'] || 0));
 
-    const teleAlgaeNet = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
-    const totalScore = parseFloat(row[total_score] || 0);
+    const teleAlgaeNet = parseInt(row['Algae in Net'] || 0);
+    const totalScore = parseFloat(row['Total Score'] || 0);
 
     teamMap[team].matches.push(row);
     teamMap[team].epaTotal += totalScore;
     teamMap[team].matchCount++;
-    teamMap[team].coralCycles.push(tele_mechanism1);
+    teamMap[team].coralCycles.push(teleCoral);
     teamMap[team].algaeNetCycles.push(teleAlgaeNet);
 
-    if (row[auto.starting.position] === 'c') teamMap[team].flags.add('centerAuto');
-    if (parseInt(row[auto.mechanism1.scoringLocation4] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation4] || 0) > 0) teamMap[team].flags.add('L1');
-    if (parseInt(row[auto.mechanism1.scoringLocation3] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation3] || 0) > 0) teamMap[team].flags.add('L2');
-    if (parseInt(row[auto.mechanism1.scoringLocation2] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation2] || 0) > 0) teamMap[team].flags.add('L3');
-    if (parseInt(row[auto.mechanism1.scoringLocation1] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation1] || 0) > 0) teamMap[team].flags.add('L4');
-    if (parseInt(row[auto.mechanism2.scoringLocation3] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0) teamMap[team].flags.add('RemoveAlgae');
-    if (parseInt(row[auto.mechanism2.scoringLocation1] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0) teamMap[team].flags.add('BargeAlgae');
-    if (parseInt(row[auto.mechanism2.scoringLocation2] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0) teamMap[team].flags.add('ProcessorAlgae');
-    if (parseFloat(row[defense.rating] || 0) > 0) teamMap[team].flags.add('defense');
-    if (parseFloat(row[tele.endGame.header] || 0) === tele.endGame.state1) teamMap[team].flags.add('deepClimb');
-    if (parseFloat(row[tele.endGame.header] || 0) === tele.endGame.state2) teamMap[team].flags.add('shallowClimb');
+    if (row['Auton Starting Position'] === 'c') teamMap[team].flags.add('centerAuto');
+    if (parseInt(row['Auton L1'] || 0) > 0 || parseInt(row['L1'] || 0) > 0) teamMap[team].flags.add('L1');
+    if (parseInt(row['Auton L2'] || 0) > 0 || parseInt(row['L2'] || 0) > 0) teamMap[team].flags.add('L2');
+    if (parseInt(row['Auton L3'] || 0) > 0 || parseInt(row['L3'] || 0) > 0) teamMap[team].flags.add('L3');
+    if (parseInt(row['Auton L4'] || 0) > 0 || parseInt(row['L4'] || 0) > 0) teamMap[team].flags.add('L4');
+    if (parseInt(row['Auton Algae Removed'] || 0) > 0 || parseInt(row['Algae removed'] || 0) > 0) teamMap[team].flags.add('RemoveAlgae');
+    if (parseInt(row['Auton Algae in Net'] || 0) > 0 || parseInt(row['Algae in Net'] || 0) > 0) teamMap[team].flags.add('BargeAlgae');
+    if (parseInt(row['Auton Algae in Processor'] || 0) > 0 || parseInt(row['Algae in Processor'] || 0) > 0) teamMap[team].flags.add('ProcessorAlgae');
+    if (parseFloat(row['Defense Rating'] || 0) > 0) teamMap[team].flags.add('defense');
+    if (parseFloat(row['Climb Score'] || 0) === 12) teamMap[team].flags.add('deepClimb');
+    if (parseFloat(row['Climb Score'] || 0) === 6) teamMap[team].flags.add('shallowClimb');
   });
 
   pitScoutingData.forEach(row => {
-    const team = row[team_number];
+    const team = row['Team No.'];
     if (!showHiddenTeamsInFilter && hiddenTeams.includes(team)) return;
     if (!teamMap[team]) return;
 
-    if (row[pitScouting.trait1]) teamMap[team].flags.add('groundBarge');
-    if (row[pitScouting.trait2]) teamMap[team].flags.add('groundProcessor');
+    if (row['Ground Barge']) teamMap[team].flags.add('groundBarge');
+    if (row['Ground Processor']) teamMap[team].flags.add('groundProcessor');
     if (typeof row['Drivetrain'] === 'string' && row['Drivetrain'].toLowerCase().includes('swerve')) {
       teamMap[team].flags.add('swerve');
     }
@@ -4908,7 +4706,7 @@ function renderMatchPredictor() {
   const teamStats = {};
 
   allTeams.forEach(team => {
-    const teamData = parsedData.filter(row => row[team_number] === team);
+    const teamData = parsedData.filter(row => row['Team No.'] === team);
     if (teamData.length === 0) return;
 
     const stats = {
@@ -4918,37 +4716,16 @@ function renderMatchPredictor() {
         mostCommonStats: null
       },
       tele: {
-        mechanism1: {
-          scoringLocation1: 0,
-          scoringLocation2: 0,
-          scoringLocation3: 0,
-          scoringLocation4: 0,
-          scoringLocation5: 0
-        },
-        mechanism2: {
-          scoringLocation1: 0,
-          scoringLocation2: 0,
-          scoringLocation3: 0,
-          scoringLocation4: 0,
-          scoringLocation5: 0
-        }
+        L1: 0, L2: 0, L3: 0, L4: 0,
+        barge: 0, processor: 0, removed: 0
       },
       endgame: {
-        state1: 0,
-        state2: 0,
-        state3: 0,
-        state4: 0,
-        state5: 0,
-        state1attempts: 0,
-        state2attempts:0,
-        state3attempts:0,
-        state4attempts:0,
-        state5attempts:0,
-        state1Rate: '-',
-        state2Rate: '-',
-        state3Rate: '-',
-        state4Rate: '-',
-        state5Rate: '-'
+        deepClimb: 0,
+        shallowClimb: 0,
+        deepAttempts: 0,
+        shallowAttempts: 0,
+        deepClimbRate: '-',
+        shallowClimbRate: '-'
       },
       epa: 0,
       matches: teamData.length
@@ -4956,17 +4733,17 @@ function renderMatchPredictor() {
 
     teamData.forEach(row => {
       const autoRun = {
-        mechanism1_scoringLocation4: parseInt(row[auto.mechanism1.scoringLocation4] || 0),
-        mechanism1_scoringLocation3: parseInt(row[auto.mechanism1.scoringLocation3] || 0),
-        mechanism1_scoringLocation2: parseInt(row[auto.mechanism1.scoringLocation2] || 0),
-        mechanism1_scoringLocation1: parseInt(row[auto.mechanism1.scoringLocation1] || 0),
-        mechanism2_scoringLocation1: parseInt(row[auto.mechanism2.scoringLocation1] || 0),
-        mechanism2_scoringLocation2: parseInt(row[auto.mechanism2.scoringLocation2] || 0),
-        mechanism2_scoringLocation3: parseInt(row[auto.mechanism2.scoringLocation3] || 0),
-        score: parseInt(row[auto_score] || 0),
+        L1: parseInt(row['Auton L1'] || 0),
+        L2: parseInt(row['Auton L2'] || 0),
+        L3: parseInt(row['Auton L3'] || 0),
+        L4: parseInt(row['Auton L4'] || 0),
+        barge: parseInt(row['Auton Algae in Net'] || 0),
+        processor: parseInt(row['Auton Algae in Processor'] || 0),
+        removed: parseInt(row['Auton Algae Removed'] || 0),
+        score: parseInt(row['Auton Score'] || 0)
       };
 
-      const runKey = `${autoRun.mechanism1_scoringLocation4}-${autoRun.mechanism1_scoringLocation3}-${autoRun.mechanism1_scoringLocation2}-${autoRun.mechanism1_scoringLocation1}`;
+      const runKey = `${autoRun.L1}-${autoRun.L2}-${autoRun.L3}-${autoRun.L4}`;
 
       if (!stats.auto.modes[runKey]) {
         stats.auto.modes[runKey] = {
@@ -4992,58 +4769,57 @@ function renderMatchPredictor() {
 
     if (mostCommonRun) {
       stats.auto.mostCommonStats = {
-        mechanism1_scoringLocation4: mostCommonRun.mechanism1_scoringLocation4,
-        mechanism1_scoringLocation3: mostCommonRun.mechanism1_scoringLocation3,
-        mechanism1_scoringLocation2: mostCommonRun.mechanism1_scoringLocation2,
-        mechanism1_scoringLocation1: mostCommonRun.mechanism1_scoringLocation1,
-        mechanism2_scoringLocation1: mostCommonRun.mechanism2_scoringLocation1,
-        mechanism2_scoringLocation2: mostCommonRun.mechanism2_scoringLocation2,
-        mechanism2_scoringLocation3: mostCommonRun.mechanism2_scoringLocation3,
+        L1: mostCommonRun.L1,
+        L2: mostCommonRun.L2,
+        L3: mostCommonRun.L3,
+        L4: mostCommonRun.L4,
+        barge: mostCommonRun.barge,
+        processor: mostCommonRun.processor,
+        removed: mostCommonRun.removed
       };
     }
 
     teamData.forEach(row => {
-      stats.tele.mechanism1.scoringLocation4 += parseInt(row[tele.mechanism1.scoringLocation4] || 0);
-      stats.tele.mechanism1.scoringLocation3 += parseInt(row[tele.mechanism1.scoringLocation3] || 0);
-      stats.tele.mechanism1.scoringLocation2 += parseInt(row[tele.mechanism1.scoringLocation2] || 0);
-      stats.tele.mechanism1.scoringLocation1 += parseInt(row[tele.mechanism1.scoringLocation1] || 0);
+      stats.tele.L1 += parseInt(row['L1'] || 0);
+      stats.tele.L2 += parseInt(row['L2'] || 0);
+      stats.tele.L3 += parseInt(row['L3'] || 0);
+      stats.tele.L4 += parseInt(row['L4'] || 0);
+      stats.tele.barge += parseInt(row['Algae in Net'] || 0);
+      stats.tele.processor += parseInt(row['Algae in Processor'] || 0);
+      stats.tele.removed += parseInt(row['Algae removed'] || 0);
 
-      stats.tele.mechanism2.scoringLocation1 += parseInt(row[tele.mechanism2.scoringLocation1] || 0);
-      stats.tele.mechanism2.scoringLocation2 += parseInt(row[tele.mechanism2.scoringLocation2] || 0);
-      stats.tele.mechanism2.scoringLocation3 += parseInt(row[tele.mechanism2.scoringLocation3] || 0);
+      const climbScore = parseFloat(row['Climb Score'] || 0);
 
-      const climbScore = parseFloat(row[tele.endGame.header] || 0);
-      if (climbScore === tele.endGame.state1) {
-        stats.endgame.state1++;
-      } else if (climbScore === tele.endGame.state2) {
-        stats.endgame.state2++;
+      if (climbScore === 12 || climbScore === 2.1) {
+        stats.endgame.deepAttempts++;
+        if (climbScore === 12) stats.endgame.deepClimb++;
       }
 
-      stats.epa += parseFloat(row[total_score] || 0);
+      if (climbScore === 6 || climbScore === 2.1) {
+        stats.endgame.shallowAttempts++;
+        if (climbScore === 6) stats.endgame.shallowClimb++;
+      }
+
+      stats.epa += parseFloat(row['Total Score'] || 0);
     });
 
     if (stats.matches > 0) {
-      stats.tele.L4 = (stats.tele.mechanism1.scoringLocation4 / stats.matches).toFixed(1);
-      stats.tele.L3 = (stats.tele.mechanism1.scoringLocation3 / stats.matches).toFixed(1);
-      stats.tele.L2 = (stats.tele.mechanism1.scoringLocation2 / stats.matches).toFixed(1);
-      stats.tele.L1 = (stats.tele.mechanism1.scoringLocation1 / stats.matches).toFixed(1);
+      stats.tele.L1 = (stats.tele.L1 / stats.matches).toFixed(1);
+      stats.tele.L2 = (stats.tele.L2 / stats.matches).toFixed(1);
+      stats.tele.L3 = (stats.tele.L3 / stats.matches).toFixed(1);
+      stats.tele.L4 = (stats.tele.L4 / stats.matches).toFixed(1);
+      stats.tele.barge = (stats.tele.barge / stats.matches).toFixed(1);
+      stats.tele.processor = (stats.tele.processor / stats.matches).toFixed(1);
+      stats.tele.removed = (stats.tele.removed / stats.matches).toFixed(1);
 
-      stats.tele.Barge = (stats.tele.mechanism2.scoringLocation1 / stats.matches).toFixed(1);
-      stats.tele.Processor = (stats.tele.mechanism2.scoringLocation2 / stats.matches).toFixed(1);
-      stats.tele.Removed = (stats.tele.mechanism2.scoringLocation3 / stats.matches).toFixed(1);
-
-      const totalAttempts = teamData.filter(r => {
-        const cs = parseFloat(r[tele.endGame.header] || 0);
-        return cs === tele.endGame.state1 || cs === tele.endGame.state2 || cs === tele.endGame.failed || cs === tele.endGame.notAttempted || cs === tele.endGame.park;
-      }).length;
-
-      const state1Rate = totalAttempts > 0 ? (stats.endgame.state1 / totalAttempts * 100) : 0;
-      const state2Rate = totalAttempts > 0 ? (stats.endgame.state2 / totalAttempts * 100) : 0;
-
-      stats.endgame.state1Rate = state1Rate > 0 ? state1Rate.toFixed(1) + '%' : '-';
-      stats.endgame.state2Rate = state2Rate > 0 ? state2Rate.toFixed(1) + '%' : '-';
-      stats.endgame.state1rate = stats.endgame.state1Rate;
-      stats.endgame.state2rate = stats.endgame.state2Rate;
+      if (stats.endgame.deepAttempts > 0) {
+        const rate = (stats.endgame.deepClimb / stats.endgame.deepAttempts * 100);
+        stats.endgame.deepClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
+      }
+      if (stats.endgame.shallowAttempts > 0) {
+        const rate = (stats.endgame.shallowClimb / stats.endgame.shallowAttempts * 100);
+        stats.endgame.shallowClimbRate = rate === 0 ? '-' : rate.toFixed(1) + '%';
+      }
 
       stats.epa = (stats.epa / stats.matches).toFixed(1);
     }
@@ -5123,17 +4899,16 @@ function renderMatchPredictor() {
 
   ['L1', 'L2', 'L3', 'L4'].forEach(level => {
     const row = document.createElement('tr');
-    const levelKey = `mechanism1_scoringLocation${{'L1': 1, 'L2': 2, 'L3': 3, 'L4': 4}[level]}`;
     row.innerHTML = `
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Auto ${level}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[levelKey] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[level] : '0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[levelKey] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[level] : '0'}
         </td>
       `).join('')}
     `;
@@ -5142,21 +4917,16 @@ function renderMatchPredictor() {
 
   ['Barge', 'Processor', 'Removed'].forEach(type => {
     const row = document.createElement('tr');
-    const typeKey = {
-      'Barge': 'mechanism2_scoringLocation1',
-      'Processor': 'mechanism2_scoringLocation2',
-      'Removed': 'mechanism2_scoringLocation3'
-    }[type];
     row.innerHTML = `
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Auto ${type}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[typeKey] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[type.toLowerCase()] : '0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[typeKey] : '0'}
+          ${teamStats[team]?.auto.mostCommonStats ? teamStats[team].auto.mostCommonStats[type.toLowerCase()] : '0'}
         </td>
       `).join('')}
     `;
@@ -5196,12 +4966,12 @@ function renderMatchPredictor() {
       <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Tele ${type}</td>
       ${redTeams.map(team => `
         <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.tele[type] || '0.0'}
+          ${teamStats[team]?.tele[type.toLowerCase()] || '0.0'}
         </td>
       `).join('')}
       ${blueTeams.map(team => `
         <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-          ${teamStats[team]?.tele[type] || '0.0'}
+          ${teamStats[team]?.tele[type.toLowerCase()] || '0.0'}
         </td>
       `).join('')}
     `;
@@ -5217,37 +4987,37 @@ function renderMatchPredictor() {
   `;
   table.appendChild(endgameHeader);
 
-  const state1row = document.createElement('tr');
-  state1row.innerHTML = `
+  const deepClimbRow = document.createElement('tr');
+  deepClimbRow.innerHTML = `
     <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Deep Climb</td>
     ${redTeams.map(team => `
       <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.state1rate || '-'}
+        ${teamStats[team]?.endgame.deepClimbRate || '-'}
       </td>
     `).join('')}
     ${blueTeams.map(team => `
       <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.state1rate || '-'}
+        ${teamStats[team]?.endgame.deepClimbRate || '-'}
       </td>
     `).join('')}
   `;
-  table.appendChild(state1row);
+  table.appendChild(deepClimbRow);
 
-  const state2row = document.createElement('tr');
-  state2row.innerHTML = `
+  const shallowClimbRow = document.createElement('tr');
+  shallowClimbRow.innerHTML = `
     <td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left;">Shallow Climb</td>
     ${redTeams.map(team => `
       <td style="background-color: #ff5c5c30; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.state2rate || '-'}
+        ${teamStats[team]?.endgame.shallowClimbRate || '-'}
       </td>
     `).join('')}
     ${blueTeams.map(team => `
       <td style="background-color: #3EDBF030; color: white; padding: 8px; text-align: center;">
-        ${teamStats[team]?.endgame.state2rate || '-'}
+        ${teamStats[team]?.endgame.shallowClimbRate || '-'}
       </td>
     `).join('')}
   `;
-  table.appendChild(state2row);
+  table.appendChild(shallowClimbRow);
 
   const epaRow = document.createElement('tr');
   epaRow.innerHTML = `
@@ -5304,124 +5074,122 @@ function updateAllianceCompareTable(redTeams, blueTeams) {
   thead.appendChild(headerRow);
 
   const parsedData = parseCSV().data;
-  
   function getTeamRows(team) {
-    return parsedData.filter(row => row[team_number] === team);
+    return parsedData.filter(row => row['Team No.'] === team);
   }
-  
   function avg(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
   }
-  
   function sum(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '0.00';
+    return vals.length ? vals.reduce((a, b) => a + b, 0) : '-';
   }
-  
   function max(rows, key) {
     const vals = rows.map(r => parseFloat(r[key] || 0)).filter(v => !isNaN(v));
-    return vals.length ? Math.max(...vals).toFixed(2) : '0.00';
+    return vals.length ? Math.max(...vals) : '-';
   }
-  
   function count(rows, key) {
     return rows.filter(r => r[key] !== undefined && r[key] !== '').length;
   }
 
   const statDefs = [
-    { label: 'Avg Total Score', fn: rows => avg(rows, total_score) },
-    { label: 'Avg Auto Score', fn: rows => avg(rows, auto_score) },
-    { label: 'Avg Tele Score', fn: rows => {
-      const vals = rows.map(r => parseFloat(r[total_score] || 0) - parseFloat(r[auto_score] || 0)).filter(v => !isNaN(v));
-      return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
-    }},
-    { label: 'Avg Climb Score', fn: rows => avg(rows, tele.endGame.header) },
-    { label: 'Avg Auto L4', fn: rows => avg(rows, auto.mechanism1.scoringLocation4) },
-    { label: 'Avg Auto Leave', fn: rows => avg(rows, auto.leave) },
-    { label: 'Avg Tele L4', fn: rows => avg(rows, tele.mechanism1.scoringLocation4) },
-    { label: 'Avg Tele L3', fn: rows => avg(rows, tele.mechanism1.scoringLocation3) },
-    { label: 'Avg Tele L2', fn: rows => avg(rows, tele.mechanism1.scoringLocation2) },
-    { label: 'Avg Tele L1', fn: rows => avg(rows, tele.mechanism1.scoringLocation1) },
+    { label: "Avg Total Points", fn: rows => avg(rows, 'Total Score') },
+    { label: "Avg Auto Points", fn: rows => avg(rows, 'Auton Score') },
+    { label: "Avg TeleOp Points", fn: rows => avg(rows, 'Teleop Score') },
+    { label: "Avg Climb Points", fn: rows => avg(rows, 'Climb Score') },
+    { label: "Avg Auto L4", fn: rows => avg(rows, 'Auton L4') },
+    { label: "Avg Leave", fn: rows => avg(rows, 'Auton Leave starting line') },
+    { label: "Avg L4", fn: rows => avg(rows, 'L4') },
+    { label: "Avg L3", fn: rows => avg(rows, 'L3') },
+    { label: "Avg L2", fn: rows => avg(rows, 'L2') },
+    { label: "Avg L1", fn: rows => avg(rows, 'L1') },
     {
-      label: 'Avg Coral Cycles', fn: rows => {
+      label: "Avg Coral Cycles", fn: rows => {
         const vals = rows.map(r =>
-          (parseInt(r[tele.mechanism1.scoringLocation4] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation3] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation2] || 0)) +
-          (parseInt(r[tele.mechanism1.scoringLocation1] || 0))
+          (parseInt(r['L1'] || 0)) +
+          (parseInt(r['L2'] || 0)) +
+          (parseInt(r['L3'] || 0)) +
+          (parseInt(r['L4'] || 0))
         );
-        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
-      }
-    },
-    { label: 'Avg Algae Removed', fn: rows => avg(rows, tele.mechanism2.scoringLocation3) },
-    { label: 'Avg Algae Processor', fn: rows => avg(rows, tele.mechanism2.scoringLocation2) },
-    { label: 'Avg Algae Net', fn: rows => avg(rows, tele.mechanism2.scoringLocation1) },
-    { label: 'Max Algae Net', fn: rows => max(rows, tele.mechanism2.scoringLocation1) },
-    {
-      label: 'Avg Algae Cycles', fn: rows => {
-        const vals = rows.map(r =>
-          (parseInt(r[tele.mechanism2.scoringLocation1] || 0)) +
-          (parseInt(r[tele.mechanism2.scoringLocation2] || 0))
-        );
-        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '0.00';
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
       }
     },
     {
-      label: 'Climb Attempts', fn: rows => {
+      label: "Avg A+T L4", fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r['Auton L4'] || 0)) +
+          (parseInt(r['L4'] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+      }
+    },
+    { label: "Avg Algae Remove", fn: rows => avg(rows, 'Algae removed') },
+    { label: "Avg Alg in Processor", fn: rows => avg(rows, 'Algae in Processor') },
+    { label: "Avg Alg in Net", fn: rows => avg(rows, 'Algae in Net') },
+    { label: "Max Alg in Net", fn: rows => max(rows, 'Algae in Net') },
+    {
+      label: "Avg Alg Cycles", fn: rows => {
+        const vals = rows.map(r =>
+          (parseInt(r['Algae in Net'] || 0)) +
+          (parseInt(r['Algae in Processor'] || 0))
+        );
+        return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : '-';
+      }
+    },
+    {
+      label: "Attempted Climbs", fn: rows => {
         return rows.filter(r => {
-          const v = parseFloat(r[tele.endGame.header] || 0);
+          const v = parseFloat(r['Climb Score'] || 0);
           return v === 12 || v === 6 || v === 2.1;
         }).length;
       }
     },
     {
-      label: 'Climb Success', fn: rows => {
+      label: "Successful Climbs", fn: rows => {
         return rows.filter(r => {
-          const v = parseFloat(r[tele.endGame.header] || 0);
+          const v = parseFloat(r['Climb Score'] || 0);
           return v === 12 || v === 6;
         }).length;
       }
     },
     {
-      label: 'Climb Rate', fn: rows => {
+      label: "Climb Rate", fn: rows => {
         const attempts = rows.filter(r => {
-          const v = parseFloat(r[tele.endGame.header] || 0);
+          const v = parseFloat(r['Climb Score'] || 0);
           return v === 12 || v === 6 || v === 2.1;
         }).length;
         const successes = rows.filter(r => {
-          const v = parseFloat(r[tele.endGame.header] || 0);
+          const v = parseFloat(r['Climb Score'] || 0);
           return v === 12 || v === 6;
         }).length;
-        return attempts > 0 ? ((successes / attempts) * 100).toFixed(1) + "%" : "0%";
+        return attempts > 0 ? ((successes / attempts) * 100).toFixed(1) + "%" : "-";
       }
     },
-    { label: 'Avg Driver Skill', fn: rows => avg(rows, driver_skill) },
-    { label: 'Defense Count', fn: rows => count(rows, defense.rating) },
-    { label: 'Max Defense Rating', fn: rows => max(rows, defense.rating) },
-    { label: 'Robot Died Count', fn: rows => count(rows, died.header) }
+    { label: "Avg Driver Skill", fn: rows => avg(rows, 'Driver skill') },
+    { label: "Defense Count", fn: rows => count(rows, 'Defense Rating') },
+    { label: "Max Def. Rating", fn: rows => max(rows, 'Defense Rating') },
+    { label: "SUM of Immobolized", fn: rows => sum(rows, 'Died or Immobilized') }
   ];
 
   statDefs.forEach((stat, idx) => {
     const borderStyle = "border-bottom: 1px solid #333;";
-    const bgColor = idx % 2 === 0 ? "#1C1E21" : "#252829";
-    const statCell = `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: left; width: 180px; ${borderStyle}">${stat.label}</td>`;
-    
-    const redCells = redTeams.map((team) => {
-      const cellBg = idx % 2 === 0 ? "#ff5c5c30" : "#ff7b7b30";
-      const rows = getTeamRows(team);
-      const value = rows.length > 0 ? stat.fn(rows) : '—';
-      return `<td style="background-color: ${cellBg}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${value}</td>`;
+    const statCell = `<td style="background-color: #1C1E21; color: white; padding: 8px; text-align: left; width: 180px; ${borderStyle}">${stat.label}</td>`;
+    const redCells = redTeams.map((team, i) => {
+      const bgColor = idx % 2 === 0 ? "#ff5c5c30" : "#ff7b7b30";
+      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
     }).join('');
-    
     const redTotalBg = idx % 2 === 0 ? "#ff83fa30" : "#ffb6e630";
     const redTotal = (() => {
       const vals = redTeams.map(team => {
         const rows = getTeamRows(team);
         const v = stat.fn(rows);
-        return parseFloat(v) || 0;
+        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
       }).filter(v => typeof v === 'number' && !isNaN(v));
-      if (stat.fn(getTeamRows(redTeams[0])).includes('%')) return '—';
-      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '—';
+      if (typeof stat.fn(getTeamRows(redTeams[0])) === 'string' && stat.fn(getTeamRows(redTeams[0])).includes('%')) {
+        return '-';
+      }
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
     })();
     const redTotalCell = `<td style="background-color: ${redTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${redTotal}</td>`;
 
@@ -5430,18 +5198,19 @@ function updateAllianceCompareTable(redTeams, blueTeams) {
       const vals = blueTeams.map(team => {
         const rows = getTeamRows(team);
         const v = stat.fn(rows);
-        return parseFloat(v) || 0;
+        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
       }).filter(v => typeof v === 'number' && !isNaN(v));
-      if (stat.fn(getTeamRows(blueTeams[0])).includes('%')) return '—';
-      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '—';
+      if (typeof stat.fn(getTeamRows(blueTeams[0])) === 'string' && stat.fn(getTeamRows(blueTeams[0])).includes('%')) {
+        return '-';
+      }
+      return vals.length ? vals.reduce((a, b) => a + b, 0).toFixed(2) : '-';
     })();
-    const blueTotalCell = `<td style="background-color: ${blueTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${blueTotal}</td>`;
+    const blueTotalCell = `<td style="background-color: ${blueTotalBg}; color: white; padding: 8px; text-align: center; font-weight:bold; ${borderStyle} border-left: 1px solid #333;">${blueTotal}</td>`; const blueTotalColor = idx % 2 === 0 ? "#8105d8" : "#cf8ffc";
 
-    const blueCells = blueTeams.map((team) => {
-      const cellBg = idx % 2 === 0 ? "#3EDBF030" : "#5cf0ff30";
-      const rows = getTeamRows(team);
-      const value = rows.length > 0 ? stat.fn(rows) : '—';
-      return `<td style="background-color: ${cellBg}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${value}</td>`;
+
+    const blueCells = blueTeams.map((team, i) => {
+      const bgColor = idx % 2 === 0 ? "#3EDBF030" : "#5cf0ff30";
+      return `<td style="background-color: ${bgColor}; color: white; padding: 8px; text-align: center; ${borderStyle} border-left: 1px solid #333;">${team ? stat.fn(getTeamRows(team)) : '-'}</td>`;
     }).join('');
 
     const row = document.createElement('tr');
@@ -5530,6 +5299,39 @@ function addStatRows(category, stats, statType, table, redTeams, blueTeams, team
     table.appendChild(row);
   });
 }
+
+function addStatRows(category, stats, statType, table, redTeams, blueTeams, teamStats) {
+  const categoryRow = document.createElement('tr');
+  categoryRow.innerHTML = `
+    <td colspan="${redTeams.length + blueTeams.length + 1}" 
+        style="background-color: #2a2d31; color: white; font-weight: bold; padding: 8px;">
+      ${category}
+    </td>
+  `;
+  table.appendChild(categoryRow);
+
+  stats.forEach(stat => {
+    const statKey = stat.toLowerCase().replace(' ', '');
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+      <td style="background-color: #1C1E21; color: white; padding: 8px;">${stat}</td>
+      ${redTeams.map(team => `
+        <td style="background-color: #ff5c5c30; color: white;">
+          ${teamStats[team]?.[statType]?.[statKey] || 'N/A'}
+        </td>
+      `).join('')}
+      ${blueTeams.map(team => `
+        <td style="background-color: #3EDBF030; color: white;">
+          ${teamStats[team]?.[statType]?.[statKey] || 'N/A'}
+        </td>
+      `).join('')}
+    `;
+
+    table.appendChild(row);
+  });
+}
+
 function toggleStatsTable() {
   const container = document.getElementById('matchStatsTableContainer');
   const arrow = document.getElementById('statsToggleArrow');
@@ -5983,15 +5785,15 @@ function openAllianceComparison(alliance) {
     content.appendChild(teamContainer);
 
     const allTeamData = teamNumbers.map(t => filterTeamData(t));
-    const maxTeleCoral = getMaxTeleMechanism1(...allTeamData);
-    const maxTeleAlgae = getMaxTeleMechanism2(...allTeamData);
-    const maxAutoCoral = getMaxAutoMechanism1(...allTeamData);
-    const maxAutoAlgae = getMaxAutoMechanism2(...allTeamData);
+    const maxTeleCoral = getMaxTeleCoral(...allTeamData);
+    const maxTeleAlgae = getMaxTeleAlgae(...allTeamData);
+    const maxAutoCoral = getMaxAutoCoral(...allTeamData);
+    const maxAutoAlgae = getMaxAutoAlgae(...allTeamData);
 
-    renderAutoMechanism1ChartForTeam(teamData, `allianceAutoCoral${index}`, maxAutoCoral);
-    renderAutoMechanism2ChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
-    renderTeleMechanism1ChartforTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
-    renderTeleMechanism2ChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
+    renderAutoCoralChartForTeam(teamData, `allianceAutoCoral${index}`, maxAutoCoral);
+    renderAutoAlgaeChartForTeam(teamData, `allianceAutoAlgae${index}`, maxAutoAlgae);
+    renderTeleCoralChartForTeam(teamData, `allianceTeleCoral${index}`, maxTeleCoral);
+    renderTeleAlgaeChartForTeam(teamData, `allianceTeleAlgae${index}`, maxTeleAlgae);
     renderEndGameChartForTeam(teamData, `allianceClimb${index}`);
   });
 

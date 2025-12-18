@@ -285,10 +285,10 @@ label {
 #comparisonResultTeleAlgae2,
 #comparisonResultEndGame1,
 #comparisonResultEndGame2,
-#autoMechanism1,
-#teleMechanism1,
-#autoMechanism2,
-#teleMechanism2,
+#autoCoral,
+#teleCoral,
+#autoAlgae,
+#teleAlgae,
 #endGame,
 #scouterComments {
     width: 100% !important;
@@ -341,7 +341,7 @@ label {
 }
 
 #startingPositionFilter,
-#mechanism2TypeFilter {
+#algaeTypeFilter {
     padding: 8px;
     border-radius: 4px;
     background-color: #1C1E21;
@@ -353,7 +353,7 @@ label {
 }
 
 #startingPositionFilter:focus,
-#mechanism2TypeFilter:focus {
+#algaeTypeFilter:focus {
     outline: none;
     border-color: #1e90ff;
     background-color: #2a2d31;
@@ -1418,42 +1418,42 @@ label {
     border-color: #cf8ffc !important;
 }
 
-#reliabilityTotalMechanism1Cycles:checked {
+#reliabilityTotalCoralCycles:checked {
     background-color: #ff83fa !important;
     border-color: #ff83fa !important;
 }
 
-#reliabilityMechanism1ScoringLocation1Cycles:checked {
+#reliabilityL4Cycles:checked {
     background-color: #ff8bfc !important;
     border-color: #ff8bfc !important;
 }
 
-#reliabilityMechanism1ScoringLocation2Cycles:checked {
+#reliabilityL3Cycles:checked {
     background-color: #ed0cef !important;
     border-color: #ed0cef !important;
 }
 
-#reliabilityMechanism1ScoringLocation3Cycles:checked {
+#reliabilityL2Cycles:checked {
     background-color: #BF02ff !important;
     border-color: #BF02ff !important;
 }
 
-#reliabilityMechanism1ScoringLocation4Cycles:checked {
+#reliabilityL1Cycles:checked {
     background-color: #8105d8 !important;
     border-color: #8105d8 !important;
 }
 
-#reliabilityTotalMechanism2Cycles:checked {
+#reliabilityTotalAlgaeCycles:checked {
     background-color: #006fff !important;
     border-color: #006fff !important;
 }
 
-#reliabilityMechanism2ScoringLocation1Cycles:checked {
+#reliabilityBargeCycles:checked {
     background-color: #3498db !important;
     border-color: #3498db !important;
 }
 
-#reliabilityMechanism2ScoringLocation2Cycles:checked {
+#reliabilityProcessorCycles:checked {
     background-color: #14c7de !important;
     border-color: #14c7de !important;
 }
