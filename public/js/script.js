@@ -735,13 +735,13 @@ function renderRankingTable() {
 
   const visibleTeamsData = parsed.filter(row => {
     if (isIsolated && isolatedTeams.length > 0) {
-      return isolatedTeams.includes(row['Team No.']);
+      return isolatedTeams.includes(row[team_number]);
     }
-    return !hiddenTeams.includes(row['Team No.']);
+    return !hiddenTeams.includes(row[team_number]);
   });
   const teams = {};
   visibleTeamsData.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!team) return;
     if (!teams[team]) teams[team] = [];
     teams[team].push(row);
@@ -766,8 +766,8 @@ function renderRankingTable() {
       }
       if (key === 'Tele Algae') {
         return arr.map(r =>
-          (parseInt(r['Algae in Net'] || 0)) +
-          (parseInt(r['Algae in Processor'] || 0))
+          (parseInt(r[tele.mechanism2.scoringLocation1] || 0)) +
+          (parseInt(r[tele.mechanism2.scoringLocation2] || 0))
         ).reduce((a, b) => a + b, 0) /  arr.length;
       }
       if (key === 'Climb Attempts') {
@@ -4513,7 +4513,7 @@ async function addHiddenTeam(e) {
   const input = document.getElementById('hideTeamInput');
   const teamNumber = input.value.trim();
   const data = parseCSV().data;
-  const teamExists = data.some(row => row['Team No.'] === teamNumber);
+  const teamExists = data.some(row => row[team_number] === teamNumber);
 
   if (!teamNumber) return;
 
@@ -4622,12 +4622,12 @@ function applyFilters() {
   const sortBy = document.getElementById('filterTeamsDropdown').value;
 
   const teamMap = {};
-  const hasDeepClimbFilter = selectedFilters.includes('deepClimb');
-  const hasShallowClimbFilter = selectedFilters.includes('shallowClimb');
-  const hasBothClimbFilters = hasDeepClimbFilter && hasShallowClimbFilter;
+  const hasState1Filter = selectedFilters.includes('deepClimb');
+  const hasState2Filter = selectedFilters.includes('shallowClimb');
+  const hasBothClimbFilters = hasState1Filter && hasState2Filter;
 
   parsed.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!team) return;
     if (!showHiddenTeamsInFilter && hiddenTeams.includes(team)) return;
 
@@ -4642,41 +4642,41 @@ function applyFilters() {
       };
     }
 
-    const teleCoral =
-      (parseInt(row['L1'] || 0)) +
-      (parseInt(row['L2'] || 0)) +
-      (parseInt(row['L3'] || 0)) +
-      (parseInt(row['L4'] || 0));
+    const tele_mechanism1 =
+      (parseInt(row[tele.mechanism1.scoringLocation4] || 0)) +
+      (parseInt(row[tele.mechanism1.scoringLocation3] || 0)) +
+      (parseInt(row[tele.mechanism1.scoringLocation2] || 0)) +
+      (parseInt(row[tele.mechanism1.scoringLocation1] || 0));
 
-    const teleAlgaeNet = parseInt(row['Algae in Net'] || 0);
-    const totalScore = parseFloat(row['Total Score'] || 0);
+    const teleAlgaeNet = parseInt(row[tele.mechanism2.scoringLocation1] || 0);
+    const totalScore = parseFloat(row[total_score] || 0);
 
     teamMap[team].matches.push(row);
     teamMap[team].epaTotal += totalScore;
     teamMap[team].matchCount++;
-    teamMap[team].coralCycles.push(teleCoral);
+    teamMap[team].coralCycles.push(tele_mechanism1);
     teamMap[team].algaeNetCycles.push(teleAlgaeNet);
 
-    if (row['Auton Starting Position'] === 'c') teamMap[team].flags.add('centerAuto');
-    if (parseInt(row['Auton L1'] || 0) > 0 || parseInt(row['L1'] || 0) > 0) teamMap[team].flags.add('L1');
-    if (parseInt(row['Auton L2'] || 0) > 0 || parseInt(row['L2'] || 0) > 0) teamMap[team].flags.add('L2');
-    if (parseInt(row['Auton L3'] || 0) > 0 || parseInt(row['L3'] || 0) > 0) teamMap[team].flags.add('L3');
-    if (parseInt(row['Auton L4'] || 0) > 0 || parseInt(row['L4'] || 0) > 0) teamMap[team].flags.add('L4');
-    if (parseInt(row['Auton Algae Removed'] || 0) > 0 || parseInt(row['Algae removed'] || 0) > 0) teamMap[team].flags.add('RemoveAlgae');
-    if (parseInt(row['Auton Algae in Net'] || 0) > 0 || parseInt(row['Algae in Net'] || 0) > 0) teamMap[team].flags.add('BargeAlgae');
-    if (parseInt(row['Auton Algae in Processor'] || 0) > 0 || parseInt(row['Algae in Processor'] || 0) > 0) teamMap[team].flags.add('ProcessorAlgae');
-    if (parseFloat(row['Defense Rating'] || 0) > 0) teamMap[team].flags.add('defense');
-    if (parseFloat(row['Climb Score'] || 0) === 12) teamMap[team].flags.add('deepClimb');
-    if (parseFloat(row['Climb Score'] || 0) === 6) teamMap[team].flags.add('shallowClimb');
+    if (row[auto.starting.position] === 'c') teamMap[team].flags.add('centerAuto');
+    if (parseInt(row[auto.mechanism1.scoringLocation4] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation4] || 0) > 0) teamMap[team].flags.add('L1');
+    if (parseInt(row[auto.mechanism1.scoringLocation3] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation3] || 0) > 0) teamMap[team].flags.add('L2');
+    if (parseInt(row[auto.mechanism1.scoringLocation2] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation2] || 0) > 0) teamMap[team].flags.add('L3');
+    if (parseInt(row[auto.mechanism1.scoringLocation1] || 0) > 0 || parseInt(row[tele.mechanism1.scoringLocation1] || 0) > 0) teamMap[team].flags.add('L4');
+    if (parseInt(row[auto.mechanism2.scoringLocation3] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation3] || 0) > 0) teamMap[team].flags.add('RemoveAlgae');
+    if (parseInt(row[auto.mechanism2.scoringLocation1] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation1] || 0) > 0) teamMap[team].flags.add('BargeAlgae');
+    if (parseInt(row[auto.mechanism2.scoringLocation2] || 0) > 0 || parseInt(row[tele.mechanism2.scoringLocation2] || 0) > 0) teamMap[team].flags.add('ProcessorAlgae');
+    if (parseFloat(row[defense.rating] || 0) > 0) teamMap[team].flags.add('defense');
+    if (parseFloat(row[tele.endGame.header] || 0) === tele.endGame.state1) teamMap[team].flags.add('deepClimb');
+    if (parseFloat(row[tele.endGame.header] || 0) === tele.endGame.state2) teamMap[team].flags.add('shallowClimb');
   });
 
   pitScoutingData.forEach(row => {
-    const team = row['Team No.'];
+    const team = row[team_number];
     if (!showHiddenTeamsInFilter && hiddenTeams.includes(team)) return;
     if (!teamMap[team]) return;
 
-    if (row['Ground Barge']) teamMap[team].flags.add('groundBarge');
-    if (row['Ground Processor']) teamMap[team].flags.add('groundProcessor');
+    if (row[pitScouting.trait1]) teamMap[team].flags.add('groundBarge');
+    if (row[pitScouting.trait2]) teamMap[team].flags.add('groundProcessor');
     if (typeof row['Drivetrain'] === 'string' && row['Drivetrain'].toLowerCase().includes('swerve')) {
       teamMap[team].flags.add('swerve');
     }
